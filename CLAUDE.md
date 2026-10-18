@@ -86,6 +86,9 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   strength / cardio / other. Group classes (`Workout`, `Crossfit`, `HighIntensityIntervalTraining`)
   count as strength (owner's decision). `Activity.category_override` (manual) always wins and is never
   touched by syncs; `effective_category()` is what every count must use.
+- Category `transport` ("Déplacement", owner's decision): walks (Strava `Walk`, Garmin `walking`...)
+  and outdoor rides under 5 km. Counts in no session, minute or distance goal, but still in the
+  training load. Use `activity_automatic_category(activity)`: the rule needs the distance.
 - Weeks are ISO weeks (Monday-Sunday) in `APP_TIMEZONE`: `app/services/weeks.py` converts local
   boundaries to UTC separately, so DST weeks are 167/169 h. Labels look like `2026-W42`.
 - `app/services/goals.py` computes progress; only `active` goals overlapping the week count.

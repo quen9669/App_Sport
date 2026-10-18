@@ -117,7 +117,7 @@ def test_details_without_gps_have_no_route() -> None:
         ("hiit", Category.STRENGTH),
         ("indoor_cardio", Category.STRENGTH),  # gym classes, like Strava "Workout"
         ("yoga", Category.OTHER),
-        ("walking", Category.OTHER),
+        ("walking", Category.TRANSPORT),  # walking is getting around
     ],
 )
 def test_garmin_types_are_classified(type_key: str, category: Category) -> None:

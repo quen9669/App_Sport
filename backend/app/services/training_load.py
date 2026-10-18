@@ -40,7 +40,8 @@ from app.services.weeks import Week
 EFFORT_PER_MINUTE = {
     Category.CARDIO: 1.4,
     Category.STRENGTH: 0.8,
-    Category.OTHER: 0.5,  # walking, yoga...
+    Category.TRANSPORT: 0.5,  # walks and short rides: an effort, though not sport
+    Category.OTHER: 0.5,  # yoga, hikes...
 }
 ACUTE_DAYS = 7
 CHRONIC_DAYS = 28

@@ -50,7 +50,7 @@ export interface ImportResult {
   warnings: string[]
 }
 
-export type Category = 'strength' | 'cardio' | 'other'
+export type Category = 'strength' | 'cardio' | 'transport' | 'other'
 export type GoalKind =
   | 'strength_sessions'
   | 'cardio_sessions'

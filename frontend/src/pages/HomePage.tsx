@@ -31,7 +31,7 @@ const STATUS_LABELS: Record<BackendStatus, string> = {
   error: 'Backend injoignable',
 }
 
-const CATEGORIES: Category[] = ['strength', 'cardio', 'other']
+const CATEGORIES: Category[] = ['strength', 'cardio', 'transport', 'other']
 
 export default function HomePage() {
   const [status, setStatus] = useState<BackendStatus>('loading')

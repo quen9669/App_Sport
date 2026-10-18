@@ -71,7 +71,9 @@ def test_sunday_late_evening_belongs_to_that_week() -> None:
         ("VirtualRide", Category.CARDIO),
         ("Swim", Category.CARDIO),
         ("Yoga", Category.OTHER),
-        ("Walk", Category.OTHER),
+        ("Walk", Category.TRANSPORT),  # walking is getting around, not sport
+        ("walking", Category.TRANSPORT),
+        ("Hike", Category.OTHER),
         ("SomethingNew", Category.OTHER),
     ],
 )
@@ -79,10 +81,32 @@ def test_automatic_category(sport_type: str, expected: Category) -> None:
     assert automatic_category(sport_type) == expected
 
 
+@pytest.mark.parametrize(
+    ("sport_type", "distance_m", "expected"),
+    [
+        ("Ride", 3200.0, Category.TRANSPORT),  # a short trip by bike
+        ("cycling", 4999.0, Category.TRANSPORT),
+        ("Ride", 5000.0, Category.CARDIO),  # 5 km and more is a workout
+        ("Ride", None, Category.CARDIO),  # unknown distance: keep it as sport
+        ("indoor_cycling", 0.0, Category.CARDIO),  # indoor rides never are trips
+        ("VirtualRide", 2000.0, Category.CARDIO),
+        ("Run", 2000.0, Category.CARDIO),  # the rule is for rides only
+    ],
+)
+def test_short_rides_are_transport(
+    sport_type: str, distance_m: float | None, expected: Category
+) -> None:
+    assert automatic_category(sport_type, distance_m) == expected
+    activity = Activity(sport_type=sport_type, distance_m=distance_m)
+    assert effective_category(activity) == expected
+
+
 def test_manual_override_wins() -> None:
     activity = Activity(sport_type="Workout", category_override="cardio")
     assert effective_category(activity) == Category.CARDIO
     activity.category_override = None
     assert effective_category(activity) == Category.STRENGTH
+    activity.category_override = "transport"
+    assert effective_category(activity) == Category.TRANSPORT
     activity.category_override = "garbage"
     assert effective_category(activity) == Category.STRENGTH

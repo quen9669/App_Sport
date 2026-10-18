@@ -192,3 +192,33 @@ def test_training_load_goal_uses_the_load_and_shows_on_the_chart(
     assert client.get("/api/training-load").json()["target"] == 300
     too_high = client.post("/api/goals", json={"kind": "training_load", "target": 9000})
     assert too_high.status_code == 422
+
+
+def test_transport_counts_in_no_sport_goal(client: TestClient, db: Session) -> None:
+    """Walks and rides under 5 km are trips: no cardio, minutes or kilometres."""
+    cardio = add_goal(db, "cardio_sessions", 3)
+    minutes = add_goal(db, "active_minutes", 150)
+    ride_km = add_goal(db, "distance_km", 50, sport="ride")
+
+    add_activity(db, "Ride", datetime(2026, 10, 13, 8, 0, tzinfo=UTC), 12, distance_km=3.5)
+    add_activity(db, "Walk", datetime(2026, 10, 14, 12, 0, tzinfo=UTC), 40, distance_km=3)
+    add_activity(db, "Ride", datetime(2026, 10, 17, 9, 0, tzinfo=UTC), 80, distance_km=30)
+
+    body = client.get("/api/goals/progress", params={"week": "2026-W42"}).json()
+    by_goal = {item["goal"]["id"]: item for item in body["goals"]}
+    assert by_goal[cardio.id]["done"] == 1
+    assert by_goal[minutes.id]["done"] == 80
+    assert by_goal[ride_km.id]["done"] == 30
+    categories = sorted(a["category"] for a in body["activities"])
+    assert categories == ["cardio", "transport", "transport"]
+
+
+def test_short_ride_can_be_corrected_back_to_cardio(client: TestClient, db: Session) -> None:
+    ride = add_activity(db, "Ride", datetime(2026, 10, 13, 8, 0, tzinfo=UTC), 15, distance_km=4)
+    corrected = client.patch(f"/api/activities/{ride.id}/category", json={"category": "cardio"})
+    assert corrected.json() == {
+        "id": ride.id,
+        "category": "cardio",
+        "automatic_category": "transport",
+        "overridden": True,
+    }
