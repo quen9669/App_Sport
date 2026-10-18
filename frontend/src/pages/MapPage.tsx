@@ -1,6 +1,6 @@
-// "Carte" page: every activity on a map (routes or heatmap), with filters by
-// sport, period and distance, the list of what is shown, and the places used
-// for the sessions without GPS.
+// "Activités" tab: every activity on a map (routes or heatmap), with filters by
+// sport, period and distance, and the list of what is shown. The places used for
+// the sessions without GPS are edited in Réglages (PlacesPage).
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 
 import {
@@ -11,7 +11,6 @@ import {
   type SportGroup,
 } from '../api/client'
 import ActivityTable from '../components/ActivityTable'
-import PlacesPanel from '../components/PlacesPanel'
 import type { MapMode } from '../components/RoutesMap'
 import { PERIOD_CHOICES, SPORT_LABELS } from '../utils/activity'
 
@@ -92,8 +91,8 @@ export default function MapPage() {
 
   return (
     <>
-      <h1>Carte</h1>
-      <p className="subtitle">Tes parcours, et où tu t’entraînes le plus</p>
+      <h1>Activités</h1>
+      <p className="subtitle">Tes parcours sur la carte, et la liste des séances</p>
 
       <MapFiltersForm filters={filters} onChange={changeFilters} />
       <div className="segmented" role="group" aria-label="Affichage">
@@ -138,8 +137,6 @@ export default function MapPage() {
         </p>
       )}
       {data && <VisibleList data={data} />}
-
-      <PlacesPanel />
     </>
   )
 }

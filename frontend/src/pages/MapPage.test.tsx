@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import type { MapRoutes, Place } from '../api/client'
+import type { MapRoutes } from '../api/client'
 import type { MapMode } from '../components/RoutesMap'
 import { fakeBackend } from '../test/fakeBackend'
 import MapPage from './MapPage'
@@ -97,18 +97,6 @@ const data: MapRoutes = {
   total: 3,
 }
 
-const places: Place[] = [
-  {
-    id: 7,
-    name: 'Jims Gare',
-    latitude: 49.6,
-    longitude: 6.13,
-    city: 'Luxembourg',
-    role: 'strength_default',
-    chosen_count: 0,
-  },
-]
-
 function renderPage() {
   return render(
     <MemoryRouter>
@@ -119,7 +107,7 @@ function renderPage() {
 
 describe('MapPage', () => {
   it('loads the visible activities and lists them', async () => {
-    const fetchMock = fakeBackend({ 'GET /api/map/routes': data, 'GET /api/places': places })
+    const fetchMock = fakeBackend({ 'GET /api/map/routes': data })
     renderPage()
 
     expect(await screen.findByText('1 tracés, mode routes')).toBeInTheDocument()
@@ -150,7 +138,7 @@ describe('MapPage', () => {
   })
 
   it('sends the filters to the backend and switches to the heatmap', async () => {
-    const fetchMock = fakeBackend({ 'GET /api/map/routes': data, 'GET /api/places': places })
+    const fetchMock = fakeBackend({ 'GET /api/map/routes': data })
     renderPage()
     await screen.findByTestId('map')
 
@@ -167,16 +155,5 @@ describe('MapPage', () => {
       expect(last).not.toContain('days=')
     })
     expect(screen.getByText('1 tracés, mode heat')).toBeInTheDocument()
-  })
-
-  it('shows the places used for sessions without GPS', async () => {
-    fakeBackend({ 'GET /api/map/routes': data, 'GET /api/places': places })
-    renderPage()
-
-    const panel = await screen.findByRole('region', { name: 'Mes lieux' })
-    const form = await within(panel).findByRole('form', { name: 'Lieu Jims Gare' })
-    expect(within(form).getByDisplayValue('49.6, 6.13')).toBeInTheDocument()
-    expect(within(form).getByLabelText(/Ville/)).toHaveValue('Luxembourg')
-    expect(within(form).getByRole('combobox')).toHaveValue('strength_default')
   })
 })

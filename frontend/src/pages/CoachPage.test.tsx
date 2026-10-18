@@ -184,7 +184,7 @@ describe('CoachPage plans', () => {
     expect(within(card).getByText(/5:00 \/km/)).toBeInTheDocument()
     expect(within(card).getByText('Allure de course')).toBeInTheDocument()
     await user.click(within(card).getByRole('button', { name: 'Accepter' }))
-    expect(await within(card).findByText(/il est sur l’Accueil/)).toBeInTheDocument()
+    expect(await within(card).findByText(/il est dans Mon plan/)).toBeInTheDocument()
     const patch = fetchMock.mock.calls.find(([, init]) => init?.method === 'PATCH')
     expect(JSON.parse(String(patch?.[1]?.body))).toEqual({ accepted: true })
   })

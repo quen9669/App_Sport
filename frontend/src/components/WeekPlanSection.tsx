@@ -1,5 +1,5 @@
-// Accueil: the weekly plans accepted on the coach screen (this week and the
-// next one). They are a guide: they never change the goals.
+// "Mon plan" page: the weekly plans accepted on the coach screen (this week and
+// the next one). They are a guide: they never change the goals.
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -27,7 +27,7 @@ export default function WeekPlanSection() {
   const shown = [plans.this_week, plans.next_week].filter((plan) => plan !== null)
   return (
     <section className="card" aria-labelledby="plan-title">
-      <h2 id="plan-title">Mon plan</h2>
+      <h2 id="plan-title">Semaines acceptées</h2>
       {shown.length === 0 ? (
         <p className="hint">
           Pas de plan accepté. <Link to="/coach">Demande un plan au coach</Link> : il s’affichera
