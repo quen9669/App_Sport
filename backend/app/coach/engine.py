@@ -80,12 +80,15 @@ class Engine:
     settings: Settings
     llm: LLM
     now: datetime  # UTC
+    # Only for the evaluation (evals/run.py): another version of the system prompt
+    # to compare with the current one. The app always uses the files in prompts/.
+    prompt: prompts.Prompt | None = None
 
     # --- Building the request ---
 
     def _system(self, conversation: CoachConversation) -> list[dict[str, Any]]:
         """Two blocks: the fixed prompt (cached) and today's context (changes every day)."""
-        prompt = prompts.system_prompt(conversation.coach)
+        prompt = self.prompt or prompts.system_prompt(conversation.coach)
         today = self.now.astimezone(ZoneInfo(self.settings.app_timezone)).date()
         context = [f"Date du jour : {FRENCH_DAYS[today.weekday()]} {today.isoformat()}."]
         memories = coach_repo.accepted_memories(self.db, conversation.coach)

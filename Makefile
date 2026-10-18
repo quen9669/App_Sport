@@ -10,7 +10,7 @@ BACKEND := backend
 FRONTEND := frontend
 
 .PHONY: help install dev dev-backend dev-frontend test test-backend test-frontend \
-	test-e2e e2e-install lint format typecheck check clean db-upgrade db-revision seed seed-clear
+	test-e2e e2e-install lint format typecheck check clean db-upgrade db-revision seed seed-clear eval
 
 help: ## Show this list of commands
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | \
@@ -42,6 +42,9 @@ seed: db-upgrade ## Fill the database with a year of realistic synthetic data
 seed-clear: ## Remove the synthetic data (real data is never touched)
 	cd $(BACKEND) && uv run python -m scripts.seed --clear
 
+eval: ## Grade the AI coaches with the real model (paid calls): make eval ARGS="--scenario injury"
+	cd $(BACKEND) && uv run python -m evals.run $(ARGS)
+
 db-revision: ## Create a migration from model changes: make db-revision m="add goal table"
 	cd $(BACKEND) && uv run alembic revision --autogenerate -m "$(m)"
 
@@ -71,7 +74,7 @@ format: ## Automatically format all code
 	cd $(FRONTEND) && npm run format
 
 typecheck: ## Check types (mypy for Python, tsc for TypeScript)
-	cd $(BACKEND) && uv run mypy app tests scripts
+	cd $(BACKEND) && uv run mypy app tests scripts evals
 	cd $(FRONTEND) && npm run typecheck
 
 check: lint typecheck test ## Everything CI checks: lint, types and tests
