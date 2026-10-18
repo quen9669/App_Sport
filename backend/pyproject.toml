@@ -54,3 +54,7 @@ pythonpath = ["."]
 # Lets us write `async def test_...` without decorating each test.
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's `Depends(...)` / `Query(...)` as default values are the normal FastAPI style.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query"]

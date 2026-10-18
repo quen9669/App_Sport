@@ -9,6 +9,7 @@ from collections.abc import Iterator
 from functools import lru_cache
 from pathlib import Path
 
+from fastapi import Depends
 from sqlalchemy import Engine, create_engine, event
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session, sessionmaker
@@ -51,11 +52,22 @@ def get_session_factory() -> sessionmaker[Session]:
     return sessionmaker(bind=engine, expire_on_commit=False)
 
 
-def get_db() -> Iterator[Session]:
+def provide_session_factory() -> sessionmaker[Session]:
+    """FastAPI dependency returning the session factory.
+
+    Routes that start background work (which outlives the request) use it to
+    open their own session. Tests override this one dependency to point the
+    whole app at a temporary database.
+    """
+    return get_session_factory()
+
+
+def get_db(
+    factory: sessionmaker[Session] = Depends(provide_session_factory),
+) -> Iterator[Session]:
     """FastAPI dependency: open a session for one request and always close it.
 
     Usage in a route: ``def route(db: Session = Depends(get_db)) -> ...``.
-    Tests replace this dependency to use a temporary database.
     """
-    with get_session_factory()() as session:
+    with factory() as session:
         yield session

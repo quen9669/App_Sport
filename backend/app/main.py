@@ -8,7 +8,7 @@ to see and try every route.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health
+from app.api import health, strava, sync
 from app.config import get_settings
 from app.logging_config import configure_logging
 
@@ -35,6 +35,8 @@ def create_app() -> FastAPI:
 
     # Every route lives under /api so the frontend and the API never clash.
     app.include_router(health.router, prefix="/api")
+    app.include_router(strava.router, prefix="/api")
+    app.include_router(sync.router, prefix="/api")
     return app
 
 
