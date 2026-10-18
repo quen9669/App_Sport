@@ -10,7 +10,7 @@ BACKEND := backend
 FRONTEND := frontend
 
 .PHONY: help install dev dev-backend dev-frontend test test-backend test-frontend \
-	test-e2e e2e-install lint format typecheck check clean
+	test-e2e e2e-install lint format typecheck check clean db-upgrade db-revision
 
 help: ## Show this list of commands
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | \
@@ -20,12 +20,24 @@ install: ## Install backend and frontend dependencies
 	cd $(BACKEND) && uv sync
 	cd $(FRONTEND) && npm ci
 	@test -f .env || (cp .env.example .env && echo "Created .env from .env.example")
+	@# Fill in a random encryption key for stored tokens if none is set yet.
+	@if grep -q '^TOKEN_ENCRYPTION_KEY=$$' .env; then \
+		key=$$(cd $(BACKEND) && uv run --quiet python -c "from app.services.crypto import generate_key; print(generate_key())"); \
+		sed -i "s|^TOKEN_ENCRYPTION_KEY=$$|TOKEN_ENCRYPTION_KEY=$$key|" .env; \
+		echo "Generated TOKEN_ENCRYPTION_KEY in .env"; \
+	fi
 
 dev: ## Start backend (port 8000) and frontend (port 5173) together; Ctrl+C stops both
 	$(MAKE) -j2 dev-backend dev-frontend
 
-dev-backend: ## Start only the backend, with auto-reload on code changes
+dev-backend: db-upgrade ## Start only the backend, with auto-reload on code changes
 	cd $(BACKEND) && uv run uvicorn app.main:app --reload --port 8000
+
+db-upgrade: ## Apply database migrations (creates the SQLite file if needed)
+	cd $(BACKEND) && uv run alembic upgrade head
+
+db-revision: ## Create a migration from model changes: make db-revision m="add goal table"
+	cd $(BACKEND) && uv run alembic revision --autogenerate -m "$(m)"
 
 dev-frontend: ## Start only the frontend dev server
 	cd $(FRONTEND) && npm run dev -- --port 5173
