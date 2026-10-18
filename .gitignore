@@ -17,6 +17,8 @@ exports/
 *.FIT
 
 # --- Python ---
+# Coach evaluation reports (make eval): answers of the real model, kept locally.
+backend/evals/reports/
 __pycache__/
 *.py[cod]
 .venv/

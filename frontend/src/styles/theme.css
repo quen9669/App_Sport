@@ -657,6 +657,61 @@ textarea {
   min-width: 0;
 }
 
+/* A weekly plan proposed by the coach (chat) or accepted (Accueil). */
+.plan-card {
+  margin: 0.5rem 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 0.6rem;
+  background: var(--bg);
+}
+
+.plan-card h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.plan-sessions {
+  margin: 0.5rem 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.plan-session {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.5rem;
+}
+
+.plan-day {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* "mar. 20 oct." -> "Mar. 20 oct." */
+.plan-day::first-letter {
+  text-transform: uppercase;
+}
+
+.plan-details,
+.plan-why {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.plan-session--rest strong {
+  color: var(--text-muted);
+}
+
+.plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 /* Read by screen readers, invisible on screen. */
 .visually-hidden {
   position: absolute;

@@ -187,7 +187,10 @@ erDiagram
 - **Coachs IA** : `coach_conversation` et `coach_message` (blocs de contenu au format de l'API,
   en JSON) gardent les discussions ; `coach_memory` les faits retenus (`proposed` par le coach,
   `accepted` par FRANKS : seuls ceux-là sont envoyés au modèle) ; `coach_call` journalise chaque
-  appel (modèle, jetons, coût en euros, latence, outils) et sert au budget du mois.
+  appel (modèle, jetons, coût en euros, latence, outils) et sert au budget du mois ;
+  `coach_plan` les plans de semaine proposés par le coach (`proposed`, puis `accepted`, `rejected`
+  ou `replaced` : un seul plan accepté par semaine, affiché sur l'Accueil ; il reste si la
+  conversation est supprimée).
 - **Tabac** : seuls les jours avec cigarette sont enregistrés (`smoking_day`) ; tous les autres jours
   depuis `smoke_free_since` comptent comme sans cigarette.
 - **Pas de double comptage** : une séance saisie compte seule pour les objectifs seulement si elle

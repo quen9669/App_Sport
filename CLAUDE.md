@@ -198,3 +198,20 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - Routes in `api/coach.py`; the answer is SSE (`text` / `tool` / `done` / `error`) with its own DB
   session. Tests use `tests/fixtures/fake_llm.py`. Page `CoachPage` (`/coach`), answers rendered by
   `CoachText` (mini-Markdown built from React elements, never raw HTML).
+
+## Longevity coach, weekly plan, evaluation (phase 5b)
+
+- Coach `longevity` (page `/longevite`, prompt `prompts/longevity.md`): its own tools in
+  `coach/tools/longevity.py` (daily activity, VO2max, heart-rate zones from each activity's
+  AVERAGE HR, smoke-free counters without notes). `COACH_TOOLS` in `coach/tools/__init__.py`
+  says which coach gets which tool; only the training coach can propose a plan.
+- `propose_weekly_plan` (`coach/tools/plan.py`) stores a `coach_plan` row as `proposed` (week
+  from this Monday to two weeks ahead); the engine streams it as an SSE `plan` event, shown by
+  `PlanCard`. `PATCH /api/coach/plans/{id}` accepts or rejects; accepting replaces the week's
+  previous accepted plan. `GET /api/coach/plans/current` feeds `WeekPlanSection` on Accueil.
+- Evaluation in `backend/evals/` (`make eval`, real paid calls, `--max-eur` cap, synthetic data
+  only, reports in `evals/reports/`, gitignored): `scenarios.py` (fixed date 2026-10-18 and
+  seed), `checks.py`, `judge.py` (JSON grades 1-5), `report.py`. `--compare file.md` runs a
+  prompt variant (coach taken from its version line) next to the current one through
+  `Engine.prompt`. `tests/test_evals.py` covers it all with FakeLLM. A new prompt behaviour
+  deserves a scenario.

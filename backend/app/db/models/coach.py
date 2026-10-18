@@ -1,13 +1,13 @@
-"""AI coaches: conversations, messages, durable memory and the log of model calls.
+"""AI coaches: conversations, messages, memory, weekly plans and the log of model calls.
 
 Everything stays in the local database. Only what the coach asks for through
 its tools is sent to the model, at the moment it needs it.
 """
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
-from sqlalchemy import JSON, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Date, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -67,6 +67,32 @@ class CoachMemory(Base):
     status: Mapped[str] = mapped_column(String(16), default="proposed")  # proposed / accepted
     created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now, onupdate=utc_now)
+
+
+class CoachPlan(Base):
+    """A week of sessions proposed by the coach (tool ``propose_weekly_plan``).
+
+    It only becomes FRANKS's plan when he accepts it on the coach screen; an
+    accepted plan is shown on the Accueil page and never changes his goals.
+    """
+
+    __tablename__ = "coach_plan"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    coach: Mapped[str] = mapped_column(String(16))
+    # Kept when the conversation is deleted: an accepted plan must stay on Accueil.
+    conversation_id: Mapped[int | None] = mapped_column(
+        ForeignKey("coach_conversation.id", ondelete="SET NULL"), index=True
+    )
+    week_start: Mapped[date] = mapped_column(Date, index=True)  # a Monday
+    summary: Mapped[str] = mapped_column(Text, default="")
+    # [{"day": "2026-10-19", "kind": "run", "title": ..., "duration_min": ..., ...}]
+    days: Mapped[list[dict[str, Any]]] = mapped_column(JSON)
+    # proposed -> accepted or rejected; an accepted plan becomes "replaced" when
+    # another plan of the same week is accepted.
+    status: Mapped[str] = mapped_column(String(16), default="proposed")
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
+    decided_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
 
 
 class CoachCall(Base):

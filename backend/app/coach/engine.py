@@ -11,6 +11,7 @@ Everything is streamed to the screen as it happens (``CoachEvent``), every
 model call is logged with its cost, and the monthly budget is checked first.
 """
 
+import json
 import logging
 import time as clock
 from collections.abc import Iterator
@@ -24,6 +25,7 @@ from sqlalchemy.orm import Session
 from app.coach import history, prompts
 from app.coach.costs import log_call, month_budget
 from app.coach.llm import LLM, Final, LLMError, TextDelta, Usage
+from app.coach.plans import PLAN_TOOL, plan_data
 from app.coach.tools import ALL_TOOLS, ToolContext, run_tool, tools_for
 from app.config import Settings
 from app.db.models import CoachConversation
@@ -53,6 +55,11 @@ class ToolEvent:
 
 
 @dataclass(frozen=True)
+class PlanEvent:
+    plan: dict[str, Any]  # see app/coach/plans.py: shown as a card with Accept / Modify
+
+
+@dataclass(frozen=True)
 class DoneEvent:
     cost_eur: float  # this answer, all model calls included
     month_spent_eur: float
@@ -64,7 +71,7 @@ class ErrorEvent:
     message: str  # French, shown as is
 
 
-CoachEvent = TextEvent | ToolEvent | DoneEvent | ErrorEvent
+CoachEvent = TextEvent | ToolEvent | PlanEvent | DoneEvent | ErrorEvent
 
 
 @dataclass
@@ -73,12 +80,15 @@ class Engine:
     settings: Settings
     llm: LLM
     now: datetime  # UTC
+    # Only for the evaluation (evals/run.py): another version of the system prompt
+    # to compare with the current one. The app always uses the files in prompts/.
+    prompt: prompts.Prompt | None = None
 
     # --- Building the request ---
 
     def _system(self, conversation: CoachConversation) -> list[dict[str, Any]]:
         """Two blocks: the fixed prompt (cached) and today's context (changes every day)."""
-        prompt = prompts.system_prompt(conversation.coach)
+        prompt = self.prompt or prompts.system_prompt(conversation.coach)
         today = self.now.astimezone(ZoneInfo(self.settings.app_timezone)).date()
         context = [f"Date du jour : {FRENCH_DAYS[today.weekday()]} {today.isoformat()}."]
         memories = coach_repo.accepted_memories(self.db, conversation.coach)
@@ -109,9 +119,9 @@ class Engine:
 
     def _run_tools(
         self, conversation: CoachConversation, final: Final
-    ) -> Iterator[ToolEvent | dict[str, Any]]:
+    ) -> Iterator[ToolEvent | PlanEvent | dict[str, Any]]:
         """Run every tool the model asked for; yields screen events, then result blocks."""
-        context = ToolContext(self.db, self.settings, conversation.coach, self.now)
+        context = ToolContext(self.db, self.settings, conversation.coach, self.now, conversation.id)
         allowed = {tool.name for tool in tools_for(conversation.coach)}
         for block in final.content:
             if block.get("type") != "tool_use":
@@ -129,12 +139,21 @@ class Engine:
                     # told it failed and can answer without it.
                     logger.exception("Coach tool %s failed", name)
                     content, is_error = '{"error": "the tool failed"}', True
+            if name == PLAN_TOOL and not is_error:
+                plan = self._proposed_plan(content)
+                if plan is not None:
+                    yield plan
             yield {
                 "type": "tool_result",
                 "tool_use_id": block["id"],
                 "content": content,
                 "is_error": is_error,
             }
+
+    def _proposed_plan(self, content: str) -> PlanEvent | None:
+        plan_id = json.loads(content).get("plan_id")
+        plan = coach_repo.get_plan(self.db, plan_id) if plan_id else None
+        return PlanEvent(plan_data(plan)) if plan else None
 
     # --- The loop ---
 
@@ -185,7 +204,7 @@ class Engine:
                 break
             results: list[dict[str, Any]] = []
             for item in self._run_tools(conversation, final):
-                if isinstance(item, ToolEvent):
+                if isinstance(item, ToolEvent | PlanEvent):
                     yield item
                 else:
                     results.append(item)

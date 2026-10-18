@@ -10,8 +10,8 @@
 | 3a | Activités Garmin (Strava en complément), écran Santé, charge d'entraînement | ✅ Terminé |
 | 3b | Carte interactive, heatmap, détail d'une activité, lieux des séances sans GPS | ✅ Terminé |
 | 4 | Prédicteur de course et allures | ✅ Terminé |
-| 5a | Moteur des coachs IA, coach musculation/cardio, écran de discussion | 🟡 En revue |
-| 5b | Coach longévité, plan de semaine proposé, banc d'évaluation | ⚪ À faire |
+| 5a | Moteur des coachs IA, coach musculation/cardio, écran de discussion | ✅ Terminé |
+| 5b | Coach longévité, plan de semaine proposé, banc d'évaluation | 🟡 En revue |
 | 6 | PWA complète, sécurité, déploiement | ⚪ À faire |
 
 ## Phase 0 : critères d'acceptation
@@ -101,6 +101,18 @@
 - [x] Mémoire : le coach propose, FRANKS accepte, corrige ou oublie
 - [x] Prompts versionnés dans des fichiers, garde-fous santé (pas de diagnostic, renvoi au médecin)
 - [x] Tout est testé sans clé API (faux modèle) ; sans clé, l'écran explique quoi faire
+
+## Phase 5b : critères d'acceptation
+
+- [x] Coach longévité (page « Longévité ») : pas, étages, minutes d'intensité, VO2max, zones
+      cardio, sommeil, jours sans cigarette ; distingue le bien établi de l'incertain, aucun
+      complément alimentaire, pas un avis médical
+- [x] Plan de semaine proposé par le coach muscu/cardio sous forme de carte (Accepter, Modifier,
+      Refuser) ; le plan accepté s'affiche sur l'Accueil
+- [x] Banc d'évaluation : 8 scénarios « golden » sur données synthétiques, contrôles automatiques,
+      LLM-juge (pertinence, prudence, honnêteté), rapport comparant deux versions de prompt
+- [x] `make eval` se lance à la main (appels payants, plafond `--max-eur`) ; la CI le teste avec
+      le faux modèle, sans jamais appeler l'API
 
 ## En plus (demandes de FRANKS)
 

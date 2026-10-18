@@ -679,7 +679,7 @@ export const setRunExcluded = (activityId: number, excluded: boolean) =>
 
 // --- AI coaches ---
 
-export type CoachName = 'training'
+export type CoachName = 'training' | 'longevity'
 
 export interface CoachStatus {
   configured: boolean // an API key is set in .env
@@ -700,10 +700,40 @@ export interface CoachConversation {
   updated_at: string
 }
 
+export type PlanSessionKind =
+  'run' | 'ride' | 'strength' | 'class' | 'walk' | 'mobility' | 'rest' | 'other'
+
+/** One session of a weekly plan (mirrors PlanSessionOut). */
+export interface PlanSession {
+  day: string // ISO date
+  kind: PlanSessionKind
+  title: string
+  duration_min: number
+  intensity: string
+  details: string
+  why: string
+}
+
+/** A week proposed by the coach (mirrors PlanOut). */
+export interface CoachPlan {
+  id: number
+  coach: CoachName
+  week_start: string // Monday
+  summary: string
+  sessions: PlanSession[]
+  status: 'proposed' | 'accepted' | 'rejected' | 'replaced'
+}
+
+export interface CurrentPlans {
+  this_week: CoachPlan | null
+  next_week: CoachPlan | null
+}
+
 export interface CoachShownMessage {
   role: 'user' | 'assistant'
   text: string
   tools: string[] // French labels of the tools used, e.g. "lit ton sommeil"
+  plans: CoachPlan[] // weekly plans proposed in this answer
 }
 
 export interface CoachConversationDetail extends CoachConversation {
@@ -720,6 +750,7 @@ export interface CoachMemory {
 export type CoachEvent =
   | { type: 'text'; text: string }
   | { type: 'tool'; name: string; label: string }
+  | ({ type: 'plan' } & CoachPlan)
   | { type: 'done'; cost_eur: number; month_spent_eur: number; month_limit_eur: number }
   | { type: 'error'; message: string }
 
@@ -739,6 +770,9 @@ export const addMemory = (coach: CoachName, text: string) =>
 export const updateMemory = (id: number, change: { text?: string; accepted?: boolean }) =>
   sendJson<CoachMemory>('PATCH', `/api/coach/memories/${id}`, change)
 export const deleteMemory = (id: number) => request<void>('DELETE', `/api/coach/memories/${id}`)
+export const fetchCurrentPlans = () => request<CurrentPlans>('GET', '/api/coach/plans/current')
+export const decidePlan = (id: number, accepted: boolean) =>
+  sendJson<CoachPlan>('PATCH', `/api/coach/plans/${id}`, { accepted })
 
 /**
  * Ask the coach and receive its answer piece by piece.

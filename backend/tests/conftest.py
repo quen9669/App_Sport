@@ -16,10 +16,12 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 import app.db.models  # noqa: F401  (registers the tables)
-from app.config import get_settings
+from app.api.coach import get_llm
+from app.config import Settings, get_settings
 from app.db.base import Base
 from app.db.session import provide_session_factory
 from app.main import create_app
+from tests.fixtures.fake_llm import FakeLLM
 
 TEST_ENCRYPTION_KEY = Fernet.generate_key().decode()
 
@@ -73,3 +75,16 @@ def client(session_factory: sessionmaker[Session]) -> Iterator[TestClient]:
     application.dependency_overrides[provide_session_factory] = lambda: session_factory
     with TestClient(application) as test_client:
         yield test_client
+
+
+@pytest.fixture
+def settings() -> Settings:
+    return get_settings()
+
+
+@pytest.fixture
+def fake(client: TestClient) -> Iterator[FakeLLM]:
+    """The coach's model replaced by a scripted fake for the API routes."""
+    llm = FakeLLM()
+    client.app.dependency_overrides[get_llm] = lambda: llm  # type: ignore[attr-defined]
+    yield llm

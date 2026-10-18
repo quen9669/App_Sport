@@ -4,7 +4,6 @@ The model is always the scripted FakeLLM (tests/fixtures/fake_llm.py).
 """
 
 import json
-from collections.abc import Iterator
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -13,13 +12,12 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app.api.coach import get_llm
 from app.coach import history, prompts
 from app.coach.costs import cost_eur, month_budget
 from app.coach.engine import DoneEvent, Engine, ErrorEvent, TextEvent, ToolEvent
 from app.coach.llm import LLMError, Usage
 from app.coach.tools import ALL_TOOLS, ToolContext, run_tool, tools_for
-from app.config import Settings, get_settings
+from app.config import Settings
 from app.db.models import (
     Activity,
     CoachCall,
@@ -32,12 +30,24 @@ from app.db.models import (
 from app.repositories import coach as coach_repo
 from tests.fixtures.fake_llm import FakeLLM, text_turn, tool_turn
 
-NOW = datetime(2026, 10, 18, 12, 0, tzinfo=UTC)
+NOW = datetime(2026, 10, 18, 12, 0, tzinfo=UTC)  # a Sunday
 
-
-@pytest.fixture
-def settings() -> Settings:
-    return get_settings()
+# A valid plan for the next week (Monday 19 October 2026).
+PLAN: dict[str, Any] = {
+    "week_start": "2026-10-19",
+    "summary": "Semaine d'endurance avec une séance de seuil.",
+    "sessions": [
+        {
+            "day": "2026-10-20",
+            "kind": "run",
+            "title": "Footing",
+            "duration_min": 45,
+            "intensity": "6:00 /km",
+            "why": "Endurance de base",
+        },
+        {"day": "2026-10-19", "kind": "rest", "title": "Repos", "duration_min": 0, "why": "Récup"},
+    ],
+}
 
 
 def ctx(db: Session, settings: Settings) -> ToolContext:
@@ -85,6 +95,8 @@ def test_every_tool_answers_on_an_empty_database(db: Session, settings: Settings
         arguments: dict[str, Any] = {"activity_id": 1} if name == "get_activity_detail" else {}
         if name == "propose_memory":
             arguments = {"text": "Préfère courir le matin"}
+        if name == "propose_weekly_plan":
+            arguments = PLAN
         text, is_error = run_tool(tool, ctx(db, settings), arguments)
         assert not is_error, (name, text)
         json.loads(text)  # always valid JSON
@@ -166,7 +178,7 @@ def test_profile_and_goals(db: Session, settings: Settings) -> None:
 
 def test_prompts_are_versioned_files() -> None:
     prompt = prompts.system_prompt("training")
-    assert prompt.version == "training-v1+common-v1"
+    assert prompt.version == "training-v2+common-v1"
     assert "médecin" in prompt.text and "propose_memory" in prompt.text
     assert "version:" not in prompt.text
 
@@ -312,13 +324,6 @@ def test_previous_conversation_summary_is_reused(db: Session, settings: Settings
 # --- Routes --------------------------------------------------------------------------------
 
 
-@pytest.fixture
-def fake(client: TestClient) -> Iterator[FakeLLM]:
-    llm = FakeLLM()
-    client.app.dependency_overrides[get_llm] = lambda: llm  # type: ignore[attr-defined]
-    yield llm
-
-
 def sse(body: str) -> list[tuple[str, dict[str, Any]]]:
     events = []
     for chunk in body.strip().split("\n\n"):
@@ -359,8 +364,13 @@ def test_conversation_flow(client: TestClient, fake: FakeLLM) -> None:
     detail = client.get(f"/api/coach/conversations/{conversation['id']}").json()
     assert detail["title"] == "Mes objectifs ?"
     assert detail["messages"] == [
-        {"role": "user", "text": "Mes objectifs ?", "tools": []},
-        {"role": "assistant", "text": "Tu as 0 objectif.", "tools": ["lit ton profil"]},
+        {"role": "user", "text": "Mes objectifs ?", "tools": [], "plans": []},
+        {
+            "role": "assistant",
+            "text": "Tu as 0 objectif.",
+            "tools": ["lit ton profil"],
+            "plans": [],
+        },
     ]
     listed = client.get("/api/coach/training/conversations").json()
     assert [c["id"] for c in listed] == [conversation["id"]]
