@@ -22,6 +22,7 @@ from app.api import (
     health_data,
     maps,
     places,
+    plan_workouts,
     profile,
     race,
     smoking,
@@ -53,6 +54,7 @@ PROTECTED_ROUTERS: list[APIRouter] = [
     smoking.router,
     race.router,
     coach.router,
+    plan_workouts.router,
 ]
 
 

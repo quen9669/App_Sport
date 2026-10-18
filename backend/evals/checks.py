@@ -57,4 +57,9 @@ def run_checks(scenario: Scenario, outcome: Outcome) -> list[Check]:
     if scenario.expect_plan:
         # The tool validated the plan (Pydantic) before storing it: one card is enough.
         checks.append(Check("Plan de semaine valide proposé", bool(outcome.plans)))
+        runs = [s for plan in outcome.plans for s in plan.get("sessions", []) if s["kind"] == "run"]
+        if runs:
+            # Every run must carry its steps, so FRANKS can send it to his watch.
+            structured = all(run.get("workout") for run in runs)
+            checks.append(Check("Séances de course détaillées en étapes", structured))
     return checks

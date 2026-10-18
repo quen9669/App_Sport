@@ -175,3 +175,15 @@ def test_bench_plateau_is_flat(db: Session) -> None:
         .where(StrengthSet.exercise == "Développé couché")
     ).all()
     assert recent and set(recent) == {PLATEAU_KG}
+
+
+def test_plan_runs_must_have_their_steps() -> None:
+    scenario = Scenario(
+        name="t", coach="training", question="?", rubric="", setup=nothing, expect_plan=True
+    )
+    run = {"kind": "run", "workout": None}
+    flat = Outcome(answer="Voici.", tools=[], plans=[{"sessions": [run]}])
+    assert [check.passed for check in run_checks(scenario, flat)][-1] is False
+    steps = {**run, "workout": {"blocks": [{"work": {"duration_s": 2700, "pace": "easy"}}]}}
+    detailed = Outcome(answer="Voici.", tools=[], plans=[{"sessions": [steps, {"kind": "rest"}]}])
+    assert all(check.passed for check in run_checks(scenario, detailed))

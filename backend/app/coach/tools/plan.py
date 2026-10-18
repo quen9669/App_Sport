@@ -1,7 +1,9 @@
 """The weekly plan: the coach proposes a structured week, FRANKS accepts it or not.
 
 The model has to fill a strict schema (checked by Pydantic): a day, a type of
-session, a duration, an intensity and a reason for each session. A plan is
+session, a duration, an intensity and a reason for each session. A run also
+gets its steps (``RunWorkout``: warm-up, blocks, cool-down) with pace ZONES,
+which the app turns into paces and FRANKS can send to his Garmin watch. A plan is
 only stored as "proposed"; the coach screen shows it as a card with
 "Accepter" / "Modifier", and an accepted plan appears on the Accueil page.
 It never changes the goals.
@@ -14,6 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.coach.tools.base import Tool, ToolContext
 from app.repositories import coach as coach_repo
+from app.services.workouts import RunWorkout
 
 # How far ahead a plan can start: this week or one of the next two.
 MAX_WEEKS_AHEAD = 2
@@ -39,6 +42,17 @@ class PlanSession(BaseModel):
         default="", max_length=300, description="Content in French (intervals, exercises...)."
     )
     why: str = Field(min_length=3, max_length=200, description="Why this session, in French.")
+    workout: RunWorkout | None = Field(
+        default=None,
+        description="Runs only, and required for them: the steps (warm-up, blocks of "
+        "repeats with recovery, cool-down) with pace ZONES, not numbers.",
+    )
+
+    @model_validator(mode="after")
+    def _workout_for_runs_only(self) -> "PlanSession":
+        if self.workout is not None and self.kind != "run":
+            raise ValueError("workout is only for kind 'run'")
+        return self
 
 
 class PlanInput(BaseModel):
