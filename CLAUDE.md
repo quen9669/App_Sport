@@ -125,3 +125,16 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   `intensity_minutes` (Garmin daily `moderateIntensityMinutes` + 2 × `vigorousIntensityMinutes`,
   summed per week by `health_dashboard.weekly_intensity`). Their targets are drawn as a dashed line
   on the Santé charts (`WeeklyBarChart`); `/api/intensity-minutes` serves the weekly series.
+
+## Map and activity detail (phase 3b)
+
+- `/api/map/routes` (`services/activity_map.py`): filters (sport group run/ride/strength/other,
+  days, km), only routes intersecting `bbox` are sent, simplified with Douglas-Peucker
+  (`services/geo.py`) for the zoom. `bounds`/`total` cover every match so the map can frame them.
+- Activities without a route are grouped on a `place` (`services/places.py`): `activity.place_id`
+  (manual, never touched by syncs) else the place whose `role` is `strength_default` (strength) or
+  `other_default` (the rest). Owner's defaults (migration): Jims Gare / Jims Gasperich.
+- `/api/activities/{id}` returns aligned series thinned to 1,000 points (speed derived from distance
+  when the source has none). Frontend: `MapPage` (`/carte`), `ActivityPage` (`/activites/:id`);
+  Leaflet components (`RoutesMap`, `ActivityMap`) are lazy-loaded, use `preferCanvas`, and are
+  mocked in unit tests (jsdom has no canvas); E2E stubs the OSM tiles.

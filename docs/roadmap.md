@@ -7,8 +7,8 @@
 | 1b | Garmin (bibliothèque + import de fichiers), synchro planifiée, données synthétiques, écran Sources | ✅ Terminé |
 | 2a | Profil, poids, classification des activités, objectifs et tableau de bord | ✅ Terminé |
 | 2b | Saisie des séances de musculation, historique des semaines | ✅ Terminé |
-| 3a | Activités Garmin (Strava en complément), écran Santé, charge d'entraînement | 🟡 En revue |
-| 3b | Carte interactive, heatmap, détail d'une activité | ⚪ À faire |
+| 3a | Activités Garmin (Strava en complément), écran Santé, charge d'entraînement | ✅ Terminé |
+| 3b | Carte interactive, heatmap, détail d'une activité, lieux des séances sans GPS | 🟡 En revue |
 | 4 | Prédicteur de course et allures | ⚪ À faire |
 | 5 | Coachs IA (musculation/cardio et longévité) | ⚪ À faire |
 | 6 | PWA complète, sécurité, déploiement | ⚪ À faire |
@@ -64,8 +64,20 @@
 - [x] Écran Santé : sommeil (durée, score, régularité), FC repos, HRV, poids sur 7, 30 ou 90 jours
 - [x] Charge par semaine (TRIMP avec la FC, sinon durée × effort estimé) et ratio aigu/chronique
       avec mise en garde
-- [ ] Vérifié sur tes vraies données Garmin (noms des champs de la bibliothèque, id Garmin dans
-      l'`external_id` Strava)
+- [x] Vérifié sur tes vraies données Garmin (FC, sommeil, HRV, poids, minutes d'intensité) ; l'id
+      Garmin dans l'`external_id` Strava reste à vérifier quand Strava sera connecté
+
+## Phase 3b : critères d'acceptation
+
+- [x] Carte de tous les tracés (Leaflet, rendu canvas, fond OpenStreetMap), couleur par sport
+- [x] Filtres par sport, période et distance ; seuls les tracés visibles sont envoyés, simplifiés
+      (Douglas-Peucker) selon le zoom
+- [x] Un tap sur un tracé : résumé et lien vers le détail ; liste des activités de la zone affichée
+- [x] Heatmap des zones les plus fréquentées
+- [x] Séances sans GPS placées sur un lieu : muscu à Jims Gare, le reste à Jims Gasperich par défaut,
+      modifiable par séance et dans « Mes lieux »
+- [x] Détail d'une activité : carte, profil d'altitude, allure (ou vitesse) et FC ; le curseur des
+      graphiques déplace un point sur la carte
 
 ## Points à surveiller
 

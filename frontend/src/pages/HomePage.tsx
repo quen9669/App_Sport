@@ -165,7 +165,9 @@ export default function HomePage() {
                 {progress.activities.map((activity) => (
                   <li key={activity.id} className={activity.hidden ? 'activity--hidden' : ''}>
                     <div>
-                      <strong>{activity.name}</strong>
+                      <strong>
+                        <Link to={`/activites/${activity.id}`}>{activity.name}</Link>
+                      </strong>
                       {/* Garmin and Strava may both have this session: let the user pick. */}
                       {activity.possible_duplicate && !activity.hidden && (
                         <span className="badge">Doublon possible</span>

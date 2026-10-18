@@ -402,3 +402,51 @@ textarea {
   font-size: 1.25rem;
   font-weight: 700;
 }
+
+/* --- Map (phase 3b) --- */
+.map {
+  height: 60vh;
+  min-height: 320px;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  /* Leaflet's panes use z-index up to 1000: keep them under the sticky nav. */
+  z-index: 0;
+}
+
+.map--detail {
+  height: 45vh;
+  min-height: 260px;
+}
+
+.map-filters .segmented {
+  flex-wrap: wrap;
+}
+
+.inline-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.inline-fields input {
+  width: 7rem;
+}
+
+.map-popup ul {
+  margin: 0.25rem 0;
+  padding-left: 1rem;
+}
+
+.place-list {
+  list-style: none;
+  padding: 0;
+}
+
+.place-form {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
