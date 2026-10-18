@@ -13,8 +13,9 @@ keep functions short, and explain important choices in PR descriptions.
 
 ## Stack
 
-- **Backend** (`backend/`): Python 3.12+, `uv`, FastAPI, Pydantic v2, pydantic-settings.
-  Coming in phase 1: SQLAlchemy 2.x, Alembic, SQLite (PostgreSQL-compatible), APScheduler, httpx.
+- **Backend** (`backend/`): Python 3.12+, `uv`, FastAPI, Pydantic v2, pydantic-settings,
+  SQLAlchemy 2.x + Alembic (SQLite, PostgreSQL-compatible), httpx (sync client), cryptography (Fernet).
+  Coming in phase 1b: APScheduler, garminconnect, fitdecode.
 - **Frontend** (`frontend/`): React 19, Vite, TypeScript strict, `vite-plugin-pwa`.
   Coming later: react-leaflet (OpenStreetMap), Recharts.
 - **Tests**: pytest + pytest-asyncio; Vitest + Testing Library; Playwright (E2E, desktop + Pixel 7).
@@ -30,6 +31,8 @@ keep functions short, and explain important choices in PR descriptions.
 | `make test-e2e` | Playwright E2E (run `make e2e-install` once first) |
 | `make lint` / `make format` / `make typecheck` | Quality checks / auto-format / types |
 | `make check` | Everything CI runs (except E2E) |
+| `make db-upgrade` | Apply Alembic migrations (also run by `make dev-backend`) |
+| `make db-revision m="..."` | Autogenerate a migration after changing a model |
 
 Single backend test: `cd backend && uv run pytest tests/test_health.py -k ok`.
 Single frontend test: `cd frontend && npx vitest run src/App.test.tsx`.
@@ -40,7 +43,12 @@ Use an existing Chromium for E2E: `PLAYWRIGHT_CHROMIUM_PATH=/path/to/chrome make
 - Code, identifiers, comments and commits in **English**; UI text and coach answers in **French**.
 - Conventional Commits (`feat:`, `fix:`, `test:`, `docs:`, `chore:`, `build:`, `ci:`), one per logical step.
 - One branch and one PR per phase; CI must be green before merging.
-- Backend layers: `app/api` (thin routes) → `app/services` (logic) → `app/repositories` (DB access).
+- Backend layers: `app/api` (thin routes) → `app/services` (logic) → `app/repositories` (DB access);
+  `app/integrations/<source>` holds external API clients (HTTP only, no DB).
+- DB: SI units, UTC datetimes (`UTCDateTime`), upserts keyed on `(source, external_id)` for idempotency,
+  raw API JSON kept in `raw_payload`. Every model change needs a migration (`tests/test_migrations.py`).
+- External APIs are never called in tests: use `respx` and the fakes in `tests/fixtures/`.
+- Injected `now`/`sleep` callables keep time-dependent code (quotas, token expiry) testable.
 - All routes under `/api`. Response shapes are Pydantic models; frontend mirrors them in `src/api/`.
 - Settings only via `app.config.get_settings()`; never read `os.environ` directly.
 - Timezone `Europe/Luxembourg`, metric units; store datetimes in UTC.
@@ -49,8 +57,15 @@ Use an existing Chromium for E2E: `PLAYWRIGHT_CHROMIUM_PATH=/path/to/chrome make
 
 - Never commit `.env`, tokens, databases or exported health data (see `.gitignore`).
 - Never log secrets: logging goes through `SecretRedactingFilter` (`app/logging_config.py`).
+- OAuth tokens are stored encrypted (`app/services/crypto.py`, key `TOKEN_ENCRYPTION_KEY`).
 - No third-party telemetry or trackers.
 
 ## Architecture decisions
 
-See `docs/adr/`. Current: `0001-stack.md`.
+See `docs/adr/`. Current: `0001-stack.md`. Data model: `docs/data-model.md`.
+
+## Strava sync (phase 1a)
+
+`app/services/strava_sync.py`, one run = new activities (7-day overlap) → a few history pages
+(cursor `strava_backfill` in `sync_cursor`) → missing streams. Quotas: `integrations/strava/rate_limit.py`
+waits for the next 15-min window, stops the run as `partial` near the daily limit.

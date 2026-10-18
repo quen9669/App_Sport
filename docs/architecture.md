@@ -35,12 +35,31 @@ Le code est découpé en couches. Chaque couche ne parle qu'à celle d'en dessou
 | Couche | Dossier | Rôle |
 |---|---|---|
 | Routes | `app/api/` | Reçoit la requête HTTP, valide les entrées, renvoie la réponse. Aucune logique métier. |
-| Services | `app/services/` (phase 1) | La logique : synchroniser, calculer, décider. |
-| Accès aux données | `app/repositories/` (phase 1) | Lire et écrire en base. |
-| Intégrations | `app/integrations/` (phase 1) | Clients Strava et Garmin. |
+| Services | `app/services/` | La logique : synchroniser, calculer, décider. |
+| Accès aux données | `app/repositories/` | Lire et écrire en base. |
+| Intégrations | `app/integrations/` | Clients Strava et Garmin. |
 
 Pourquoi ce découpage : on peut tester la logique sans serveur HTTP, et changer de base de données
 ou de source de données sans tout réécrire.
+
+Base de données : modèles dans `app/db/models/`, migrations dans `alembic/`, détail dans
+[data-model.md](data-model.md).
+
+### Synchronisation Strava
+
+```mermaid
+sequenceDiagram
+    participant U as Toi
+    participant API as Backend
+    participant S as Strava
+    U->>API: POST /api/sync/strava
+    API-->>U: 202 (lancé)
+    API->>API: token encore valide ? sinon refresh
+    API->>S: activités récentes (7 jours de recouvrement)
+    API->>S: quelques pages d'historique (reprise au curseur)
+    API->>S: streams manquants (nombre limité)
+    API->>API: upserts + journal sync_log
+```
 
 Fichiers transverses :
 - `app/config.py` : tous les réglages, lus depuis `.env`.

@@ -6,7 +6,7 @@ une carte de mes sorties, prédira mes temps de course et proposera deux coachs 
 
 > Cette application donne des conseils d'entraînement, pas un avis médical.
 
-**État actuel : phase 0** (squelette). Voir [docs/roadmap.md](docs/roadmap.md).
+**État actuel : phase 1a** (modèle de données et synchro Strava). Voir [docs/roadmap.md](docs/roadmap.md).
 
 ## Installation (Windows avec WSL2)
 
@@ -62,9 +62,11 @@ make help        # liste de toutes les commandes
 
 ## Configuration des clés
 
-Les clés Strava, Garmin et Anthropic se mettront dans `.env` (voir les commentaires de
-`.env.example`). Elles ne sont pas nécessaires pour la phase 0 ; les guides de création des comptes
-arriveront avec les phases concernées.
+Les clés se mettent dans `.env` (voir les commentaires de `.env.example`). `make install` génère
+automatiquement `TOKEN_ENCRYPTION_KEY`, qui chiffre les tokens stockés.
+
+- **Strava** : suis [docs/learning/01-strava-setup.md](docs/learning/01-strava-setup.md).
+- **Garmin** et **Anthropic** : guides à venir avec les phases concernées.
 
 ## Documentation
 
