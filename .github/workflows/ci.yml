@@ -64,6 +64,34 @@ jobs:
       - name: Build
         run: npm run build
 
+  security:
+    name: Security (vulnerable dependencies, secrets)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # the whole history: a key committed then removed still counts
+      - uses: astral-sh/setup-uv@v7
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      # Known vulnerabilities in the Python libraries the app runs with (locked versions).
+      - name: Audit Python dependencies
+        working-directory: backend
+        run: |
+          uv export --locked --no-dev --format requirements-txt > "$RUNNER_TEMP/requirements.txt"
+          uvx pip-audit --disable-pip -r "$RUNNER_TEMP/requirements.txt"
+      # Same for the interface's libraries (only serious ones block the PR).
+      - name: Audit npm dependencies
+        working-directory: frontend
+        run: npm audit --omit=dev --audit-level=high
+      # A key, token or password committed by mistake blocks the PR.
+      - name: Look for secrets
+        run: |
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.28.0/gitleaks_8.28.0_linux_x64.tar.gz \
+            | tar xz -C "$RUNNER_TEMP" gitleaks
+          "$RUNNER_TEMP/gitleaks" git . --no-banner --redact
+
   e2e:
     name: End-to-end (Playwright)
     runs-on: ubuntu-latest
