@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.db.models import BodyMetric, UserProfile
 from app.db.models.enums import DataSource
+from app.integrations.health.provider import WeightRecord
 
 PROFILE_ID = 1  # single-user application: the profile is always row 1
 
@@ -52,6 +53,26 @@ def upsert_body_metric(db: Session, measured_on: date, fields: dict[str, Any]) -
         setattr(metric, name, value)
     db.flush()
     return metric
+
+
+def upsert_weight_from_source(db: Session, source: str, record: WeightRecord) -> bool | None:
+    """Store a weigh-in coming from a sync (Garmin). Returns created, or None if skipped.
+
+    A weigh-in typed in the app on the same day always wins: a sync never
+    overwrites it. Test data ("synthetic") is replaced by the real value.
+    """
+    metric = db.scalar(select(BodyMetric).where(BodyMetric.measured_on == record.day))
+    if metric is not None and metric.source == DataSource.MANUAL:
+        return None
+    created = metric is None
+    if metric is None:
+        metric = BodyMetric(measured_on=record.day)
+        db.add(metric)
+    metric.source = source
+    metric.weight_kg = record.weight_kg
+    metric.body_fat_pct = record.body_fat_pct
+    db.flush()
+    return created
 
 
 def delete_body_metric(db: Session, metric_id: int) -> bool:

@@ -42,7 +42,13 @@ function Stat({ label, value }: { label: string; value: string | null }) {
   )
 }
 
-function Chart(props: { points: TrendPoint[]; name: string; unit: string; digits?: number }) {
+function Chart(props: {
+  points: TrendPoint[]
+  name: string
+  unit: string
+  digits?: number
+  smooth?: boolean
+}) {
   if (!hasData(props.points)) return <p className="hint">Pas encore assez de données.</p>
   return (
     <Suspense fallback={<p className="hint">Chargement du graphique…</p>}>
@@ -90,6 +96,7 @@ export default function HealthPage() {
   const sleepAverage = mean(pick(sleepHours))
   const bedtime = mean(pick((d) => d.bedtime_min))
   const wake = mean(pick((d) => d.wake_min))
+  const lastWeight = days.at(-1)
 
   return (
     <>
@@ -156,7 +163,24 @@ export default function HealthPage() {
 
       <section className="card" aria-labelledby="weight-title">
         <h2 id="weight-title">Poids</h2>
-        <Chart points={trendPoints(days, (d) => d.weight_kg)} name="Pesée" unit="kg" digits={1} />
+        {lastWeight?.weight_kg != null && lastWeight.weight_measured_on ? (
+          <>
+            <dl className="stats">
+              <Stat label="Dernier poids" value={`${formatNumber(lastWeight.weight_kg)} kg`} />
+              <Stat label="Pesé le" value={formatShortDate(lastWeight.weight_measured_on)} />
+            </dl>
+            <p className="hint">Ce poids reste affiché jusqu’à ta prochaine pesée.</p>
+            <Chart
+              points={trendPoints(days, (d) => d.weight_kg)}
+              name="Poids"
+              unit="kg"
+              digits={1}
+              smooth={false}
+            />
+          </>
+        ) : (
+          <p className="hint">Aucune pesée pour l’instant (Garmin Connect ou saisie dans l’app).</p>
+        )}
       </section>
 
       {days.length > 0 && (

@@ -22,6 +22,7 @@ function day(date: string, overrides: Partial<HealthDay> = {}): HealthDay {
     resting_hr: 50,
     hrv_ms: 60,
     weight_kg: null,
+    weight_measured_on: null,
     ...overrides,
   }
 }
@@ -61,6 +62,30 @@ describe('HealthPage', () => {
     expect(screen.getByText('23:30')).toBeInTheDocument()
     expect(screen.getByText('51 bpm')).toBeInTheDocument()
     expect(screen.getByText(/pas assez de nuits/)).toBeInTheDocument()
+  })
+
+  it('shows the last weigh-in, carried forward', async () => {
+    const weighed = { weight_kg: 79.5, weight_measured_on: '2026-09-02' }
+    fakeBackend({
+      'GET /api/health-metrics': {
+        ...metrics,
+        days: metrics.days.map((d) => ({ ...d, ...weighed })),
+      },
+      'GET /api/training-load': load,
+    })
+
+    renderPage()
+
+    expect(await screen.findByText('79,5 kg')).toBeInTheDocument()
+    expect(screen.getByText('2 sept.')).toBeInTheDocument()
+  })
+
+  it('says when there is no weigh-in at all', async () => {
+    fakeBackend({ 'GET /api/health-metrics': metrics, 'GET /api/training-load': load })
+
+    renderPage()
+
+    expect(await screen.findByText(/Aucune pesée pour l’instant/)).toBeInTheDocument()
   })
 
   it('asks the backend for another period', async () => {
