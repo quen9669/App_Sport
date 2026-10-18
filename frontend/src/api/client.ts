@@ -99,6 +99,7 @@ export interface GoalProgress {
   done: number
   achieved: boolean
   activity_ids: number[]
+  session_ids: number[]
 }
 
 export interface WeekActivity {
@@ -121,6 +122,74 @@ export interface WeekProgress {
   sunday: string
   goals: GoalProgress[]
   activities: WeekActivity[]
+  sessions: WeekSession[]
+}
+
+/** A strength session typed in the app, as listed in the week. */
+export interface WeekSession {
+  id: number
+  performed_at: string
+  duration_min: number | null
+  exercises: string[]
+  set_count: number
+  /** false: the same session was recorded on Strava and counts through that activity. */
+  counted: boolean
+}
+
+export interface HistoryGoal {
+  goal_id: number
+  kind: GoalKind
+  sport: GoalSport | null
+  target: number
+  done: number
+  achieved: boolean
+}
+
+export interface HistoryWeek {
+  week: string
+  monday: string
+  goals: HistoryGoal[]
+  all_achieved: boolean
+}
+
+export interface GoalHistory {
+  weeks: HistoryWeek[] // oldest first
+  streak: number
+}
+
+export interface Exercise {
+  name: string
+  group: string
+  bodyweight: boolean
+  last_reps: number | null
+  last_weight_kg: number | null
+}
+
+export interface StrengthSetInput {
+  exercise: string
+  reps: number
+  weight_kg: number | null
+  rpe: number | null
+}
+
+export interface StrengthSet extends StrengthSetInput {
+  set_number: number
+}
+
+export interface StrengthSession {
+  id: number
+  performed_at: string
+  duration_min: number | null
+  notes: string | null
+  activity_id: number | null
+  sets: StrengthSet[]
+}
+
+export interface StrengthSessionInput {
+  performed_at: string
+  duration_min: number | null
+  notes: string | null
+  sets: StrengthSetInput[]
 }
 
 export interface CategoryResult {
@@ -215,3 +284,16 @@ export const fetchWeekProgress = (week?: string) =>
 /** `null` removes the manual correction and goes back to the automatic category. */
 export const setActivityCategory = (id: number, category: Category | null) =>
   sendJson<CategoryResult>('PATCH', `/api/activities/${id}/category`, { category })
+
+export const fetchGoalHistory = (weeks = 12) =>
+  request<GoalHistory>('GET', `/api/goals/history?weeks=${weeks}`)
+
+// --- Strength sessions (phase 2b) ---
+
+export const fetchExercises = () => request<Exercise[]>('GET', '/api/strength/exercises')
+export const fetchStrengthSessions = (limit = 10) =>
+  request<StrengthSession[]>('GET', `/api/strength/sessions?limit=${limit}`)
+export const createStrengthSession = (session: StrengthSessionInput) =>
+  sendJson<StrengthSession>('POST', '/api/strength/sessions', session)
+export const deleteStrengthSession = (id: number) =>
+  request<void>('DELETE', `/api/strength/sessions/${id}`)

@@ -17,6 +17,9 @@ test('define 3 strength + 3 cardio and see the rings on the home page', async ({
   await page.getByRole('link', { name: 'Objectifs', exact: true }).click()
   await page.getByRole('button', { name: '3 muscu + 3 cardio par semaine' }).click()
   await expect(page.getByRole('list')).toContainText('Séances de musculation : 3 séances')
+  // The seed data fills the history chart of the last 12 weeks.
+  await expect(page.getByRole('heading', { name: 'Mes 12 dernières semaines' })).toBeVisible()
+  await expect(page.locator('.recharts-surface').first()).toBeVisible()
 
   await page.getByRole('link', { name: 'Accueil' }).click()
   await expect(page.getByLabel(/^Séances de musculation : .* sur 3 séances$/)).toBeVisible()

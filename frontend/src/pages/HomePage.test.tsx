@@ -34,6 +34,7 @@ const week: WeekProgress = {
       done: 2,
       achieved: false,
       activity_ids: [10, 11],
+      session_ids: [],
     },
     {
       goal: {
@@ -48,6 +49,7 @@ const week: WeekProgress = {
       done: 3,
       achieved: true,
       activity_ids: [12, 13, 14],
+      session_ids: [],
     },
   ],
   activities: [
@@ -63,6 +65,7 @@ const week: WeekProgress = {
       automatic_category: 'strength',
     },
   ],
+  sessions: [],
 }
 
 function renderPage() {
@@ -134,6 +137,30 @@ describe('HomePage', () => {
 
     const patch = fetchMock.mock.calls.find(([, init]) => init?.method === 'PATCH')
     expect(patch?.[1]?.body).toBe(JSON.stringify({ category: 'cardio' }))
+  })
+
+  it('lists typed strength sessions and says when Strava already counted them', async () => {
+    fakeBackend({
+      'GET /api/health': health,
+      'GET /api/goals/progress': {
+        ...week,
+        sessions: [
+          {
+            id: 5,
+            performed_at: '2026-10-14T16:00:00Z',
+            duration_min: 60,
+            exercises: ['Squat', 'Développé couché'],
+            set_count: 6,
+            counted: false,
+          },
+        ],
+      },
+    })
+
+    renderPage()
+
+    expect(await screen.findByText('Squat, Développé couché')).toBeInTheDocument()
+    expect(screen.getByText('Déjà comptée via Strava')).toBeInTheDocument()
   })
 
   it('loads the previous week', async () => {

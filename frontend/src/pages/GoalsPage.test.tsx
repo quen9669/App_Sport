@@ -15,6 +15,7 @@ function goalsBackend() {
   const goals: Goal[] = []
   return fakeBackend({
     'GET /api/goals': () => goals,
+    'GET /api/goals/history': () => ({ weeks: [], streak: 0 }),
     'POST /api/goals': (_url: string, init?: RequestInit) => {
       const input = JSON.parse(String(init?.body)) as GoalInput
       const goal: Goal = {
@@ -44,6 +45,35 @@ describe('GoalsPage', () => {
     expect(list).toHaveTextContent('Séances de musculation : 3 séances')
     expect(list).toHaveTextContent('Séances de cardio : 3 séances')
     expect(screen.queryByRole('button', { name: /3 muscu/ })).not.toBeInTheDocument()
+  })
+
+  it('shows the streak and the history table', async () => {
+    fakeBackend({
+      'GET /api/goals': [],
+      'GET /api/goals/history': {
+        streak: 2,
+        weeks: ['2026-W41', '2026-W42'].map((week) => ({
+          week,
+          monday: '2026-10-05',
+          all_achieved: true,
+          goals: [
+            {
+              goal_id: 1,
+              kind: 'strength_sessions',
+              sport: null,
+              target: 3,
+              done: 3,
+              achieved: true,
+            },
+          ],
+        })),
+      },
+    })
+
+    render(<GoalsPage />)
+
+    expect(await screen.findByText('2 semaines réussies d’affilée')).toBeInTheDocument()
+    expect(screen.getByRole('table')).toHaveTextContent('2026-W423 / 3Oui')
   })
 
   it('checks the target bounds before sending', async () => {

@@ -29,6 +29,14 @@ export const GOAL_TARGET_BOUNDS: Record<GoalKind, Range> = {
   distance_km: { min: 1, max: 1000 },
 }
 
+export const STRENGTH_BOUNDS = {
+  reps: { min: 1, max: 100 },
+  weight_kg: { min: 0, max: 500 },
+  rpe: { min: 1, max: 10 },
+  duration_min: { min: 1, max: 300 },
+  max_sets: 100,
+} as const
+
 /** French error message if `value` is outside `range`, otherwise null. */
 export function rangeError(value: number, range: Range, unit = ''): string | null {
   if (Number.isNaN(value)) return 'Nombre invalide'
