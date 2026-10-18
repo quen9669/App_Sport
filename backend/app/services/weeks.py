@@ -46,6 +46,9 @@ class Week:
     def previous(self) -> "Week":
         return week_of(self.monday - timedelta(days=7))
 
+    def next(self) -> "Week":
+        return week_of(self.monday + timedelta(days=7))
+
 
 def week_of(day: date) -> Week:
     iso = day.isocalendar()

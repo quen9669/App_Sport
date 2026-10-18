@@ -17,6 +17,8 @@ def test_week_label_and_days() -> None:
     assert week.sunday == date(2026, 10, 18)
     assert week.label == "2026-W42"
     assert week.previous().label == "2026-W41"
+    assert week.next().label == "2026-W43"
+    assert parse_week("2026-W53").next().label == "2027-W01"
 
 
 def test_iso_year_differs_from_calendar_year() -> None:

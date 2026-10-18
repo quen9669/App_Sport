@@ -91,6 +91,8 @@ class WeekActivityOut(BaseModel):
 
 class WeekProgressOut(BaseModel):
     week: str
+    previous_week: str
+    next_week: str
     monday: date
     sunday: date
     goals: list[GoalProgressOut]
@@ -159,6 +161,8 @@ def read_progress(
     progress, activities = week_progress(db, selected, settings.app_timezone)
     return WeekProgressOut(
         week=selected.label,
+        previous_week=selected.previous().label,
+        next_week=selected.next().label,
         monday=selected.monday,
         sunday=selected.sunday,
         goals=[
