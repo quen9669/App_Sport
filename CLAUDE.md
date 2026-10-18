@@ -120,7 +120,8 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - Training load: `services/training_load.py` (Banister TRIMP, else minutes × effort per category);
   no ACWR before 5 weeks of history. Max HR: profile, else the highest activity `max_heartrate`
   of the last year (120-230 bpm, hidden and duplicates skipped), else 220 - age. Health series: `services/health_dashboard.py` (one row per day,
-  Garmin preferred over other sources). Routes in `api/dashboards.py`; page `HealthPage` (`/sante`).
+  Garmin preferred over other sources). Routes in `api/dashboards.py`; page `HealthPage` (`/sante`,
+  one tab per `section`, see "Interface" below).
 - Weight: Garmin weigh-ins (`get_body_composition`, grams, a year looked back at each sync) go to
   `body_metric` with `source="garmin"`, never over a weigh-in typed in the app. The Santé page
   carries the last weigh-in forward until the next one (owner's choice: no smoothing, no invented values).
@@ -143,7 +144,7 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   (manual, never touched by syncs) else the place whose `role` is `strength_default` (strength) or
   `other_default` (the rest). Owner's defaults (migration): Jims Gare / Jims Gasperich.
 - `/api/activities/{id}` returns aligned series thinned to 1,000 points (speed derived from distance
-  when the source has none). Frontend: `MapPage` (`/carte`), `ActivityPage` (`/activites/:id`);
+  when the source has none). Frontend: `MapPage` (`/activites`, `/carte` redirects), `ActivityPage` (`/activites/:id`);
   Leaflet components (`RoutesMap`, `ActivityMap`) are lazy-loaded, use `preferCanvas`, and are
   mocked in unit tests (jsdom has no canvas); E2E stubs the OSM tiles.
 - The map opens on the last 14 days (owner's choice). Activities with a start point but no route
@@ -208,10 +209,25 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - `propose_weekly_plan` (`coach/tools/plan.py`) stores a `coach_plan` row as `proposed` (week
   from this Monday to two weeks ahead); the engine streams it as an SSE `plan` event, shown by
   `PlanCard`. `PATCH /api/coach/plans/{id}` accepts or rejects; accepting replaces the week's
-  previous accepted plan. `GET /api/coach/plans/current` feeds `WeekPlanSection` on Accueil.
+  previous accepted plan. `GET /api/coach/plans/current` feeds `WeekPlanSection` (page `/plan`)
+  and `TodayPlan` (today's sessions on "Ma semaine").
 - Evaluation in `backend/evals/` (`make eval`, real paid calls, `--max-eur` cap, synthetic data
   only, reports in `evals/reports/`, gitignored): `scenarios.py` (fixed date 2026-10-18 and
   seed), `checks.py`, `judge.py` (JSON grades 1-5), `report.py`. `--compare file.md` runs a
   prompt variant (coach taken from its version line) next to the current one through
   `Engine.prompt`. `tests/test_evals.py` covers it all with FakeLLM. A new prompt behaviour
   deserves a scenario.
+
+## Interface (design pass before phase 6)
+
+- Owner's choice: clean, Garmin Connect look in the red of his "QF" logo (`src/assets/logo.png`,
+  PWA icons in `public/icons/`). Tokens in `styles/theme.css`: `--accent` (logo red, fills),
+  `--accent-text` (darker red for text), `--success` (reached goals stay green), dark mode redefines
+  them. Barlow fonts come from `@fontsource` (bundled, never a font CDN).
+- Menu in 3 folders (owner's request), all in `src/navigation.ts`: Entraînement (Ma semaine,
+  Activités, Muscu, Course, Objectifs), Santé (Résumé, Sommeil, Récupération, Activité, Poids,
+  Tabac), Coach (Muscu et cardio, Longévité, Mon plan); Réglages (Profil, Sources, Mes lieux)
+  behind the gear. `AppShell` renders both a phone layout (dark top bar with the folder's tabs,
+  bottom bar with the folders) and a PC sidebar (>= 60rem); CSS shows one. In unit tests both are in
+  the DOM: scope queries by the nav's `aria-label`. E2E opens tabs through `e2e/nav.ts`.
+- Each page keeps its own `h1`. A new page needs a route in `App.tsx` and a tab in `navigation.ts`.

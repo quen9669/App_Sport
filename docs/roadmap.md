@@ -11,7 +11,7 @@
 | 3b | Carte interactive, heatmap, détail d'une activité, lieux des séances sans GPS | ✅ Terminé |
 | 4 | Prédicteur de course et allures | ✅ Terminé |
 | 5a | Moteur des coachs IA, coach musculation/cardio, écran de discussion | ✅ Terminé |
-| 5b | Coach longévité, plan de semaine proposé, banc d'évaluation | 🟡 En revue |
+| 5b | Coach longévité, plan de semaine proposé, banc d'évaluation | ✅ Terminé |
 | 6 | PWA complète, sécurité, déploiement | ⚪ À faire |
 
 ## Phase 0 : critères d'acceptation
@@ -122,6 +122,9 @@
       cigarette saisis à la main, séries et bilan par mois, gardés pour la future partie longévité
 - [x] Pas et étages montés/descendus (Garmin) sur la page Santé, avec les objectifs « Pas par
       jour » (moyenne de la semaine) et « Étages montés » (par semaine)
+- [x] Nouvelle interface épurée, esprit Garmin Connect en rouge, avec le logo QF : menu en 3
+      dossiers (Entraînement, Santé, Coach) et leurs onglets, Réglages derrière la roue dentée,
+      barre du bas sur téléphone et barre latérale sur PC, Santé découpée en onglets
 
 ## Points à surveiller
 
