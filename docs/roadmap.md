@@ -8,7 +8,7 @@
 | 2a | Profil, poids, classification des activités, objectifs et tableau de bord | ✅ Terminé |
 | 2b | Saisie des séances de musculation, historique des semaines | ✅ Terminé |
 | 3a | Activités Garmin (Strava en complément), écran Santé, charge d'entraînement | ✅ Terminé |
-| 3b | Carte interactive, heatmap, détail d'une activité, lieux des séances sans GPS | 🟡 En revue |
+| 3b | Carte interactive, heatmap, détail d'une activité, lieux des séances sans GPS | ✅ Terminé |
 | 4 | Prédicteur de course et allures | ⚪ À faire |
 | 5 | Coachs IA (musculation/cardio et longévité) | ⚪ À faire |
 | 6 | PWA complète, sécurité, déploiement | ⚪ À faire |
