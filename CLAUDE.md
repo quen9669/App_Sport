@@ -115,7 +115,8 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   count of activities must use `activities_repo.activities_between()` (or `not_duplicate()`) and skip
   `hidden`.
 - Training load: `services/training_load.py` (Banister TRIMP, else minutes × effort per category);
-  no ACWR before 5 weeks of history. Health series: `services/health_dashboard.py` (one row per day,
+  no ACWR before 5 weeks of history. Max HR: profile, else the highest activity `max_heartrate`
+  of the last year (120-230 bpm, hidden and duplicates skipped), else 220 - age. Health series: `services/health_dashboard.py` (one row per day,
   Garmin preferred over other sources). Routes in `api/dashboards.py`; page `HealthPage` (`/sante`).
 - Weight: Garmin weigh-ins (`get_body_composition`, grams, a year looked back at each sync) go to
   `body_metric` with `source="garmin"`, never over a weigh-in typed in the app. The Santé page

@@ -50,7 +50,7 @@ class WeekLoadOut(BaseModel):
 class HeartRateParamsOut(BaseModel):
     max_hr: int | None
     resting_hr: int | None
-    max_source: str | None  # "profile" or "age" (220 - age)
+    max_source: str | None  # "profile", "observed" (highest recorded) or "age" (220 - age)
     resting_source: str | None  # "profile" or "garmin"
 
 

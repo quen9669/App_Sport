@@ -88,6 +88,23 @@ def test_heart_rate_params_fall_back_to_age_and_garmin(db: Session) -> None:
     assert params.max_source == params.resting_source == "profile"
 
 
+def test_max_hr_falls_back_to_the_highest_recorded(db: Session) -> None:
+    """No max HR in the profile: the watch's highest reading beats 220 - age."""
+    profile = profile_repo.get_or_create_profile(db)
+    profile.birth_date = date(1990, 11, 1)
+    add_activity(db, "1", NOW - timedelta(days=10), max_heartrate=181.0)
+    add_activity(db, "2", NOW - timedelta(days=20), max_heartrate=187.4)
+    add_activity(db, "3", NOW - timedelta(days=30), max_heartrate=250.0)  # glitch
+    add_activity(db, "4", NOW - timedelta(days=40), max_heartrate=199.0, hidden=True)
+    add_activity(db, "5", NOW - timedelta(days=400), max_heartrate=195.0)  # too old
+    params = heart_rate_params(db, NOW.date())
+    assert (params.max_hr, params.max_source) == (187, "observed")
+
+    profile.max_heartrate = 190
+    db.commit()
+    assert heart_rate_params(db, NOW.date()).max_source == "profile"
+
+
 def test_weekly_load_and_acwr(db: Session) -> None:
     # 4 easy weeks (one 60-min run without HR = 84 each), then a big last week.
     for week_back in range(1, 5):

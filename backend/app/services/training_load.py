@@ -22,7 +22,7 @@ of injury risk: the interface says so.
 import math
 import statistics
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 
 from sqlalchemy.orm import Session
 
@@ -44,6 +44,10 @@ EFFORT_PER_MINUTE = {
 }
 ACUTE_DAYS = 7
 CHRONIC_DAYS = 28
+# Without a max HR in the profile, the highest one the watch recorded over
+# this period is used: it is personal, unlike the 220 - age formula.
+OBSERVED_MAX_LOOKBACK = timedelta(days=365)
+PLAUSIBLE_MAX_HR = (120, 230)  # same bounds as the profile form
 
 
 @dataclass
@@ -53,7 +57,7 @@ class HeartRateParams:
     max_hr: int | None
     resting_hr: int | None
     sex: str | None
-    max_source: str | None = None  # "profile" or "age"
+    max_source: str | None = None  # "profile", "observed" or "age"
     resting_source: str | None = None  # "profile" or "garmin"
 
     @property
@@ -92,11 +96,18 @@ def session_load(session: StrengthSession) -> float:
 
 
 def heart_rate_params(db: Session, today: date) -> HeartRateParams:
-    """Max HR: profile, else 220 - age. Resting HR: profile, else Garmin's recent median."""
+    """Max HR: profile, else the highest recorded in a year of activities, else 220 - age.
+
+    Resting HR: profile, else Garmin's recent median.
+    """
     profile: UserProfile = profile_repo.get_or_create_profile(db)
     params = HeartRateParams(profile.max_heartrate, profile.resting_heartrate, profile.sex)
+    since = datetime.combine(today - OBSERVED_MAX_LOOKBACK, time(), tzinfo=UTC)
+    observed = activities_repo.highest_max_heartrate(db, since, *PLAUSIBLE_MAX_HR)
     if params.max_hr is not None:
         params.max_source = "profile"
+    elif observed is not None:
+        params.max_hr, params.max_source = round(observed), "observed"
     elif profile.birth_date is not None:
         birth = profile.birth_date
         age = today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
