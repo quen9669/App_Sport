@@ -11,6 +11,10 @@ from typing import Literal
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Used when COACH_MODEL / COACH_LIGHT_MODEL are left empty in .env.
+DEFAULT_COACH_MODEL = "claude-sonnet-5-5"
+DEFAULT_COACH_LIGHT_MODEL = "claude-haiku-5-5"
+
 
 class Settings(BaseSettings):
     """All configuration values of the backend, with safe defaults for development."""
@@ -52,6 +56,30 @@ class Settings(BaseSettings):
     # --- Security ---
     # Fernet key used to encrypt OAuth tokens before they are written to the database.
     token_encryption_key: str = ""
+
+    # --- AI coaches (phase 5) ---
+    # The key stays in .env (never in the code, never logged). Empty = coaches disabled.
+    anthropic_api_key: str = ""
+    # Models are configuration, not code: empty means the defaults below.
+    coach_model: str = ""
+    coach_light_model: str = ""  # cheaper model for small jobs (summaries)
+    coach_monthly_budget_eur: float = Field(default=10, ge=0, le=1000)
+    # Prices to estimate costs, in US dollars per million tokens (check
+    # https://www.anthropic.com/pricing if they change). Cache reads cost 10 %
+    # of the input price, cache writes 125 %.
+    coach_price_input_usd: float = 3.0
+    coach_price_output_usd: float = 15.0
+    coach_light_price_input_usd: float = 1.0
+    coach_light_price_output_usd: float = 5.0
+    usd_to_eur: float = 0.92
+
+    @property
+    def main_model(self) -> str:
+        return self.coach_model or DEFAULT_COACH_MODEL
+
+    @property
+    def light_model(self) -> str:
+        return self.coach_light_model or DEFAULT_COACH_LIGHT_MODEL
 
     @property
     def cors_origin_list(self) -> list[str]:
