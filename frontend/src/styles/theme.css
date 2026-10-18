@@ -1,0 +1,80 @@
+/*
+ * Global styles and light/dark theme.
+ * Colors are CSS variables: components use var(--text) etc., and the dark
+ * theme only redefines the variables. The theme follows the phone/PC setting.
+ */
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --accent: #16a34a;
+  --danger: #dc2626;
+  --border: #e2e8f0;
+
+  color-scheme: light dark;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --accent: #22c55e;
+    --danger: #f87171;
+    --border: #334155;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Mobile-first: designed for a phone screen, widened on larger screens. */
+.app {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin-top: -0.5rem;
+}
+
+.status {
+  display: inline-block;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  font-weight: 600;
+}
+
+.status--ok {
+  color: var(--accent);
+}
+
+.status--error {
+  color: var(--danger);
+}
+
+.disclaimer {
+  margin-top: 2rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
