@@ -28,6 +28,9 @@ TEST_ENCRYPTION_KEY = Fernet.generate_key().decode()
 def test_settings(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     """Environment variables for tests; settings are re-read for each test."""
     monkeypatch.setenv("APP_ENV", "test")
+    monkeypatch.setenv("SCHEDULER_ENABLED", "false")
+    monkeypatch.setenv("GARMIN_EMAIL", "")
+    monkeypatch.setenv("GARMIN_PASSWORD", "")
     monkeypatch.setenv("TOKEN_ENCRYPTION_KEY", TEST_ENCRYPTION_KEY)
     monkeypatch.setenv("STRAVA_CLIENT_ID", "12345")
     monkeypatch.setenv("STRAVA_CLIENT_SECRET", "test-client-secret")
