@@ -42,6 +42,8 @@ class StravaActivitySummary(BaseModel):
     # Identifier given by the uploader. For activities sent by Garmin Connect it
     # looks like "garmin_ping_123456789" (to be confirmed on real data).
     external_id: str | None = None
+    location_city: str | None = None  # often empty since Strava stopped filling it
+    start_latlng: list[float] | None = None  # [lat, lng], or [] without GPS
 
 
 def parse_timezone(value: str | None) -> str | None:
@@ -82,7 +84,15 @@ def activity_fields(summary: StravaActivitySummary) -> dict[str, Any]:
         "is_manual": summary.manual,
         "is_trainer": summary.trainer,
         "garmin_activity_id": garmin_id_from_external_id(summary.external_id),
+        "location_name": summary.location_city or None,
+        **_start_point(summary.start_latlng),
     }
+
+
+def _start_point(latlng: list[float] | None) -> dict[str, float | None]:
+    if latlng and len(latlng) == 2:
+        return {"start_latitude": latlng[0], "start_longitude": latlng[1]}
+    return {"start_latitude": None, "start_longitude": None}
 
 
 def streams_to_series(payload: dict[str, Any]) -> dict[str, list[Any]]:

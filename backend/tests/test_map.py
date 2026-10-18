@@ -91,7 +91,8 @@ def test_filters_by_sport_period_and_distance(db: Session) -> None:
     assert len(ids()) == 4
     assert ids(sport=SportGroup.RUN, since=datetime.now(UTC) - timedelta(days=30)) == [run.id]
     assert len(ids(min_km=15)) == 2
-    assert len(ids(sport=SportGroup.OTHER)) == 1
+    assert len(ids(sport=SportGroup.WALK)) == 1  # the hike
+    assert ids(sport=SportGroup.OTHER) == []
 
 
 def test_hidden_duplicates_and_indoor_sessions_are_not_on_the_map(db: Session) -> None:

@@ -50,6 +50,12 @@ class Activity(Base):
     average_cadence: Mapped[float | None] = mapped_column(Float)
     # Google "encoded polyline" of the route, already simplified by Strava. Enough for the map.
     summary_polyline: Mapped[str | None] = mapped_column(Text)
+    # Where it started: the town given by the source (Garmin "locationName",
+    # Strava "location_city") and the GPS start point. The country is computed
+    # from that point (app/services/countries.py), never sent anywhere.
+    location_name: Mapped[str | None] = mapped_column(String(120))
+    start_latitude: Mapped[float | None] = mapped_column(Float)
+    start_longitude: Mapped[float | None] = mapped_column(Float)
     has_heartrate: Mapped[bool] = mapped_column(default=False)
     is_manual: Mapped[bool] = mapped_column(default=False)
     is_trainer: Mapped[bool] = mapped_column(default=False)  # indoor (home trainer, treadmill)

@@ -7,10 +7,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy.orm import Session
 
+from app.api.rows import ActivityRowFields, row_fields
 from app.config import Settings, get_settings
 from app.db.models import Goal
 from app.db.session import get_db
 from app.repositories import goals as goals_repo
+from app.services.activity_location import Locator
 from app.services.classification import activity_automatic_category, effective_category
 from app.services.dedupe import DuplicateStatus
 from app.services.goals import (
@@ -89,14 +91,8 @@ class GoalProgressOut(BaseModel):
     session_ids: list[int]  # typed strength sessions counted on their own
 
 
-class WeekActivityOut(BaseModel):
-    id: int
-    name: str
+class WeekActivityOut(ActivityRowFields):
     sport_type: str
-    start_time: datetime
-    moving_time_s: int | None
-    elapsed_time_s: int
-    distance_m: float | None
     category: str  # what is counted
     automatic_category: str  # what the rule says, to show "corrected by hand"
     source: str  # "garmin", "strava"...
@@ -208,6 +204,7 @@ def read_progress(
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from None
 
     data = week_progress(db, selected, settings.app_timezone)
+    locator = Locator(db)
     return WeekProgressOut(
         week=selected.label,
         previous_week=selected.previous().label,
@@ -226,13 +223,8 @@ def read_progress(
         ],
         activities=[
             WeekActivityOut(
-                id=a.id,
-                name=a.name,
+                **row_fields(a, locator.locate(a)),
                 sport_type=a.sport_type,
-                start_time=a.start_time,
-                moving_time_s=a.moving_time_s,
-                elapsed_time_s=a.elapsed_time_s,
-                distance_m=a.distance_m,
                 category=effective_category(a),
                 automatic_category=activity_automatic_category(a),
                 source=a.source,

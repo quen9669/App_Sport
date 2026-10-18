@@ -19,7 +19,7 @@ import {
 } from 'react-leaflet'
 import { Link } from 'react-router-dom'
 
-import type { Bounds, MapPlace, MapRoute } from '../api/client'
+import type { Bounds, MapPlace, MapPoint, MapRoute } from '../api/client'
 import {
   cssColor,
   decodePolyline,
@@ -39,17 +39,21 @@ const START_ZOOM = 12
 const HEAT_COLOR = '#ff4d00'
 const HEAT_OPACITY = 0.18
 
+// Pixels: the biggest a gym circle gets, whatever its number of sessions.
+const MAX_PLACE_RADIUS = 16
+
 export type MapMode = 'routes' | 'heat'
 
 interface Props {
   routes: MapRoute[]
+  points: MapPoint[] // activities with a start point but no route yet
   places: MapPlace[]
   mode: MapMode
   fitTo: Bounds | null // frame these bounds when they change (new filters)
   onViewChange: (bbox: string, zoom: number) => void
 }
 
-export default function RoutesMap({ routes, places, mode, fitTo, onViewChange }: Props) {
+export default function RoutesMap({ routes, points, places, mode, fitTo, onViewChange }: Props) {
   return (
     <MapContainer
       className="map"
@@ -63,6 +67,9 @@ export default function RoutesMap({ routes, places, mode, fitTo, onViewChange }:
       <FitBounds bounds={fitTo} />
       {routes.map((route) => (
         <RouteLine key={route.id} route={route} heat={mode === 'heat'} />
+      ))}
+      {points.map((point) => (
+        <StartDot key={point.id} point={point} heat={mode === 'heat'} />
       ))}
       {places.map((place) => (
         <PlaceMarker key={place.id} place={place} heat={mode === 'heat'} />
@@ -82,6 +89,34 @@ function RouteLine({ route, heat }: { route: MapRoute; heat: boolean }) {
         <RouteSummary route={route} />
       </Popup>
     </Polyline>
+  )
+}
+
+/** An activity known only by its start point (its route is not imported yet). */
+function StartDot({ point, heat }: { point: MapPoint; heat: boolean }) {
+  const color = heat ? HEAT_COLOR : cssColor(SPORT_COLOR_VARS[point.sport])
+  return (
+    <CircleMarker
+      center={[point.latitude, point.longitude]}
+      radius={5}
+      pathOptions={{
+        color,
+        fillColor: color,
+        fillOpacity: heat ? HEAT_OPACITY * 2 : 0.7,
+        weight: 1,
+      }}
+    >
+      <Popup>
+        <div className="map-popup">
+          <strong>{point.name}</strong>
+          <div className="hint">
+            {SPORT_LABELS[point.sport]} · {formatDateTime(point.start_time)}
+          </div>
+          <div className="hint">Départ seulement : le tracé n’est pas encore importé.</div>
+          <Link to={`/activites/${point.id}`}>Voir le détail</Link>
+        </div>
+      </Popup>
+    </CircleMarker>
   )
 }
 
@@ -108,8 +143,9 @@ function RouteSummary({ route }: { route: MapRoute }) {
 }
 
 function PlaceMarker({ place, heat }: { place: MapPlace; heat: boolean }) {
-  // The circle grows with the number of sessions (area, not radius, is what the eye compares).
-  const radius = 6 + 3 * Math.sqrt(place.activity_count)
+  // The circle grows with the number of sessions (area, not radius, is what the
+  // eye compares), up to a cap: a year of gym sessions must not hide the map.
+  const radius = Math.min(6 + 2 * Math.sqrt(place.activity_count), MAX_PLACE_RADIUS)
   const color = heat ? HEAT_COLOR : cssColor(SPORT_COLOR_VARS.strength)
   return (
     <CircleMarker
@@ -124,7 +160,7 @@ function PlaceMarker({ place, heat }: { place: MapPlace; heat: boolean }) {
             {place.activity_count} séance{place.activity_count > 1 ? 's' : ''} sans GPS
           </div>
           <ul>
-            {place.activities.map((activity) => (
+            {place.activities.slice(0, 5).map((activity) => (
               <li key={activity.id}>
                 <Link to={`/activites/${activity.id}`}>{activity.name}</Link>{' '}
                 <span className="hint">{formatDateTime(activity.start_time)}</span>

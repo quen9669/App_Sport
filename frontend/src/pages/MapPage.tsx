@@ -2,18 +2,23 @@
 // sport, period and distance, the list of what is shown, and the places used
 // for the sessions without GPS.
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
 
-import { fetchMapRoutes, type Bounds, type MapRoutes, type SportGroup } from '../api/client'
+import {
+  fetchMapRoutes,
+  type ActivityRow,
+  type Bounds,
+  type MapRoutes,
+  type SportGroup,
+} from '../api/client'
+import ActivityTable from '../components/ActivityTable'
 import PlacesPanel from '../components/PlacesPanel'
 import type { MapMode } from '../components/RoutesMap'
-import { formatKm, PERIOD_CHOICES, SPORT_LABELS } from '../utils/activity'
-import { formatDateTime } from '../utils/format'
+import { PERIOD_CHOICES, SPORT_LABELS } from '../utils/activity'
 
 // Loaded on demand: Leaflet (~150 kB) is only downloaded when the map is opened.
 const RoutesMap = lazy(() => import('../components/RoutesMap'))
 
-const SPORTS: (SportGroup | null)[] = [null, 'run', 'ride', 'strength', 'other']
+const SPORTS: (SportGroup | null)[] = [null, 'run', 'ride', 'walk', 'strength', 'other']
 // The list under the map stops here: beyond, the map itself is more useful.
 const LIST_LIMIT = 30
 
@@ -24,7 +29,8 @@ export interface MapFilters {
   maxKm: string
 }
 
-const START_FILTERS: MapFilters = { sport: null, days: 365, minKm: '', maxKm: '' }
+// FRANKS's choice: the map opens on the last 14 days, framed on them.
+const START_FILTERS: MapFilters = { sport: null, days: 14, minKm: '', maxKm: '' }
 
 /** Text input to a number, or undefined when empty or invalid (no filter). */
 function kmValue(text: string): number | undefined {
@@ -79,7 +85,9 @@ export default function MapPage() {
   }, [filters, view])
 
   const shown = data
-    ? data.routes.length + data.places.reduce((n, p) => n + p.activity_count, 0)
+    ? data.routes.length +
+      data.points.length +
+      data.places.reduce((n, p) => n + p.activity_count, 0)
     : 0
 
   return (
@@ -116,6 +124,7 @@ export default function MapPage() {
       <Suspense fallback={<p className="hint">Chargement de la carte…</p>}>
         <RoutesMap
           routes={data?.routes ?? []}
+          points={data?.points ?? []}
           places={data?.places ?? []}
           mode={mode}
           fitTo={fitTo}
@@ -198,38 +207,25 @@ function MapFiltersForm({
 
 /** The activities in view, newest first: easier than tapping thin lines on a phone. */
 function VisibleList({ data }: { data: MapRoutes }) {
-  const routes = [...data.routes].reverse().slice(0, LIST_LIMIT)
-  if (routes.length === 0 && data.places.length === 0) {
+  const rows: ActivityRow[] = [
+    ...data.routes,
+    ...data.points,
+    ...data.places.flatMap((place) => place.activities),
+  ]
+  // ISO dates in UTC sort correctly as text.
+  rows.sort((a, b) => b.start_time.localeCompare(a.start_time))
+  if (rows.length === 0) {
     return <p className="hint">Aucune activité dans cette zone avec ces filtres.</p>
   }
   return (
     <section className="card" aria-labelledby="visible-title">
       <h2 id="visible-title">Dans la zone affichée</h2>
-      <ul className="activity-list">
-        {routes.map((route) => (
-          <li key={route.id}>
-            <div>
-              <Link to={`/activites/${route.id}`}>{route.name}</Link>
-              <span className="hint">
-                {' '}
-                {SPORT_LABELS[route.sport]} · {formatDateTime(route.start_time)}
-                {route.distance_m !== null && ` · ${formatKm(route.distance_m)}`}
-              </span>
-            </div>
-          </li>
-        ))}
-        {data.places.map((place) => (
-          <li key={`place-${place.id}`}>
-            <div>
-              <strong>{place.name}</strong>
-              <span className="hint">
-                {' '}
-                {place.activity_count} séance{place.activity_count > 1 ? 's' : ''} sans GPS
-              </span>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <ActivityTable rows={rows.slice(0, LIST_LIMIT)} label="Activités dans la zone affichée" />
+      {rows.length > LIST_LIMIT && (
+        <p className="hint">
+          Les {LIST_LIMIT} plus récentes sur {rows.length}. Zoome ou filtre pour voir les autres.
+        </p>
+      )}
     </section>
   )
 }

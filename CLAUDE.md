@@ -141,6 +141,16 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   when the source has none). Frontend: `MapPage` (`/carte`), `ActivityPage` (`/activites/:id`);
   Leaflet components (`RoutesMap`, `ActivityMap`) are lazy-loaded, use `preferCanvas`, and are
   mocked in unit tests (jsdom has no canvas); E2E stubs the OSM tiles.
+- The map opens on the last 14 days (owner's choice). Activities with a start point but no route
+  yet (Garmin routes come with the details) are dots at their start, never at a gym.
+- Activity tables (`components/ActivityTable.tsx`, week list and map list): flag, town, date, name,
+  sport (emoji + `--sport-*` colour: red run, green ride, purple walk, yellow strength, orange other),
+  distance (empty for strength / no distance), duration. Rows come from `api/rows.py`.
+- Town: `activity.location_name` (Garmin `locationName`, Strava `location_city`), else the place's
+  `city`. Country: `services/countries.py`, offline point-in-polygon on Natural Earth borders
+  (`app/geodata/countries.json.gz`), never a web service. Flags on Windows: bundled font
+  (`country-flag-emoji-polyfill`, loaded from the app itself).
+- Motorcycle trips (`motorcycling_v2`...) are `transport` with zero training load.
 
 ## Smoke-free tracking
 

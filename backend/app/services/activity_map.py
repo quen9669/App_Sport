@@ -22,7 +22,14 @@ from sqlalchemy.orm import Session
 from app.db.models import Activity, Place
 from app.repositories import activities as activities_repo
 from app.services import geo, polyline
-from app.services.classification import RIDE_SPORTS, RUN_SPORTS, Category, effective_category
+from app.services.activity_location import start_point
+from app.services.classification import (
+    RIDE_SPORTS,
+    RUN_SPORTS,
+    WALK_SPORTS,
+    Category,
+    effective_category,
+)
 from app.services.places import PlaceBook
 from app.services.stream_codec import decode_streams
 
@@ -38,8 +45,9 @@ SPEED_WINDOW = 5
 class SportGroup(StrEnum):
     RUN = "run"
     RIDE = "ride"
+    WALK = "walk"  # walks and hikes
     STRENGTH = "strength"  # weight training and gym classes
-    OTHER = "other"  # walks, hikes, swims...
+    OTHER = "other"  # swims, yoga, skiing, motorcycle trips...
 
 
 def sport_group(activity: Activity) -> SportGroup:
@@ -47,6 +55,8 @@ def sport_group(activity: Activity) -> SportGroup:
         return SportGroup.RUN
     if activity.sport_type in RIDE_SPORTS:
         return SportGroup.RIDE
+    if activity.sport_type in WALK_SPORTS:
+        return SportGroup.WALK
     if effective_category(activity) == Category.STRENGTH:
         return SportGroup.STRENGTH
     return SportGroup.OTHER
@@ -67,6 +77,19 @@ class MapRoute:
 
 
 @dataclass
+class MapPoint:
+    """An activity with a known start point but no route (yet): drawn as a dot.
+
+    Garmin routes arrive with the activity details, fetched a few at a time
+    during the history import: until then the start point is all there is.
+    """
+
+    activity: Activity
+    latitude: float
+    longitude: float
+
+
+@dataclass
 class MapPlace:
     place: Place
     activities: list[Activity] = field(default_factory=list)  # newest first
@@ -75,6 +98,7 @@ class MapPlace:
 @dataclass
 class MapResult:
     routes: list[MapRoute] = field(default_factory=list)
+    points: list[MapPoint] = field(default_factory=list)  # start point only
     places: list[MapPlace] = field(default_factory=list)  # activities without GPS
     # Rectangle around every matching route, visible or not: the map uses it
     # to frame all the activities when it opens or when a filter changes.
@@ -111,7 +135,11 @@ def map_routes(
     for activity in _matching_activities(db, filters):
         points = polyline.decode(activity.summary_polyline or "")
         if len(points) < 2:
-            _add_to_place(result, by_place, book, activity, visible)
+            start = start_point(activity)
+            if start is not None:
+                _add_point(result, activity, start, visible)
+            else:
+                _add_to_place(result, by_place, book, activity, visible)
             continue
         box = geo.bounds_of(points)
         result.total += 1
@@ -123,6 +151,19 @@ def map_routes(
     for item in result.places:
         item.activities.reverse()  # newest first, for the popup
     return result
+
+
+def _add_point(
+    result: MapResult,
+    activity: Activity,
+    start: tuple[float, float],
+    visible: geo.Bounds | None,
+) -> None:
+    box = geo.bounds_of([start])
+    result.total += 1
+    result.bounds = box if result.bounds is None else result.bounds.union(box)
+    if visible is None or visible.intersects(box):
+        result.points.append(MapPoint(activity, start[0], start[1]))
 
 
 def _add_to_place(

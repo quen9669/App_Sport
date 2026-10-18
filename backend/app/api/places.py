@@ -20,12 +20,14 @@ router = APIRouter(prefix="/places", tags=["places"])
 Name = Annotated[str, Field(min_length=1, max_length=120)]
 Latitude = Annotated[float, Field(ge=-90, le=90)]
 Longitude = Annotated[float, Field(ge=-180, le=180)]
+City = Annotated[str, Field(max_length=120)]
 
 
 class PlaceIn(BaseModel):
     name: Name
     latitude: Latitude
     longitude: Longitude
+    city: City | None = None  # town shown in the activity lists
     role: PlaceRole | None = None
 
 
@@ -34,6 +36,7 @@ class PlaceUpdate(BaseModel):
     name: Name | None = None
     latitude: Latitude | None = None
     longitude: Longitude | None = None
+    city: City | None = None  # "" removes it
     role: PlaceRole | None = None
 
 
@@ -42,6 +45,7 @@ class PlaceOut(BaseModel):
     name: str
     latitude: float
     longitude: float
+    city: str | None
     role: PlaceRole | None
     chosen_count: int  # activities placed here by hand
 
@@ -53,6 +57,7 @@ def _out(db: Session, place: Place) -> PlaceOut:
         name=place.name,
         latitude=place.latitude,
         longitude=place.longitude,
+        city=place.city,
         role=PlaceRole(place.role) if place.role else None,
         chosen_count=chosen,
     )
@@ -72,7 +77,12 @@ def list_places(db: Session = Depends(get_db)) -> list[PlaceOut]:
 
 @router.post("", response_model=PlaceOut, status_code=status.HTTP_201_CREATED)
 def create_place(payload: PlaceIn, db: Session = Depends(get_db)) -> PlaceOut:
-    place = Place(name=payload.name, latitude=payload.latitude, longitude=payload.longitude)
+    place = Place(
+        name=payload.name,
+        latitude=payload.latitude,
+        longitude=payload.longitude,
+        city=(payload.city or "").strip() or None,
+    )
     db.add(place)
     db.flush()
     set_role(db, place, payload.role)
@@ -87,6 +97,8 @@ def update_place(place_id: int, payload: PlaceUpdate, db: Session = Depends(get_
     for name in ("name", "latitude", "longitude"):
         if fields.get(name) is not None:
             setattr(place, name, fields[name])
+    if "city" in fields:
+        place.city = (payload.city or "").strip() or None
     if "role" in fields:
         set_role(db, place, payload.role)
     db.commit()

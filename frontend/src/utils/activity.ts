@@ -7,17 +7,54 @@ export type LatLng = [number, number]
 export const SPORT_LABELS: Record<SportGroup, string> = {
   run: 'Course',
   ride: 'Vélo',
+  walk: 'Marche',
   strength: 'Muscu',
-  other: 'Autre',
+  other: 'Divers',
 }
 
-// One chart colour per sport, in the fixed order of the theme's series
-// (validated for colour blindness): the map and the legend use the same ones.
+export const SPORT_EMOJIS: Record<SportGroup, string> = {
+  run: '🏃',
+  ride: '🚴',
+  walk: '🚶',
+  strength: '🏋️',
+  other: '🤸',
+}
+
+// One colour per sport, chosen by FRANKS: red running, green cycling, purple
+// walking, yellow strength, orange the rest. Defined in theme.css (with a
+// lighter step for the dark theme); the map and the tables use the same ones.
 export const SPORT_COLOR_VARS: Record<SportGroup, string> = {
-  run: '--series-1',
-  ride: '--series-2',
-  strength: '--series-3',
-  other: '--series-4',
+  run: '--sport-run',
+  ride: '--sport-ride',
+  walk: '--sport-walk',
+  strength: '--sport-strength',
+  other: '--sport-other',
+}
+
+/**
+ * The flag emoji of a country: "LU" -> 🇱🇺. A flag is two "regional indicator"
+ * letters, which sit at a fixed distance from A-Z in Unicode. Windows does not
+ * draw them by itself: main.tsx loads a small font for that (no external request).
+ */
+export function flagEmoji(code: string | null): string {
+  if (!code || !/^[A-Za-z]{2}$/.test(code)) return ''
+  const base = 0x1f1e6 - 'A'.charCodeAt(0)
+  return String.fromCodePoint(...[...code.toUpperCase()].map((c) => base + c.charCodeAt(0)))
+}
+
+/** Country names in French, from the browser ("LU" -> "Luxembourg"). */
+export function countryName(code: string | null): string {
+  if (!code) return ''
+  try {
+    return new Intl.DisplayNames(['fr'], { type: 'region' }).of(code.toUpperCase()) ?? code
+  } catch {
+    return code
+  }
+}
+
+/** A distance only makes sense when the activity moved somewhere. */
+export function shownDistance(row: { sport: SportGroup; distance_m: number | null }) {
+  return row.sport === 'strength' || !row.distance_m ? null : row.distance_m
 }
 
 /**
@@ -119,6 +156,7 @@ export const rowsByDistance = (series: ActivitySeries) => series.distance_m.some
 
 /** Map filters: period choices, in days (null = all the history). */
 export const PERIOD_CHOICES: { label: string; days: number | null }[] = [
+  { label: '14 jours', days: 14 },
   { label: '30 jours', days: 30 },
   { label: '3 mois', days: 90 },
   { label: '1 an', days: 365 },

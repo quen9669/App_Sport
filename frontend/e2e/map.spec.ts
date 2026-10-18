@@ -19,15 +19,24 @@ test('map: routes, filters, heatmap, then the detail of an activity', async ({ p
   await expect(page.locator('.leaflet-container canvas')).toBeVisible()
   const summary = page.getByText(/correspond.* aux filtres/)
   await expect(summary).toBeVisible()
-  // The gym sessions without GPS are on their default place.
-  await expect(page.getByRole('region', { name: 'Dans la zone affichée' })).toContainText(
-    'Jims Gare',
+  // The last 14 days by default, one activity per table row, gym sessions included
+  // (they are placed at their gym, in Luxembourg).
+  const list = page.getByRole('region', { name: 'Dans la zone affichée' })
+  await expect(page.getByRole('button', { name: '14 jours' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
   )
+  await expect(list.getByRole('table')).toContainText('Muscu')
+  await expect(list.getByRole('table')).toContainText('Luxembourg')
+  if (process.env.E2E_SCREENSHOTS) {
+    await page.screenshot({
+      path: `${process.env.E2E_SCREENSHOTS}/map-${test.info().project.name}.png`,
+      fullPage: true,
+    })
+  }
 
   await page.getByRole('group', { name: 'Sport' }).getByRole('button', { name: 'Vélo' }).click()
-  await expect(page.getByRole('region', { name: 'Dans la zone affichée' })).not.toContainText(
-    'Jims Gare',
-  )
+  await expect(list.getByRole('table')).not.toContainText('Muscu')
   await page.getByRole('button', { name: 'Heatmap' }).click()
   await expect(page.getByRole('button', { name: 'Heatmap' })).toHaveAttribute(
     'aria-pressed',

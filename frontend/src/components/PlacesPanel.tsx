@@ -101,11 +101,13 @@ function PlaceRow({
     name: string
     latitude: number
     longitude: number
+    city: string | null
     role: PlaceRole | null
   }) => void
   onDelete: () => void
 }) {
   const [name, setName] = useState(place.name)
+  const [city, setCity] = useState(place.city ?? '')
   const [coords, setCoords] = useState(`${place.latitude}, ${place.longitude}`)
   const [role, setRole] = useState<PlaceRole | ''>(place.role ?? '')
   const parsed = parseCoordinates(coords)
@@ -113,7 +115,13 @@ function PlaceRow({
   function submit(event: FormEvent) {
     event.preventDefault()
     if (!parsed || !name.trim()) return
-    onSave({ name: name.trim(), latitude: parsed[0], longitude: parsed[1], role: role || null })
+    onSave({
+      name: name.trim(),
+      latitude: parsed[0],
+      longitude: parsed[1],
+      city: city.trim() || null,
+      role: role || null,
+    })
   }
 
   return (
@@ -122,6 +130,10 @@ function PlaceRow({
         <label>
           Nom
           <input value={name} maxLength={120} onChange={(event) => setName(event.target.value)} />
+        </label>
+        <label>
+          Ville (affichée dans les listes)
+          <input value={city} maxLength={120} onChange={(event) => setCity(event.target.value)} />
         </label>
         <label>
           Coordonnées (latitude, longitude)

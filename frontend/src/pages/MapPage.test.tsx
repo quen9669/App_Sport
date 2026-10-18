@@ -47,6 +47,23 @@ const data: MapRoutes = {
       average_speed_mps: 3.1,
       average_heartrate: 148,
       polyline: '_p~iF~ps|U_ulLnnqC',
+      city: 'Luxembourg',
+      country_code: 'LU',
+    },
+  ],
+  points: [
+    {
+      id: 2,
+      name: 'Nage à Royan',
+      sport: 'other',
+      start_time: '2026-10-15T09:00:00Z',
+      distance_m: 1500,
+      moving_time_s: 2400,
+      elapsed_time_s: 2500,
+      city: 'Royan',
+      country_code: 'FR',
+      latitude: 45.62,
+      longitude: -1.02,
     },
   ],
   places: [
@@ -55,12 +72,24 @@ const data: MapRoutes = {
       name: 'Jims Gare',
       latitude: 49.6,
       longitude: 6.13,
-      activity_count: 12,
-      activities: [],
+      activity_count: 1,
+      activities: [
+        {
+          id: 3,
+          name: 'Musculation',
+          sport: 'strength',
+          start_time: '2026-10-14T17:00:00Z',
+          distance_m: null,
+          moving_time_s: 900,
+          elapsed_time_s: 900,
+          city: 'Luxembourg',
+          country_code: 'LU',
+        },
+      ],
     },
   ],
   bounds: { south: 49.5, west: 6, north: 49.7, east: 6.3 },
-  total: 13,
+  total: 3,
 }
 
 const places: Place[] = [
@@ -69,6 +98,7 @@ const places: Place[] = [
     name: 'Jims Gare',
     latitude: 49.6,
     longitude: 6.13,
+    city: 'Luxembourg',
     role: 'strength_default',
     chosen_count: 0,
   },
@@ -88,16 +118,26 @@ describe('MapPage', () => {
     renderPage()
 
     expect(await screen.findByText('1 tracés, mode routes')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Sortie du mardi' })).toHaveAttribute(
-      'href',
-      '/activites/1',
-    )
+    // One table row per activity: route, start-only dot and gym session, newest first.
+    const table = screen.getByRole('table', { name: 'Activités dans la zone affichée' })
+    const rows = within(table).getAllByRole('row').slice(1) // without the header
+    expect(rows.map((row) => within(row).getByRole('link').textContent)).toEqual([
+      'Nage à Royan',
+      'Musculation',
+      'Sortie du mardi',
+    ])
+    expect(within(rows[2]!).getByRole('link')).toHaveAttribute('href', '/activites/1')
+    expect(rows[0]).toHaveTextContent('Royan')
+    expect(rows[0]).toHaveTextContent('Divers')
+    expect(rows[2]).toHaveTextContent('10,2 km')
+    // A gym session has no distance: the cell stays empty.
+    expect(within(rows[1]!).getAllByRole('cell')[5]).toHaveTextContent(/^$/)
     expect(
-      screen.getByText(/13 activités correspondent aux filtres, 13 dans la zone/),
+      screen.getByText(/3 activités correspondent aux filtres, 3 dans la zone/),
     ).toBeInTheDocument()
     const url = String(fetchMock.mock.calls.find(([u]) => String(u).includes('/map/'))?.[0])
     expect(url).toContain('bbox=6%2C49.5%2C6.3%2C49.7')
-    expect(url).toContain('days=365') // one year by default
+    expect(url).toContain('days=14') // the last 14 days by default
   })
 
   it('sends the filters to the backend and switches to the heatmap', async () => {
@@ -127,6 +167,7 @@ describe('MapPage', () => {
     const panel = await screen.findByRole('region', { name: 'Mes lieux' })
     const form = await within(panel).findByRole('form', { name: 'Lieu Jims Gare' })
     expect(within(form).getByDisplayValue('49.6, 6.13')).toBeInTheDocument()
+    expect(within(form).getByLabelText(/Ville/)).toHaveValue('Luxembourg')
     expect(within(form).getByRole('combobox')).toHaveValue('strength_default')
   })
 })
