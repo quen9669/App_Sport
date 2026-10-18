@@ -111,4 +111,13 @@ describe('HealthPage', () => {
     expect(screen.getByText(/estimée d’après ton âge/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /FC max dans le profil/ })).toBeInTheDocument()
   })
+
+  it('says when the max heart rate is the highest one the watch recorded', async () => {
+    const observed = { ...load, heart_rate: { ...load.heart_rate, max_source: 'observed' } }
+    fakeBackend({ 'GET /api/health-metrics': metrics, 'GET /api/training-load': observed })
+
+    renderPage()
+
+    expect(await screen.findByText(/la plus haute mesurée par ta montre/)).toBeInTheDocument()
+  })
 })

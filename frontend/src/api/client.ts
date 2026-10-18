@@ -235,7 +235,7 @@ export interface TrainingLoad {
   heart_rate: {
     max_hr: number | null
     resting_hr: number | null
-    max_source: 'profile' | 'age' | null
+    max_source: 'profile' | 'observed' | 'age' | null
     resting_source: 'profile' | 'garmin' | null
   }
 }

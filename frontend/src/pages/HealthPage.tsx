@@ -237,9 +237,7 @@ function LoadSection({ load }: { load: TrainingLoad }) {
       </p>
       <p className="hint">
         {hr.max_hr && hr.resting_hr
-          ? `Calcul avec ta FC (TRIMP) : max ${hr.max_hr} bpm${
-              hr.max_source === 'age' ? ' (estimée d’après ton âge)' : ''
-            }, repos ${hr.resting_hr} bpm${hr.resting_source === 'garmin' ? ' (Garmin)' : ''}.`
+          ? `Calcul avec ta FC (TRIMP) : max ${hr.max_hr} bpm${MAX_SOURCE_NOTE[hr.max_source ?? 'profile']}, repos ${hr.resting_hr} bpm${hr.resting_source === 'garmin' ? ' (Garmin)' : ''}.`
           : 'FC max ou de repos inconnue : la charge est estimée d’après la durée.'}{' '}
         {hr.max_source !== 'profile' && (
           <Link to="/profil">Renseigne ta FC max dans le profil.</Link>
@@ -276,6 +274,13 @@ function LoadSection({ load }: { load: TrainingLoad }) {
     </section>
   )
 }
+
+// Where the max HR comes from, shown after its value.
+const MAX_SOURCE_NOTE = {
+  profile: '',
+  observed: ' (la plus haute mesurée par ta montre sur un an)',
+  age: ' (estimée d’après ton âge)',
+} as const
 
 function formatOrNull(value: number | null, digits: number): string | null {
   const rounded = round(value, digits)

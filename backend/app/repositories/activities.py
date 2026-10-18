@@ -54,6 +54,22 @@ def activities_between(db: Session, start: datetime, end: datetime) -> list[Acti
     return list(db.scalars(query))
 
 
+def highest_max_heartrate(db: Session, since: datetime, low: int, high: int) -> float | None:
+    """Highest max heart rate recorded by an activity since ``since``.
+
+    Readings outside [low, high] are ignored: a strap that slips or a watch
+    glitch can report 40 or 250 bpm. Confirmed duplicates and hidden
+    activities are skipped, like everywhere else.
+    """
+    query = select(func.max(Activity.max_heartrate)).where(
+        Activity.start_time >= since,
+        Activity.max_heartrate.between(low, high),
+        Activity.hidden.is_(False),
+        not_duplicate(),
+    )
+    return db.scalar(query)
+
+
 def upsert_raw_payload(db: Session, source: str, kind: str, external_id: str, payload: Any) -> None:
     """Keep the latest raw JSON for (source, kind, external_id)."""
     row = db.scalar(
