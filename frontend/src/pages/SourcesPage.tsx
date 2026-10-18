@@ -125,8 +125,43 @@ export default function SourcesPage() {
         </p>
       )}
 
+      <section className="card" aria-labelledby="garmin-title">
+        <h2 id="garmin-title">Garmin Connect</h2>
+        <p className="hint">Source principale : activités avec la fréquence cardiaque, sommeil.</p>
+        {garmin === null ? (
+          <p>Chargement…</p>
+        ) : !garmin.configured ? (
+          <p>
+            Garmin n’est pas configuré (<code>GARMIN_EMAIL</code> et <code>GARMIN_PASSWORD</code>{' '}
+            dans <code>.env</code>). Tu peux aussi importer un fichier ci-dessous.
+          </p>
+        ) : (
+          <>
+            <p>
+              {garmin.activity_count} activités importées
+              {garmin.activity_history_complete
+                ? ', historique complet.'
+                : ', historique en cours.'}
+            </p>
+            <p>
+              {garmin.night_count} nuits et {garmin.day_count} jours importés
+              {garmin.latest_day ? `, dernier jour : ${garmin.latest_day}.` : '.'}
+            </p>
+            <button
+              type="button"
+              onClick={() => void run(startGarminSync, 'Synchronisation Garmin lancée.')}
+            >
+              Synchroniser maintenant
+            </button>
+          </>
+        )}
+      </section>
+
       <section className="card" aria-labelledby="strava-title">
         <h2 id="strava-title">Strava</h2>
+        <p className="hint">
+          En complément : une activité déjà présente dans Garmin n’est comptée qu’une fois.
+        </p>
         {strava === null ? (
           <p>Chargement…</p>
         ) : !strava.configured ? (
@@ -160,31 +195,6 @@ export default function SourcesPage() {
                 Déconnecter
               </button>
             </div>
-          </>
-        )}
-      </section>
-
-      <section className="card" aria-labelledby="garmin-title">
-        <h2 id="garmin-title">Garmin</h2>
-        {garmin === null ? (
-          <p>Chargement…</p>
-        ) : !garmin.configured ? (
-          <p>
-            Garmin n’est pas configuré (<code>GARMIN_EMAIL</code> et <code>GARMIN_PASSWORD</code>{' '}
-            dans <code>.env</code>). Tu peux aussi importer un fichier ci-dessous.
-          </p>
-        ) : (
-          <>
-            <p>
-              {garmin.night_count} nuits et {garmin.day_count} jours importés
-              {garmin.latest_day ? `, dernier jour : ${garmin.latest_day}.` : '.'}
-            </p>
-            <button
-              type="button"
-              onClick={() => void run(startGarminSync, 'Synchronisation Garmin lancée.')}
-            >
-              Synchroniser maintenant
-            </button>
           </>
         )}
       </section>

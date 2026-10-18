@@ -63,6 +63,9 @@ const week: WeekProgress = {
       distance_m: null,
       category: 'strength',
       automatic_category: 'strength',
+      source: 'garmin',
+      hidden: false,
+      possible_duplicate: false,
     },
   ],
   sessions: [],
@@ -139,7 +142,7 @@ describe('HomePage', () => {
     expect(patch?.[1]?.body).toBe(JSON.stringify({ category: 'cardio' }))
   })
 
-  it('lists typed strength sessions and says when Strava already counted them', async () => {
+  it('lists typed strength sessions and says when the watch already counted them', async () => {
     fakeBackend({
       'GET /api/health': health,
       'GET /api/goals/progress': {
@@ -160,7 +163,46 @@ describe('HomePage', () => {
     renderPage()
 
     expect(await screen.findByText('Squat, Développé couché')).toBeInTheDocument()
-    expect(screen.getByText('Déjà comptée via Strava')).toBeInTheDocument()
+    expect(screen.getByText('Déjà comptée via la montre')).toBeInTheDocument()
+  })
+
+  it('hides one of two possible duplicates in one tap', async () => {
+    const duplicate = {
+      ...week.activities[0]!,
+      id: 12,
+      name: 'Vélo intérieur',
+      source: 'strava',
+      possible_duplicate: true,
+    }
+    const fetchMock = fakeBackend({
+      'GET /api/health': health,
+      'GET /api/goals/progress': { ...week, activities: [...week.activities, duplicate] },
+      'PATCH /api/activities/12/hidden': { id: 12, hidden: true },
+    })
+
+    renderPage()
+    expect(await screen.findByText('Doublon possible')).toBeInTheDocument()
+    // Only the doubtful activity offers the button.
+    expect(screen.queryByRole('button', { name: 'Masquer Body Pump' })).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Masquer Vélo intérieur' }))
+
+    const patch = fetchMock.mock.calls.find(([, init]) => init?.method === 'PATCH')
+    expect(patch?.[1]?.body).toBe(JSON.stringify({ hidden: true }))
+  })
+
+  it('offers to show a hidden activity again', async () => {
+    fakeBackend({
+      'GET /api/health': health,
+      'GET /api/goals/progress': {
+        ...week,
+        activities: [{ ...week.activities[0]!, hidden: true }],
+      },
+    })
+
+    renderPage()
+
+    expect(await screen.findByText('Masquée')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Réafficher Body Pump' })).toBeInTheDocument()
   })
 
   it('loads the previous week', async () => {

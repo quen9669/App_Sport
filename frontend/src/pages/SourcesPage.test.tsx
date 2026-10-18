@@ -21,6 +21,8 @@ const garminOff: GarminStatus = {
   night_count: 0,
   day_count: 0,
   latest_day: null,
+  activity_count: 0,
+  activity_history_complete: false,
 }
 
 const log: SyncLog = {

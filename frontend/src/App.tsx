@@ -2,6 +2,7 @@
 import { NavLink, Route, Routes } from 'react-router-dom'
 
 import GoalsPage from './pages/GoalsPage'
+import HealthPage from './pages/HealthPage'
 import HomePage from './pages/HomePage'
 import ProfilePage from './pages/ProfilePage'
 import SourcesPage from './pages/SourcesPage'
@@ -16,6 +17,7 @@ export default function App() {
         </NavLink>
         <NavLink to="/muscu">Muscu</NavLink>
         <NavLink to="/objectifs">Objectifs</NavLink>
+        <NavLink to="/sante">Santé</NavLink>
         <NavLink to="/profil">Profil</NavLink>
         <NavLink to="/sources">Sources</NavLink>
       </nav>
@@ -24,6 +26,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/muscu" element={<StrengthPage />} />
           <Route path="/objectifs" element={<GoalsPage />} />
+          <Route path="/sante" element={<HealthPage />} />
           <Route path="/profil" element={<ProfilePage />} />
           <Route path="/sources" element={<SourcesPage />} />
         </Routes>
