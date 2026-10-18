@@ -549,3 +549,102 @@ export const deleteCigaretteDay = (day: string) =>
   request<Smoking>('DELETE', `/api/smoking/days/${day}`)
 export const saveQuitDate = (quitDate: string) =>
   sendJson<Smoking>('PUT', '/api/smoking/quit-date', { quit_date: quitDate })
+
+// --- Race predictor ---
+
+/** One run used (or considered) by the form estimate. */
+export interface RaceEffort {
+  activity_id: number
+  name: string
+  day: string // local date
+  distance_m: number
+  time_s: number
+  vdot: number
+  method: 'race' | 'heart_rate'
+  segment: boolean // the best 5/10 km inside a longer run
+  weight: number // 1 today, 0.5 after 45 days
+  used: boolean // part of the estimate
+}
+
+export interface ExcludedRun {
+  activity_id: number
+  name: string
+  day: string
+  distance_m: number
+}
+
+export interface RaceForm {
+  status: 'ok' | 'insufficient'
+  vdot: number | null
+  low: number | null
+  high: number | null
+  reason: string | null // French, shown as is
+  efforts: RaceEffort[]
+  excluded: ExcludedRun[]
+}
+
+export interface RacePrediction {
+  label: string
+  distance_m: number
+  time_s: number
+  fastest_s: number
+  slowest_s: number
+  riegel_s: number
+}
+
+export type PaceZoneKey = 'easy' | 'marathon' | 'threshold' | 'interval' | 'repetition'
+
+export interface PaceZone {
+  key: PaceZoneKey
+  slow_s_per_km: number
+  fast_s_per_km: number
+}
+
+export interface RaceSplit {
+  km: number
+  pace_s_per_km: number
+  elapsed_s: number
+}
+
+export type Feasibility = 'realistic' | 'ambitious' | 'unlikely'
+
+export interface RaceTarget {
+  name: string
+  distance_m: number
+  race_date: string
+  target_time_s: number | null
+  elevation_gain_m: number
+  days_left: number
+  predicted_s: number | null
+  required_vdot: number | null
+  pace_plan: {
+    target_time_s: number
+    average_pace_s_per_km: number
+    hill_allowance_s: number
+    splits: RaceSplit[]
+  } | null
+  feasibility: { verdict: Feasibility; gap_s: number; gap_pct: number } | null
+}
+
+export interface Race {
+  form: RaceForm
+  predictions: RacePrediction[]
+  zones: PaceZone[]
+  target: RaceTarget | null
+}
+
+export interface RaceTargetInput {
+  name: string
+  distance_m: number
+  race_date: string
+  target_time_s: number | null
+  elevation_gain_m: number
+}
+
+export const fetchRace = () => request<Race>('GET', '/api/race')
+/** Every change answers with the whole screen (the predictions may change). */
+export const saveRaceTarget = (target: RaceTargetInput) =>
+  sendJson<Race>('PUT', '/api/race/target', target)
+export const deleteRaceTarget = () => request<Race>('DELETE', '/api/race/target')
+export const setRunExcluded = (activityId: number, excluded: boolean) =>
+  sendJson<Race>('PATCH', `/api/race/efforts/${activityId}`, { excluded })

@@ -59,3 +59,10 @@ export function ageOn(birthDate: string, today: Date = new Date()): number {
 
 // Same as backend/app/api/smoking.py.
 export const CIGARETTE_BOUNDS: Range = { min: 1, max: 60 }
+
+// Same as backend/app/api/race.py (distance in km here, metres there).
+export const RACE_BOUNDS = {
+  distance_km: { min: 0.8, max: 100 },
+  elevation_gain_m: { min: 0, max: 5000 },
+  target_time_s: { min: 120, max: 24 * 3600 },
+}

@@ -533,6 +533,38 @@ textarea {
   font-size: 0.85rem;
 }
 
+/* Race page: the runs that make the form estimate stand out. */
+.activity-table .row--used td {
+  font-weight: 600;
+}
+
+.activity-table button {
+  padding: 0.1rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+/* Feasibility of the target time: colour plus the word, never colour alone. */
+.badge.feasibility--realistic,
+.badge.feasibility--ambitious,
+.badge.feasibility--unlikely {
+  margin-left: 0;
+  color: var(--text);
+  border-color: var(--feasibility-color);
+  background: color-mix(in srgb, var(--feasibility-color) 18%, transparent);
+}
+
+.feasibility--realistic {
+  --feasibility-color: var(--accent);
+}
+
+.feasibility--ambitious {
+  --feasibility-color: var(--series-4);
+}
+
+.feasibility--unlikely {
+  --feasibility-color: var(--danger);
+}
+
 /* Read by screen readers, invisible on screen. */
 .visually-hidden {
   position: absolute;
