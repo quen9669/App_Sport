@@ -6,6 +6,7 @@ from sqlalchemy import Date, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
+from app.db.models.enums import DataSource
 from app.db.types import UTCDateTime, utc_now
 
 
@@ -26,7 +27,9 @@ class UserProfile(Base):
     birth_date: Mapped[date | None] = mapped_column(Date)
     max_heartrate: Mapped[int | None] = mapped_column(Integer)
     resting_heartrate: Mapped[int | None] = mapped_column(Integer)
-    experience_level: Mapped[str | None] = mapped_column(String(16))  # beginner/intermediate/advanced
+    experience_level: Mapped[str | None] = mapped_column(
+        String(16)
+    )  # beginner/intermediate/advanced
     # Free text: injuries and limitations the coaches must respect.
     injuries: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
@@ -40,6 +43,8 @@ class BodyMetric(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     measured_on: Mapped[date] = mapped_column(Date, unique=True, index=True)
+    # "manual" for entries typed in the app, "synthetic" for `make seed` test data.
+    source: Mapped[str] = mapped_column(String(32), default=DataSource.MANUAL)
     weight_kg: Mapped[float] = mapped_column(Float)
     body_fat_pct: Mapped[float | None] = mapped_column(Float)
     waist_cm: Mapped[float | None] = mapped_column(Float)

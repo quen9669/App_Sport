@@ -23,7 +23,14 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
-from app.db.models import Activity, ActivityStream, DailyHealth, RawPayload, SleepNight
+from app.db.models import (
+    Activity,
+    ActivityStream,
+    BodyMetric,
+    DailyHealth,
+    RawPayload,
+    SleepNight,
+)
 from app.db.models.enums import DataSource
 from app.db.session import get_session_factory
 from app.integrations.health.provider import DailyHealthRecord, HealthBatch, SleepRecord
@@ -217,10 +224,39 @@ def seed_health(db: Session, start: date, end: date, rng: random.Random) -> int:
     return len(batch.sleep)
 
 
+def seed_weight(db: Session, start: date, end: date, rng: random.Random) -> int:
+    """A weigh-in about 4 days a week, slowly going from ~82 to ~79 kg.
+
+    Days that already have a real (manual) weigh-in are left alone.
+    """
+    existing = {
+        metric.measured_on: metric
+        for metric in db.scalars(select(BodyMetric).where(BodyMetric.measured_on >= start))
+    }
+    total_days = max((end - start).days, 1)
+    count = 0
+    day = start
+    while day <= end:
+        progress = (day - start).days / total_days
+        weight = round(82 - 3 * progress + rng.uniform(-0.6, 0.6), 1)
+        measured = rng.random() < 0.6
+        current = existing.get(day)
+        if measured and (current is None or current.source == SOURCE):
+            if current is None:
+                current = BodyMetric(measured_on=day, source=SOURCE)
+                db.add(current)
+            current.weight_kg = weight
+            current.waist_cm = round(88 - 3 * progress + rng.uniform(-0.5, 0.5), 1)
+            count += 1
+        day += timedelta(days=1)
+    db.commit()
+    return count
+
+
 def clear(db: Session) -> None:
     activity_ids = select(Activity.id).where(Activity.source == SOURCE)
     db.execute(delete(ActivityStream).where(ActivityStream.activity_id.in_(activity_ids)))
-    for model in (Activity, SleepNight, DailyHealth, RawPayload):
+    for model in (Activity, SleepNight, DailyHealth, RawPayload, BodyMetric):
         db.execute(delete(model).where(model.source == SOURCE))
     db.commit()
 
@@ -243,8 +279,10 @@ def main() -> None:
         start = end - timedelta(days=args.days - 1)
         activities = seed_activities(db, start, end, rng)
         nights = seed_health(db, start, end, rng)
+        weigh_ins = seed_weight(db, start, end, rng)
         print(
-            f"Synthetic data ready: {activities} activities and {nights} nights ({start} to {end})."
+            f"Synthetic data ready: {activities} activities, {nights} nights and "
+            f"{weigh_ins} weigh-ins ({start} to {end})."
         )
 
 

@@ -26,6 +26,7 @@ def upgrade() -> None:
         "body_metric",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("measured_on", sa.Date(), nullable=False),
+        sa.Column("source", sa.String(length=32), nullable=False),
         sa.Column("weight_kg", sa.Float(), nullable=False),
         sa.Column("body_fat_pct", sa.Float(), nullable=True),
         sa.Column("waist_cm", sa.Float(), nullable=True),
