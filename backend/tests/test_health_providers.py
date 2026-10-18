@@ -36,6 +36,7 @@ def test_garmin_provider_fetches_each_day() -> None:
 
     assert [s.night_date for s in batch.sleep] == [date(2026, 10, 15), date(2026, 10, 16), DAY]
     assert batch.daily[0].steps == 10423
+    assert (batch.daily[0].floors_ascended, batch.daily[0].floors_descended) == (12, 10)
     assert batch.daily[0].vo2max == 52.4
     assert batch.warnings == []
 

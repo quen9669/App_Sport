@@ -28,6 +28,27 @@ test('Santé page: sleep and recovery curves, then the training load', async ({ 
   await expect(intensity.getByRole('link', { name: /Ajoute un objectif/ })).toBeVisible()
 })
 
+test('Santé page: steps per day and floors per week', async ({ page }, testInfo) => {
+  await page.goto('/sante')
+  // The seed has steps and floors every day, and no goal for them.
+  const steps = page.getByRole('region', { name: 'Pas' })
+  await expect(steps.locator('.recharts-surface')).toBeVisible()
+  await expect(steps.getByText('Moyenne par jour cette semaine')).toBeVisible()
+  const floors = page.getByRole('region', { name: 'Étages' })
+  await expect(floors.locator('.recharts-surface')).toBeVisible()
+  await expect(floors.getByRole('link', { name: /Étages montés/ })).toBeVisible()
+  if (process.env.E2E_SCREENSHOTS) {
+    for (const [name, card] of [
+      ['steps', steps],
+      ['floors', floors],
+    ] as const) {
+      await card.screenshot({
+        path: `${process.env.E2E_SCREENSHOTS}/${name}-${testInfo.project.name}.png`,
+      })
+    }
+  }
+})
+
 test('Santé page: write a day with a cigarette, then remove it', async ({ page }, testInfo) => {
   // Each device writes its own day: the two projects share the E2E database.
   const daysAgo = testInfo.project.name === 'android' ? 4 : 3

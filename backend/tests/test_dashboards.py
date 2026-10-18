@@ -18,6 +18,7 @@ from app.services.health_dashboard import (
     minutes_from_midnight,
     sleep_regularity,
     weekly_intensity,
+    weekly_steps,
 )
 from app.services.training_load import (
     HeartRateParams,
@@ -253,3 +254,48 @@ def test_intensity_minutes_route_and_goal(client: TestClient, db: Session) -> No
     progress = client.get("/api/goals/progress").json()
     item = next(i for i in progress["goals"] if i["goal"]["id"] == goal["id"])
     assert item["done"] == 200
+
+
+def test_weekly_steps_average_only_days_with_data(db: Session) -> None:
+    w42 = Week(2026, 42)
+    db.add(DailyHealth(source="garmin", day=date(2026, 10, 12), steps=8000, floors_ascended=10))
+    db.add(
+        DailyHealth(
+            source="garmin",
+            day=date(2026, 10, 13),
+            steps=12000,
+            floors_ascended=4,
+            floors_descended=6,
+        )
+    )
+    db.add(DailyHealth(source="garmin", day=date(2026, 10, 14), resting_heartrate=50))  # no data
+    db.commit()
+
+    (week,) = weekly_steps(db, [w42])
+
+    assert (week.steps, week.step_days, week.steps_per_day) == (20000, 2, 10000)
+    assert (week.floors_ascended, week.floors_descended, week.floor_days) == (14, 6, 2)
+    assert weekly_steps(db, [Week(2026, 40)])[0].steps_per_day is None
+
+
+def test_steps_floors_route_and_goals(client: TestClient, db: Session) -> None:
+    body = client.get("/api/steps-floors").json()
+    assert len(body["weeks"]) == 12
+    assert (body["steps_target"], body["floors_target"]) == (None, None)
+
+    monday = week_of(local_today(TZ)).monday
+    db.add(DailyHealth(source="garmin", day=monday, steps=9000, floors_ascended=20))
+    db.commit()
+    steps = client.post("/api/goals", json={"kind": "steps", "target": 10000}).json()
+    floors = client.post("/api/goals", json={"kind": "floors", "target": 50}).json()
+    assert client.post("/api/goals", json={"kind": "steps", "target": 500}).status_code == 422
+
+    body = client.get("/api/steps-floors").json()
+    assert (body["steps_target"], body["floors_target"]) == (10000, 50)
+    assert body["weeks"][-1]["steps_per_day"] == 9000
+    progress = {
+        i["goal"]["id"]: i["done"] for i in client.get("/api/goals/progress").json()["goals"]
+    }
+    assert (progress[steps["id"]], progress[floors["id"]]) == (9000, 20)
+    day = client.get("/api/health-metrics?days=7").json()["days"]
+    assert any(d["steps"] == 9000 and d["floors_ascended"] == 20 for d in day)

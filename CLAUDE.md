@@ -128,6 +128,11 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   `intensity_minutes` (Garmin daily `moderateIntensityMinutes` + 2 × `vigorousIntensityMinutes`,
   summed per week by `health_dashboard.weekly_intensity`). Their targets are drawn as a dashed line
   on the Santé charts (`WeeklyBarChart`); `/api/intensity-minutes` serves the weekly series.
+- Steps and floors (owner's request): `daily_health.steps` / `floors_ascended` / `floors_descended`
+  (Garmin `totalSteps`, `floorsAscended`, `floorsDescended`, floors rounded; old days refilled from
+  `raw_payload` by the migration). `health_dashboard.weekly_steps`; `/api/steps-floors`. Goal kinds
+  `steps` (a DAILY target: the week's average day of the days with data must reach it) and `floors`
+  (floors climbed per week). Santé cards "Pas" (one bar per day) and "Étages" (per week).
 
 ## Map and activity detail (phase 3b)
 

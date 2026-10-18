@@ -44,6 +44,8 @@ class DailyHealthRecord:
     body_battery_min: int | None = None
     intensity_moderate_min: int | None = None
     intensity_vigorous_min: int | None = None
+    floors_ascended: int | None = None
+    floors_descended: int | None = None
     raw: Any = None
 
 

@@ -18,6 +18,8 @@ GOAL_UNITS = {
     "distance_km": "km",
     "training_load": "load points",
     "intensity_minutes": "Garmin intensity minutes",
+    "steps": "steps per day (weekly average)",
+    "floors": "floors climbed",
 }
 
 

@@ -48,6 +48,8 @@ def check_daily(record: DailyHealthRecord) -> list[str]:
         ("body_battery_min", 0, 100),
         ("intensity_moderate_min", 0, 1440),  # minutes in a day
         ("intensity_vigorous_min", 0, 1440),
+        ("floors_ascended", 0, 1000),  # 1,000 floors = 3 km of climbing in a day
+        ("floors_descended", 0, 1000),
     ]
     for name, low, high in checks:
         value = getattr(record, name)

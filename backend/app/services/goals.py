@@ -16,7 +16,7 @@ from app.services.classification import (
     Category,
     effective_category,
 )
-from app.services.health_dashboard import weekly_intensity
+from app.services.health_dashboard import WeekSteps, weekly_intensity, weekly_steps
 from app.services.strength import counts_on_its_own
 from app.services.training_load import activity_load, heart_rate_params, session_load
 from app.services.weeks import Week, local_today
@@ -32,6 +32,9 @@ class GoalKind(StrEnum):
     DISTANCE_KM = "distance_km"  # km per week, optionally only running or cycling
     TRAINING_LOAD = "training_load"  # training load points per week (Santé page chart)
     INTENSITY_MINUTES = "intensity_minutes"  # Garmin intensity minutes per week
+    # The two below come from the watch's daily summary, like intensity minutes.
+    STEPS = "steps"  # steps PER DAY, averaged over the week's days with data
+    FLOORS = "floors"  # floors climbed per week
 
 
 class GoalStatus(StrEnum):
@@ -137,6 +140,7 @@ def compute_progress(
     sessions: list[StrengthSession] | None = None,
     load_of: LoadOf | None = None,
     intensity: float | None = None,
+    steps: WeekSteps | None = None,
 ) -> GoalProgress:
     """Count the activities (and typed strength sessions) of the week for one goal.
 
@@ -145,11 +149,19 @@ def compute_progress(
     Hidden activities don't count. ``load_of`` is only needed by training
     load goals: without it, they stay at 0. ``intensity`` is the week's Garmin
     intensity minutes: they come from the watch's daily summary, not from
-    activities, so they are passed in already added up.
+    activities, so they are passed in already added up. ``steps`` is the same
+    for steps and floors.
     """
     progress = GoalProgress(goal=goal, done=0)
     if goal.kind == GoalKind.INTENSITY_MINUTES:
         progress.done = float(intensity or 0)
+        return progress
+    if goal.kind == GoalKind.STEPS:
+        # A daily target: the week is a success if the average day reaches it.
+        progress.done = float((steps.steps_per_day if steps else None) or 0)
+        return progress
+    if goal.kind == GoalKind.FLOORS:
+        progress.done = float(steps.floors_ascended if steps else 0)
         return progress
     for activity in activities:
         if activity.hidden:
@@ -195,8 +207,9 @@ def week_progress(db: Session, week: Week, timezone: str) -> WeekData:
     sessions = strength_repo.sessions_between(db, start, end)
     load_of = load_function(db, timezone)
     intensity = weekly_intensity(db, [week])[0].total
+    steps = weekly_steps(db, [week])[0]
     progress = [
-        compute_progress(goal, activities, sessions, load_of, intensity)
+        compute_progress(goal, activities, sessions, load_of, intensity, steps)
         for goal in goals_for_week(db, week)
     ]
     return WeekData(week, progress, activities, sessions)
@@ -219,14 +232,15 @@ def weeks_history(db: Session, last: Week, count: int, timezone: str) -> list[We
     goals = counted_goals(db)
     load_of = load_function(db, timezone)
     intensities = weekly_intensity(db, weeks)
+    steps_by_week = weekly_steps(db, weeks)
 
     history = []
-    for week, intensity in zip(weeks, intensities, strict=True):
+    for week, intensity, steps in zip(weeks, intensities, steps_by_week, strict=True):
         week_start, week_end = week.utc_range(timezone)
         week_activities = [a for a in activities if week_start <= a.start_time < week_end]
         week_sessions = [s for s in sessions if week_start <= s.performed_at < week_end]
         progress = [
-            compute_progress(goal, week_activities, week_sessions, load_of, intensity.total)
+            compute_progress(goal, week_activities, week_sessions, load_of, intensity.total, steps)
             for goal in goals
             if overlaps(goal, week)
         ]

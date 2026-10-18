@@ -9,6 +9,7 @@ import type {
   HealthMetrics,
   IntensityMinutes,
   Smoking,
+  StepsAndFloors,
   TrainingLoad,
 } from '../api/client'
 import { fakeBackend } from '../test/fakeBackend'
@@ -29,6 +30,9 @@ function day(date: string, overrides: Partial<HealthDay> = {}): HealthDay {
     hrv_ms: 60,
     weight_kg: null,
     weight_measured_on: null,
+    steps: null,
+    floors_ascended: null,
+    floors_descended: null,
     ...overrides,
   }
 }
@@ -48,6 +52,33 @@ const load: TrainingLoad = {
   acwr: 1.5,
   heart_rate: { max_hr: 185, resting_hr: 50, max_source: 'age', resting_source: 'garmin' },
   target: null,
+}
+
+const steps: StepsAndFloors = {
+  weeks: [
+    {
+      week: '2026-W41',
+      monday: '2026-10-05',
+      steps_per_day: 9500,
+      steps: 66500,
+      step_days: 7,
+      floors_ascended: 70,
+      floors_descended: 64,
+      floor_days: 7,
+    },
+    {
+      week: '2026-W42',
+      monday: '2026-10-12',
+      steps_per_day: 11200,
+      steps: 78400,
+      step_days: 7,
+      floors_ascended: 45,
+      floors_descended: 41,
+      floor_days: 7,
+    },
+  ],
+  steps_target: 10000,
+  floors_target: null,
 }
 
 const intensity: IntensityMinutes = {
@@ -87,6 +118,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
 
@@ -108,6 +140,7 @@ describe('HealthPage', () => {
       },
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
 
@@ -122,6 +155,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
 
@@ -135,6 +169,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
 
@@ -150,6 +185,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
 
@@ -167,6 +203,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': observed,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
 
@@ -180,6 +217,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
     const { unmount } = renderPage()
@@ -192,6 +230,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': { ...load, target: 350 },
       'GET /api/intensity-minutes': intensity,
+      'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
     renderPage()
@@ -205,6 +244,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
     renderPage()
@@ -213,5 +253,32 @@ describe('HealthPage', () => {
     expect(within(section).getByText('330 min')).toBeInTheDocument()
     expect(within(section).getByText('350 min')).toBeInTheDocument()
     expect(within(section).getByText(/compte double/)).toBeInTheDocument()
+  })
+
+  it('shows daily steps with their goal, and the weekly floors', async () => {
+    fakeBackend({
+      'GET /api/health-metrics': {
+        ...metrics,
+        days: [
+          day('2026-10-16', { steps: 12000, floors_ascended: 8, floors_descended: 7 }),
+          day('2026-10-17', { steps: 8000 }),
+        ],
+      },
+      'GET /api/training-load': load,
+      'GET /api/intensity-minutes': intensity,
+      'GET /api/steps-floors': steps,
+      'GET /api/smoking': smoking,
+    })
+    renderPage()
+
+    const stepsCard = await screen.findByRole('region', { name: 'Pas' })
+    expect(within(stepsCard).getByText(/11\s200/)).toBeInTheDocument() // this week
+    expect(within(stepsCard).getAllByText(/^10\s000$/)).toHaveLength(2) // the period and the goal
+    const floors = screen.getByRole('region', { name: 'Étages' })
+    const climbed = within(floors).getByText('Montés cette semaine').nextElementSibling
+    expect(climbed).toHaveTextContent('45')
+    const down = within(floors).getByText('Descendus cette semaine').nextElementSibling
+    expect(down).toHaveTextContent('41')
+    expect(within(floors).getByRole('link', { name: /Étages montés/ })).toBeInTheDocument()
   })
 })

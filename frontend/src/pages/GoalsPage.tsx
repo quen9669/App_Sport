@@ -227,7 +227,8 @@ export default function GoalsPage() {
             </select>
           </label>
           <label>
-            Cible par semaine ({GOAL_UNITS[kind]})
+            {/* Steps are a daily target (the week's average day must reach it). */}
+            {kind === 'steps' ? 'Cible par jour' : 'Cible par semaine'} ({GOAL_UNITS[kind]})
             <input
               inputMode="decimal"
               value={target}

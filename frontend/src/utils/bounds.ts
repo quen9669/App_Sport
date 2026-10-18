@@ -29,6 +29,8 @@ export const GOAL_TARGET_BOUNDS: Record<GoalKind, Range> = {
   distance_km: { min: 1, max: 1000 },
   training_load: { min: 10, max: 5000 },
   intensity_minutes: { min: 10, max: 3000 },
+  steps: { min: 1000, max: 50000 }, // per day
+  floors: { min: 1, max: 1000 },
 }
 
 export const STRENGTH_BOUNDS = {

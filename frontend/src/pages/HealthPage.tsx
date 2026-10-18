@@ -1,15 +1,17 @@
-// "Santé" page: sleep, resting heart rate, HRV and weight over 7, 30 or 90 days,
-// and the training load of the last 12 weeks.
+// "Santé" page: sleep, resting heart rate, HRV, weight, steps over 7, 30 or 90
+// days, and the training load, intensity minutes and floors of the last 12 weeks.
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import {
   fetchHealthMetrics,
   fetchIntensityMinutes,
+  fetchStepsAndFloors,
   fetchTrainingLoad,
   type HealthDay,
   type HealthMetrics,
   type IntensityMinutes,
+  type StepsAndFloors,
   type TrainingLoad,
 } from '../api/client'
 import SmokeFreeSection from '../components/SmokeFreeSection'
@@ -65,6 +67,7 @@ export default function HealthPage() {
   const [metrics, setMetrics] = useState<HealthMetrics | null>(null)
   const [load, setLoad] = useState<TrainingLoad | null>(null)
   const [intensity, setIntensity] = useState<IntensityMinutes | null>(null)
+  const [steps, setSteps] = useState<StepsAndFloors | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -97,6 +100,13 @@ export default function HealthPage() {
       .catch(() => {
         if (!cancelled) setError('Impossible de charger les minutes d’intensité.')
       })
+    fetchStepsAndFloors()
+      .then((data) => {
+        if (!cancelled) setSteps(data)
+      })
+      .catch(() => {
+        if (!cancelled) setError('Impossible de charger les pas et les étages.')
+      })
     return () => {
       cancelled = true
     }
@@ -112,7 +122,7 @@ export default function HealthPage() {
   return (
     <>
       <h1>Santé</h1>
-      <p className="subtitle">Sommeil, récupération, charge d’entraînement et tabac</p>
+      <p className="subtitle">Sommeil, récupération, charge, pas, étages et tabac</p>
 
       {error && (
         <p className="field-error" role="alert">
@@ -228,6 +238,8 @@ export default function HealthPage() {
 
       {load && <LoadSection load={load} />}
       {intensity && <IntensitySection intensity={intensity} />}
+      {steps && <StepsSection steps={steps} days={days} />}
+      {steps && <FloorsSection steps={steps} />}
       <SmokeFreeSection />
     </>
   )
@@ -259,7 +271,7 @@ function LoadSection({ load }: { load: TrainingLoad }) {
       </p>
       <Suspense fallback={<p className="hint">Chargement du graphique…</p>}>
         <WeeklyBarChart
-          weeks={load.weeks.map((week) => ({ monday: week.monday, value: week.load }))}
+          weeks={load.weeks.map((week) => ({ date: week.monday, value: week.load }))}
           name="Charge"
           target={load.target}
         />
@@ -312,7 +324,7 @@ function IntensitySection({ intensity }: { intensity: IntensityMinutes }) {
       {hasData ? (
         <Suspense fallback={<p className="hint">Chargement du graphique…</p>}>
           <WeeklyBarChart
-            weeks={intensity.weeks.map((week) => ({ monday: week.monday, value: week.total }))}
+            weeks={intensity.weeks.map((week) => ({ date: week.monday, value: week.total }))}
             name="Minutes d’intensité"
             unit="min"
             target={intensity.target}
@@ -341,6 +353,102 @@ function IntensitySection({ intensity }: { intensity: IntensityMinutes }) {
                   <td>{week.days > 0 ? week.total : '–'}</td>
                   <td>{week.days > 0 ? week.moderate : '–'}</td>
                   <td>{week.days > 0 ? week.vigorous : '–'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+  )
+}
+
+function StepsSection({ steps, days }: { steps: StepsAndFloors; days: HealthDay[] }) {
+  const current = steps.weeks.at(-1)
+  const daily = days.filter((day) => day.steps !== null)
+  const target = steps.steps_target
+  return (
+    <section className="card" aria-labelledby="steps-title">
+      <h2 id="steps-title">Pas</h2>
+      <dl className="stats">
+        <Stat
+          label="Moyenne par jour cette semaine"
+          value={current?.steps_per_day != null ? formatNumber(current.steps_per_day, 0) : null}
+        />
+        <Stat
+          label="Moyenne sur la période"
+          value={formatOrNull(mean(daily.map((day) => day.steps)), 0)}
+        />
+        {target !== null && <Stat label="Objectif par jour" value={formatNumber(target, 0)} />}
+      </dl>
+      {daily.length > 0 ? (
+        <Suspense fallback={<p className="hint">Chargement du graphique…</p>}>
+          {/* One bar per day of the chosen period; the goal is a daily target. */}
+          <WeeklyBarChart
+            weeks={daily.map((day) => ({ date: day.day, value: day.steps ?? 0 }))}
+            name="Pas"
+            target={target}
+          />
+        </Suspense>
+      ) : (
+        <p className="hint">Pas encore de pas sur cette période : lance une synchro Garmin.</p>
+      )}
+      {target === null && <GoalHint kind="Pas par jour (Garmin)" />}
+    </section>
+  )
+}
+
+function FloorsSection({ steps }: { steps: StepsAndFloors }) {
+  const current = steps.weeks.at(-1)
+  const hasFloors = steps.weeks.some((week) => week.floor_days > 0)
+  const target = steps.floors_target
+  return (
+    <section className="card" aria-labelledby="floors-title">
+      <h2 id="floors-title">Étages</h2>
+      <dl className="stats">
+        <Stat
+          label="Montés cette semaine"
+          value={current && current.floor_days > 0 ? String(current.floors_ascended) : null}
+        />
+        <Stat
+          label="Descendus cette semaine"
+          value={current && current.floor_days > 0 ? String(current.floors_descended) : null}
+        />
+        {target !== null && <Stat label="Objectif par semaine" value={`${target} étages`} />}
+      </dl>
+      <p className="hint">Comptés par ta montre : un étage correspond à environ 3 m de dénivelé.</p>
+      {hasFloors ? (
+        <Suspense fallback={<p className="hint">Chargement du graphique…</p>}>
+          <WeeklyBarChart
+            weeks={steps.weeks.map((week) => ({ date: week.monday, value: week.floors_ascended }))}
+            name="Étages montés"
+            unit="étages"
+            target={target}
+          />
+        </Suspense>
+      ) : (
+        <p className="hint">Pas encore d’étages : lance une synchro Garmin.</p>
+      )}
+      {target === null && <GoalHint kind="Étages montés (Garmin)" />}
+      <details>
+        <summary>Voir le tableau</summary>
+        <div className="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Semaine du</th>
+                <th scope="col">Pas par jour</th>
+                <th scope="col">Étages montés</th>
+                <th scope="col">Étages descendus</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...steps.weeks].reverse().map((week) => (
+                <tr key={week.week}>
+                  <td>{formatShortDate(week.monday)}</td>
+                  <td>{week.steps_per_day !== null ? formatNumber(week.steps_per_day, 0) : '–'}</td>
+                  <td>{week.floor_days > 0 ? week.floors_ascended : '–'}</td>
+                  <td>{week.floor_days > 0 ? week.floors_descended : '–'}</td>
                 </tr>
               ))}
             </tbody>

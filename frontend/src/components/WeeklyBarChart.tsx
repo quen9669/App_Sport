@@ -1,6 +1,6 @@
-// One bar per ISO week (current week last), used for the training load and the
-// Garmin intensity minutes. Loaded on demand (React.lazy in HealthPage).
-// The weekly target of a goal, if any, is a dashed horizontal line.
+// One bar per ISO week (current week last) or per day, used for the training
+// load, the Garmin intensity minutes, steps and floors. Loaded on demand
+// (React.lazy in HealthPage). The target of a goal, if any, is a dashed line.
 import {
   Bar,
   BarChart,
@@ -15,7 +15,7 @@ import {
 import { formatShortDate } from '../utils/format'
 
 export interface WeekValue {
-  monday: string // ISO date of the week's Monday
+  date: string // ISO date: the week's Monday, or the day
   value: number
 }
 
@@ -27,7 +27,7 @@ interface Props {
 }
 
 export default function WeeklyBarChart({ weeks, name, unit, target }: Props) {
-  const rows = weeks.map((week) => ({ label: formatShortDate(week.monday), value: week.value }))
+  const rows = weeks.map((week) => ({ label: formatShortDate(week.date), value: week.value }))
   const suffix = unit ? ` ${unit}` : ''
   return (
     <div className="chart">

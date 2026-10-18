@@ -43,6 +43,9 @@ class HealthDay:
     # until the next one. ``weight_measured_on`` says when it was measured.
     weight_kg: float | None = None
     weight_measured_on: date | None = None
+    steps: int | None = None
+    floors_ascended: int | None = None
+    floors_descended: int | None = None
 
 
 @dataclass
@@ -110,6 +113,10 @@ def health_days(db: Session, start: date, end: date, timezone: str) -> list[Heal
             night.resting_heartrate if night else None
         )
         point.hrv_ms = (daily.hrv_ms if daily else None) or (night.hrv_ms if night else None)
+        if daily is not None:
+            point.steps = daily.steps
+            point.floors_ascended = daily.floors_ascended
+            point.floors_descended = daily.floors_descended
         result.append(point)
         day += timedelta(days=1)
     return result
@@ -185,6 +192,51 @@ def weekly_intensity(db: Session, weeks: list[Week]) -> list[WeekIntensity]:
                 item.moderate += daily.intensity_moderate_min or 0
                 item.vigorous += daily.intensity_vigorous_min or 0
                 item.days += 1
+        result.append(item)
+    return result
+
+
+@dataclass
+class WeekSteps:
+    """Steps and floors of one week, from the watch's daily summaries."""
+
+    week: Week
+    steps: int = 0
+    step_days: int = 0  # days with a step count: 0 means "no data", not "no walking"
+    floors_ascended: int = 0
+    floors_descended: int = 0
+    floor_days: int = 0
+
+    @property
+    def steps_per_day(self) -> int | None:
+        """Average of the days with data, so a week in progress is not penalised."""
+        return round(self.steps / self.step_days) if self.step_days else None
+
+
+def weekly_steps(db: Session, weeks: list[Week]) -> list[WeekSteps]:
+    """Steps and floors of each week in ``weeks`` (one query for all of them)."""
+    if not weeks:
+        return []
+    rows = db.scalars(
+        select(DailyHealth).where(DailyHealth.day.between(weeks[0].monday, weeks[-1].sunday))
+    )
+    by_day = _best_by_day(
+        (r for r in rows if r.steps is not None or r.floors_ascended is not None),
+        lambda daily: daily.day,
+    )
+    result = []
+    for week in weeks:
+        item = WeekSteps(week)
+        for day, daily in by_day.items():
+            if not week.monday <= day <= week.sunday:
+                continue
+            if daily.steps is not None:
+                item.steps += daily.steps
+                item.step_days += 1
+            if daily.floors_ascended is not None:
+                item.floors_ascended += daily.floors_ascended
+                item.floors_descended += daily.floors_descended or 0
+                item.floor_days += 1
         result.append(item)
     return result
 

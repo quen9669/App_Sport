@@ -135,6 +135,8 @@ class FakeGarmin:
             "bodyBatteryLowestValue": 14,
             "moderateIntensityMinutes": 22,
             "vigorousIntensityMinutes": 15,
+            "floorsAscended": 12.4,
+            "floorsDescended": 9.6,
         }
 
     def get_hrv_data(self, cdate: str) -> dict[str, Any] | None:
