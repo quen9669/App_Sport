@@ -7,6 +7,7 @@ leur propre migration.
 ```mermaid
 erDiagram
     activity ||--o| activity_stream : "a (0 ou 1)"
+    place |o--o{ activity : "lieu (sans GPS)"
     activity |o--o| strength_session : "même séance (lien optionnel)"
     strength_session ||--|{ strength_set : contient
     activity {
@@ -29,6 +30,14 @@ erDiagram
         int duplicate_of_id FK "activité Garmin dont c'est la copie"
         string duplicate_status "confirmed, possible"
         bool hidden "masquée à la main"
+        int place_id FK "lieu choisi à la main (séance sans GPS)"
+    }
+    place {
+        int id PK
+        string name "ex. Jims Gare"
+        float latitude
+        float longitude
+        string role "strength_default, other_default (unique)"
     }
     activity_stream {
         int id PK

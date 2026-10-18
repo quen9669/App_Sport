@@ -262,6 +262,115 @@ export interface IntensityMinutes {
   target: number | null // weekly target of the intensity minutes goal, if any
 }
 
+// --- Map and activity detail (phase 3b) ---
+
+export type SportGroup = 'run' | 'ride' | 'strength' | 'other'
+
+/** One route on the map (mirrors MapRouteOut). */
+export interface MapRoute {
+  id: number
+  name: string
+  sport_type: string
+  sport: SportGroup
+  start_time: string
+  distance_m: number | null
+  moving_time_s: number | null
+  elapsed_time_s: number
+  elevation_gain_m: number | null
+  average_speed_mps: number | null
+  average_heartrate: number | null
+  polyline: string // encoded, simplified for the zoom level
+}
+
+export interface MapPlace {
+  id: number
+  name: string
+  latitude: number
+  longitude: number
+  activity_count: number
+  activities: {
+    id: number
+    name: string
+    sport: SportGroup
+    start_time: string
+    elapsed_time_s: number
+  }[]
+}
+
+export interface Bounds {
+  south: number
+  west: number
+  north: number
+  east: number
+}
+
+export interface MapRoutes {
+  routes: MapRoute[]
+  places: MapPlace[] // activities without GPS, grouped on their place
+  bounds: Bounds | null // around every matching activity
+  total: number
+}
+
+export interface MapQuery {
+  sport?: SportGroup
+  days?: number
+  min_km?: number
+  max_km?: number
+  bbox?: string // "west,south,east,north"
+  zoom?: number
+}
+
+export type PlaceRole = 'strength_default' | 'other_default'
+
+export interface Place {
+  id: number
+  name: string
+  latitude: number
+  longitude: number
+  role: PlaceRole | null
+  chosen_count: number
+}
+
+export interface PlaceInput {
+  name?: string
+  latitude?: number
+  longitude?: number
+  role?: PlaceRole | null
+}
+
+/** Aligned series: index i of each list is the same moment (null = no value). */
+export interface ActivitySeries {
+  time_s: number[]
+  distance_m: (number | null)[]
+  altitude_m: (number | null)[]
+  heartrate: (number | null)[]
+  speed_mps: (number | null)[]
+  latlng: ([number, number] | null)[]
+}
+
+export interface ActivityDetail {
+  id: number
+  name: string
+  sport_type: string
+  sport: SportGroup
+  category: Category
+  source: string
+  start_time: string
+  elapsed_time_s: number
+  moving_time_s: number | null
+  distance_m: number | null
+  elevation_gain_m: number | null
+  average_speed_mps: number | null
+  max_speed_mps: number | null
+  average_heartrate: number | null
+  max_heartrate: number | null
+  average_cadence: number | null
+  hidden: boolean
+  polyline: string | null
+  place: { id: number; name: string; latitude: number; longitude: number; chosen: boolean } | null
+  series: ActivitySeries
+}
+
 export interface CategoryResult {
   id: number
   category: Category
@@ -377,6 +486,24 @@ export const fetchHealthMetrics = (days = 30) =>
   request<HealthMetrics>('GET', `/api/health-metrics?days=${days}`)
 export const fetchTrainingLoad = (weeks = 12) =>
   request<TrainingLoad>('GET', `/api/training-load?weeks=${weeks}`)
+
+/** Query string from the defined values only: {sport: 'run', days: undefined} -> "?sport=run". */
+function queryString(params: object): string {
+  const entries = Object.entries(params).filter(([, value]) => value !== undefined)
+  const search = new URLSearchParams(entries.map(([key, value]) => [key, String(value)]))
+  return entries.length ? `?${search.toString()}` : ''
+}
+
+export const fetchMapRoutes = (query: MapQuery) =>
+  request<MapRoutes>('GET', `/api/map/routes${queryString(query)}`)
+export const fetchActivity = (id: number) => request<ActivityDetail>('GET', `/api/activities/${id}`)
+export const setActivityPlace = (id: number, placeId: number | null) =>
+  sendJson<ActivityDetail>('PATCH', `/api/activities/${id}/place`, { place_id: placeId })
+export const fetchPlaces = () => request<Place[]>('GET', '/api/places')
+export const createPlace = (place: PlaceInput) => sendJson<Place>('POST', '/api/places', place)
+export const updatePlace = (id: number, place: PlaceInput) =>
+  sendJson<Place>('PATCH', `/api/places/${id}`, place)
+export const deletePlace = (id: number) => request<void>('DELETE', `/api/places/${id}`)
 
 export const fetchIntensityMinutes = (weeks = 12) =>
   request<IntensityMinutes>('GET', `/api/intensity-minutes?weeks=${weeks}`)
