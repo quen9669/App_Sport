@@ -12,7 +12,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.config import Settings
-from app.services.jobs import run_scheduled_syncs
+from app.services.jobs import run_nightly_backup, run_scheduled_syncs
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +30,16 @@ def build_scheduler(
         # First run one minute after startup, not immediately: lets the app settle.
         next_run_time=datetime.now(UTC) + timedelta(minutes=1),
         # If the PC was asleep and several runs were missed, run once, not N times.
+        coalesce=True,
+        max_instances=1,
+    )
+    # A copy of the database every night at 03:30 (local time), while nobody uses the app.
+    scheduler.add_job(
+        run_nightly_backup,
+        trigger="cron",
+        hour=3,
+        minute=30,
+        id="nightly_backup",
         coalesce=True,
         max_instances=1,
     )
