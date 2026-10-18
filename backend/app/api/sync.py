@@ -7,11 +7,13 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, s
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session, sessionmaker
 
+from app.config import Settings, get_settings
 from app.db.models.enums import DataSource, SyncKind
 from app.db.session import get_db, provide_session_factory
 from app.repositories import credentials as credentials_repo
 from app.repositories import sync as sync_repo
-from app.services.strava_jobs import run_strava_sync
+from app.services.health_sync import HealthSyncAlreadyRunningError, is_garmin_sync_running
+from app.services.jobs import is_garmin_configured, run_garmin_sync, run_strava_sync
 from app.services.strava_sync import SyncAlreadyRunningError, is_sync_running
 
 router = APIRouter(prefix="/sync", tags=["sync"])
@@ -36,10 +38,15 @@ class SyncLogOut(BaseModel):
     error: str | None
 
 
-def _run_in_background(factory: sessionmaker[Session]) -> None:
+def _strava_in_background(factory: sessionmaker[Session]) -> None:
     # The button may be clicked while a scheduled run is going: nothing to do then.
     with contextlib.suppress(SyncAlreadyRunningError):
         run_strava_sync(factory, SyncKind.MANUAL)
+
+
+def _garmin_in_background(factory: sessionmaker[Session]) -> None:
+    with contextlib.suppress(HealthSyncAlreadyRunningError):
+        run_garmin_sync(factory, SyncKind.MANUAL)
 
 
 @router.post("/strava", response_model=SyncStarted, status_code=status.HTTP_202_ACCEPTED)
@@ -57,7 +64,25 @@ def start_strava_sync(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Strava is not connected.")
     if is_sync_running():
         raise HTTPException(status.HTTP_409_CONFLICT, "A Strava sync is already running.")
-    background.add_task(_run_in_background, factory)
+    background.add_task(_strava_in_background, factory)
+    return SyncStarted(status="started")
+
+
+@router.post("/garmin", response_model=SyncStarted, status_code=status.HTTP_202_ACCEPTED)
+def start_garmin_sync(
+    background: BackgroundTasks,
+    factory: sessionmaker[Session] = Depends(provide_session_factory),
+    settings: Settings = Depends(get_settings),
+) -> SyncStarted:
+    """Start a Garmin sync in the background (same pattern as Strava)."""
+    if not is_garmin_configured(settings):
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "Garmin is not configured: set GARMIN_EMAIL and GARMIN_PASSWORD in .env.",
+        )
+    if is_garmin_sync_running():
+        raise HTTPException(status.HTTP_409_CONFLICT, "A Garmin sync is already running.")
+    background.add_task(_garmin_in_background, factory)
     return SyncStarted(status="started")
 
 
