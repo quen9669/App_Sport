@@ -1,6 +1,7 @@
 """All ORM models. Importing this package registers every table on ``Base.metadata``."""
 
 from app.db.models.activity import Activity, ActivityStream
+from app.db.models.coach import CoachCall, CoachConversation, CoachMemory, CoachMessage
 from app.db.models.credential import SourceCredential
 from app.db.models.goal import Goal
 from app.db.models.health import DailyHealth, SleepNight
@@ -16,6 +17,10 @@ __all__ = [
     "Activity",
     "ActivityStream",
     "BodyMetric",
+    "CoachCall",
+    "CoachConversation",
+    "CoachMemory",
+    "CoachMessage",
     "DailyHealth",
     "Goal",
     "Place",

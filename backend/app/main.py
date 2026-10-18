@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import (
     activities,
+    coach,
     dashboards,
     goals,
     health,
@@ -79,6 +80,7 @@ def create_app() -> FastAPI:
     app.include_router(places.router, prefix="/api")
     app.include_router(smoking.router, prefix="/api")
     app.include_router(race.router, prefix="/api")
+    app.include_router(coach.router, prefix="/api")
     return app
 
 

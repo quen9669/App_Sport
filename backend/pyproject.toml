@@ -5,6 +5,7 @@ description = "Backend API of the personal sport app (FastAPI)."
 requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.20.0",
+    "anthropic>=1.15.0",
     "apscheduler>=3.11.3",
     "cryptography>=50.0.2",
     "fastapi>=0.143.3",

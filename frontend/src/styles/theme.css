@@ -565,6 +565,98 @@ textarea {
   --feasibility-color: var(--danger);
 }
 
+/* Coach page: a chat, FRANKS's questions on the right, the coach's answers on the left. */
+.coach-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.coach-bar select {
+  max-width: 100%;
+  padding: 0.35rem 0.5rem;
+}
+
+.coach-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0.25rem;
+}
+
+.bubble {
+  max-width: 90%;
+  padding: 0.5rem 0.85rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+
+.bubble p,
+.bubble ul,
+.bubble ol {
+  margin: 0.35rem 0;
+}
+
+.bubble h3 {
+  margin: 0.6rem 0 0.2rem;
+  font-size: 1rem;
+}
+
+.bubble--user {
+  align-self: flex-end;
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+}
+
+.bubble--assistant {
+  align-self: flex-start;
+  background: var(--surface);
+}
+
+.coach-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0.2rem 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.coach-tools li {
+  padding: 0 0.45rem;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+}
+
+.coach-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.coach-suggestions button {
+  text-align: left;
+}
+
+.coach-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  margin-top: 0.75rem;
+}
+
+.coach-form textarea {
+  flex: 1;
+  min-width: 0;
+}
+
 /* Read by screen readers, invisible on screen. */
 .visually-hidden {
   position: absolute;

@@ -651,3 +651,117 @@ export const saveRaceTarget = (target: RaceTargetInput) =>
 export const deleteRaceTarget = () => request<Race>('DELETE', '/api/race/target')
 export const setRunExcluded = (activityId: number, excluded: boolean) =>
   sendJson<Race>('PATCH', `/api/race/efforts/${activityId}`, { excluded })
+
+// --- AI coaches ---
+
+export type CoachName = 'training'
+
+export interface CoachStatus {
+  configured: boolean // an API key is set in .env
+  model: string
+  budget: {
+    month: string
+    spent_eur: number
+    limit_eur: number
+    warning: boolean // 80 % of the budget reached
+    exhausted: boolean
+  }
+}
+
+export interface CoachConversation {
+  id: number
+  title: string
+  created_at: string
+  updated_at: string
+}
+
+export interface CoachShownMessage {
+  role: 'user' | 'assistant'
+  text: string
+  tools: string[] // French labels of the tools used, e.g. "lit ton sommeil"
+}
+
+export interface CoachConversationDetail extends CoachConversation {
+  messages: CoachShownMessage[]
+}
+
+export interface CoachMemory {
+  id: number
+  text: string
+  status: 'proposed' | 'accepted'
+}
+
+/** One event of a streamed answer (mirrors app/api/coach.py `_sse`). */
+export type CoachEvent =
+  | { type: 'text'; text: string }
+  | { type: 'tool'; name: string; label: string }
+  | { type: 'done'; cost_eur: number; month_spent_eur: number; month_limit_eur: number }
+  | { type: 'error'; message: string }
+
+export const fetchCoachStatus = () => request<CoachStatus>('GET', '/api/coach/status')
+export const fetchConversations = (coach: CoachName) =>
+  request<CoachConversation[]>('GET', `/api/coach/${coach}/conversations`)
+export const createConversation = (coach: CoachName) =>
+  request<CoachConversationDetail>('POST', `/api/coach/${coach}/conversations`)
+export const fetchConversation = (id: number) =>
+  request<CoachConversationDetail>('GET', `/api/coach/conversations/${id}`)
+export const deleteConversation = (id: number) =>
+  request<void>('DELETE', `/api/coach/conversations/${id}`)
+export const fetchMemories = (coach: CoachName) =>
+  request<CoachMemory[]>('GET', `/api/coach/${coach}/memories`)
+export const addMemory = (coach: CoachName, text: string) =>
+  sendJson<CoachMemory>('POST', `/api/coach/${coach}/memories`, { text })
+export const updateMemory = (id: number, change: { text?: string; accepted?: boolean }) =>
+  sendJson<CoachMemory>('PATCH', `/api/coach/memories/${id}`, change)
+export const deleteMemory = (id: number) => request<void>('DELETE', `/api/coach/memories/${id}`)
+
+/**
+ * Ask the coach and receive its answer piece by piece.
+ *
+ * The backend answers with Server-Sent Events: blocks separated by a blank
+ * line, each with an `event:` line and a JSON `data:` line. EventSource only
+ * does GET requests, so the stream is read by hand with fetch.
+ */
+export async function askCoach(
+  conversationId: number,
+  text: string,
+  onEvent: (event: CoachEvent) => void,
+): Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/coach/conversations/${conversationId}/messages`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    },
+  )
+  if (!response.ok || !response.body) {
+    throw new ApiError(response.status, `Le coach ne répond pas (${response.status}).`)
+  }
+  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader()
+  let buffer = ''
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    buffer += value
+    // Handle every complete block; keep an unfinished one for the next chunk.
+    let end = buffer.indexOf('\n\n')
+    while (end !== -1) {
+      const event = parseSseBlock(buffer.slice(0, end))
+      if (event) onEvent(event)
+      buffer = buffer.slice(end + 2)
+      end = buffer.indexOf('\n\n')
+    }
+  }
+}
+
+function parseSseBlock(block: string): CoachEvent | null {
+  let name = ''
+  let data = ''
+  for (const line of block.split('\n')) {
+    if (line.startsWith('event: ')) name = line.slice(7)
+    else if (line.startsWith('data: ')) data += line.slice(6)
+  }
+  if (!name || !data) return null
+  return { type: name, ...(JSON.parse(data) as object) } as CoachEvent
+}

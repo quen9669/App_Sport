@@ -10,7 +10,8 @@
 | 3a | Activités Garmin (Strava en complément), écran Santé, charge d'entraînement | ✅ Terminé |
 | 3b | Carte interactive, heatmap, détail d'une activité, lieux des séances sans GPS | ✅ Terminé |
 | 4 | Prédicteur de course et allures | ✅ Terminé |
-| 5 | Coachs IA (musculation/cardio et longévité) | ⚪ À faire |
+| 5a | Moteur des coachs IA, coach musculation/cardio, écran de discussion | 🟡 En revue |
+| 5b | Coach longévité, plan de semaine proposé, banc d'évaluation | ⚪ À faire |
 | 6 | PWA complète, sécurité, déploiement | ⚪ À faire |
 
 ## Phase 0 : critères d'acceptation
@@ -88,6 +89,18 @@
 - [x] Temps prédits (5 km, 10 km, semi, marathon) avec fourchette, zones d'allure d'entraînement
 - [x] Course visée : plan d'allure (négative split, dénivelé), passages au km, faisabilité
 - [x] Une sortie peut être exclue du calcul à la main
+
+## Phase 5a : critères d'acceptation
+
+- [x] Moteur d'agent : le coach lit les données par des outils (13 outils typés, entrées validées),
+      jamais l'export complet ; aucune position GPS envoyée
+- [x] Réponse affichée au fil de l'eau (SSE), avec les données consultées (« lit ton sommeil… »)
+- [x] Coût de chaque appel journalisé (jetons, cache, latence), budget mensuel (10 € par défaut) :
+      alerte à 80 %, arrêt net à 100 %
+- [x] Cache de prompt, résumés par le modèle léger, historique compacté
+- [x] Mémoire : le coach propose, FRANKS accepte, corrige ou oublie
+- [x] Prompts versionnés dans des fichiers, garde-fous santé (pas de diagnostic, renvoi au médecin)
+- [x] Tout est testé sans clé API (faux modèle) ; sans clé, l'écran explique quoi faire
 
 ## En plus (demandes de FRANKS)
 

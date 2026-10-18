@@ -14,7 +14,7 @@ flowchart LR
     end
     STRAVA["API Strava"]
     GARMIN["Garmin Connect<br/>ou fichiers FIT/CSV"]
-    CLAUDE["API Anthropic<br/>(coachs, phase 5)"]
+    CLAUDE["API Gemini ou Anthropic<br/>(coachs, phase 5)"]
 
     PWA -- "HTTP JSON" --> API
     API --> DB

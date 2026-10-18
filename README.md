@@ -69,7 +69,7 @@ automatiquement `TOKEN_ENCRYPTION_KEY`, qui chiffre les tokens stockés.
 
 - **Strava** : suis [docs/learning/01-strava-setup.md](docs/learning/01-strava-setup.md).
 - **Garmin** : suis [docs/learning/02-garmin-setup.md](docs/learning/02-garmin-setup.md).
-- **Anthropic** : guide à venir avec la phase 5.
+- **Coachs IA (Gemini ou Claude)** : suis [docs/learning/03-coach-api-key.md](docs/learning/03-coach-api-key.md).
 
 ## Documentation
 

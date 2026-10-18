@@ -31,6 +31,9 @@ def test_settings(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     monkeypatch.setenv("SCHEDULER_ENABLED", "false")
     monkeypatch.setenv("GARMIN_EMAIL", "")
     monkeypatch.setenv("GARMIN_PASSWORD", "")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "")  # tests never call the real model
+    monkeypatch.setenv("GEMINI_API_KEY", "")
+    monkeypatch.setenv("COACH_PROVIDER", "")
     monkeypatch.setenv("TOKEN_ENCRYPTION_KEY", TEST_ENCRYPTION_KEY)
     monkeypatch.setenv("STRAVA_CLIENT_ID", "12345")
     monkeypatch.setenv("STRAVA_CLIENT_SECRET", "test-client-secret")
