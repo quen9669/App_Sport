@@ -5,12 +5,30 @@ Run it in development with ``make dev-backend`` (or
 to see and try every route.
 """
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, strava, sync
+from app.api import health, health_data, strava, sync
 from app.config import get_settings
+from app.db.session import get_session_factory
 from app.logging_config import configure_logging
+from app.scheduler import build_scheduler
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    """Code run when the server starts (before ``yield``) and stops (after)."""
+    settings = get_settings()
+    scheduler = None
+    if settings.scheduler_enabled:
+        scheduler = build_scheduler(settings, get_session_factory())
+        scheduler.start()
+    yield
+    if scheduler is not None:
+        scheduler.shutdown(wait=False)
 
 
 def create_app() -> FastAPI:
@@ -22,7 +40,7 @@ def create_app() -> FastAPI:
     settings = get_settings()
     configure_logging(settings.log_level)
 
-    app = FastAPI(title="App Sport API", version="0.1.0")
+    app = FastAPI(title="App Sport API", version="0.1.0", lifespan=lifespan)
 
     # CORS: the browser blocks calls from the frontend (port 5173) to the API
     # (port 8000) unless the API explicitly allows that origin.
@@ -37,6 +55,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router, prefix="/api")
     app.include_router(strava.router, prefix="/api")
     app.include_router(sync.router, prefix="/api")
+    app.include_router(health_data.router, prefix="/api")
     return app
 
 

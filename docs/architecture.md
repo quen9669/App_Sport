@@ -61,6 +61,17 @@ sequenceDiagram
     API->>API: upserts + journal sync_log
 ```
 
+### Données de santé
+
+`HealthDataProvider` est un contrat commun à toutes les sources de santé. Garmin (bibliothèque non
+officielle) et l'import de fichiers le respectent ; le reste de l'app ne connaît que le contrat.
+Si Garmin casse, seule sa synchro échoue.
+
+### Synchronisations planifiées
+
+APScheduler tourne dans le processus du backend et lance toutes les `SYNC_INTERVAL_HOURS` heures
+la synchro de chaque source configurée. Un échec sur une source n'empêche pas les autres.
+
 Fichiers transverses :
 - `app/config.py` : tous les réglages, lus depuis `.env`.
 - `app/logging_config.py` : journaux, avec masquage automatique des secrets.
@@ -70,6 +81,8 @@ Fichiers transverses :
 | Dossier | Rôle |
 |---|---|
 | `src/api/` | Tous les appels au backend, typés |
+| `src/pages/` | Une page par écran (Accueil, Sources), routées avec React Router |
+| `src/utils/` | Formatage (dates en heure de Luxembourg, libellés français) |
 | `src/styles/` | Thème clair et sombre (variables CSS) |
 | `src/App.tsx` | Composant racine |
 | `e2e/` | Tests de bout en bout Playwright |

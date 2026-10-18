@@ -15,7 +15,7 @@ keep functions short, and explain important choices in PR descriptions.
 
 - **Backend** (`backend/`): Python 3.12+, `uv`, FastAPI, Pydantic v2, pydantic-settings,
   SQLAlchemy 2.x + Alembic (SQLite, PostgreSQL-compatible), httpx (sync client), cryptography (Fernet).
-  Coming in phase 1b: APScheduler, garminconnect, fitdecode.
+  APScheduler 3 (in-process scheduled syncs), garminconnect (unofficial Garmin library).
 - **Frontend** (`frontend/`): React 19, Vite, TypeScript strict, `vite-plugin-pwa`.
   Coming later: react-leaflet (OpenStreetMap), Recharts.
 - **Tests**: pytest + pytest-asyncio; Vitest + Testing Library; Playwright (E2E, desktop + Pixel 7).
@@ -33,6 +33,7 @@ keep functions short, and explain important choices in PR descriptions.
 | `make check` | Everything CI runs (except E2E) |
 | `make db-upgrade` | Apply Alembic migrations (also run by `make dev-backend`) |
 | `make db-revision m="..."` | Autogenerate a migration after changing a model |
+| `make seed` / `make seed-clear` | Create / remove a year of synthetic data (`source="synthetic"`) |
 
 Single backend test: `cd backend && uv run pytest tests/test_health.py -k ok`.
 Single frontend test: `cd frontend && npx vitest run src/App.test.tsx`.
@@ -64,7 +65,16 @@ Use an existing Chromium for E2E: `PLAYWRIGHT_CHROMIUM_PATH=/path/to/chrome make
 
 See `docs/adr/`. Current: `0001-stack.md`. Data model: `docs/data-model.md`.
 
-## Strava sync (phase 1a)
+## Ingestion (phase 1)
+
+Health sources implement `HealthDataProvider` (`app/integrations/health/provider.py`):
+`GarminConnectProvider` (unofficial lib, imported lazily, errors → `HealthProviderError`, sync marked
+failed, app unaffected) and `FileImportProvider` (CSV template in `docs/templates/`, Garmin export
+`*_sleepData.json`). Everything is stored through `services/health_sync.store_batch` (upserts,
+plausibility bounds in `validation.py`). Jobs outside requests live in `services/jobs.py`; the
+scheduler (`app/scheduler.py`) runs them every `SYNC_INTERVAL_HOURS` and is disabled in tests.
+
+### Strava sync
 
 `app/services/strava_sync.py`, one run = new activities (7-day overlap) → a few history pages
 (cursor `strava_backfill` in `sync_cursor`) → missing streams. Quotas: `integrations/strava/rate_limit.py`

@@ -5,11 +5,14 @@ description = "Backend API of the personal sport app (FastAPI)."
 requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.20.0",
+    "apscheduler>=3.11.3",
     "cryptography>=50.0.2",
     "fastapi>=0.143.3",
+    "garminconnect>=0.3.19",
     "httpx>=0.28.1",
     "pydantic>=2.14.1",
     "pydantic-settings>=2.16.0",
+    "python-multipart>=0.0.32",
     "sqlalchemy>=2.1.5",
     "uvicorn[standard]>=0.54.0",
 ]
@@ -58,3 +61,8 @@ asyncio_default_fixture_loop_scope = "function"
 [tool.ruff.lint.flake8-bugbear]
 # FastAPI's `Depends(...)` / `Query(...)` as default values are the normal FastAPI style.
 extend-immutable-calls = ["fastapi.Depends", "fastapi.Query"]
+
+[[tool.mypy.overrides]]
+# APScheduler 3 ships without type information; treat it as "Any".
+module = ["apscheduler.*"]
+ignore_missing_imports = true

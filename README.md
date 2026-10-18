@@ -6,7 +6,7 @@ une carte de mes sorties, prédira mes temps de course et proposera deux coachs 
 
 > Cette application donne des conseils d'entraînement, pas un avis médical.
 
-**État actuel : phase 1a** (modèle de données et synchro Strava). Voir [docs/roadmap.md](docs/roadmap.md).
+**État actuel : phase 1** (ingestion Strava et Garmin, écran Sources). Voir [docs/roadmap.md](docs/roadmap.md).
 
 ## Installation (Windows avec WSL2)
 
@@ -45,10 +45,12 @@ Toutes les commandes se tapent dans le terminal **Ubuntu** de WSL2, pas dans Pow
 make dev
 ```
 
-- Frontend : http://localhost:5173 (doit afficher « Backend OK »)
+- Frontend : http://localhost:5173 (doit afficher « Backend OK »), écran des sources sur
+  http://localhost:5173/sources
 - API et sa documentation interactive : http://localhost:8000/docs
 
-`Ctrl+C` arrête les deux.
+`Ctrl+C` arrête les deux. Pas encore de compte configuré ? `make seed` remplit la base avec un an
+de données de test réalistes (`make seed-clear` pour les retirer).
 
 ## Tests et qualité
 
@@ -66,7 +68,8 @@ Les clés se mettent dans `.env` (voir les commentaires de `.env.example`). `mak
 automatiquement `TOKEN_ENCRYPTION_KEY`, qui chiffre les tokens stockés.
 
 - **Strava** : suis [docs/learning/01-strava-setup.md](docs/learning/01-strava-setup.md).
-- **Garmin** et **Anthropic** : guides à venir avec les phases concernées.
+- **Garmin** : suis [docs/learning/02-garmin-setup.md](docs/learning/02-garmin-setup.md).
+- **Anthropic** : guide à venir avec la phase 5.
 
 ## Documentation
 
