@@ -10,7 +10,12 @@ from app.config import Settings, get_settings
 from app.db.session import get_db
 from app.db.types import utc_now
 from app.services.goals import GoalKind, goals_for_week
-from app.services.health_dashboard import health_days, sleep_regularity, weekly_intensity
+from app.services.health_dashboard import (
+    health_days,
+    sleep_regularity,
+    weekly_intensity,
+    weekly_steps,
+)
 from app.services.training_load import training_load
 from app.services.weeks import Week, current_week, local_today
 
@@ -27,6 +32,9 @@ class HealthDayOut(BaseModel):
     hrv_ms: float | None
     weight_kg: float | None  # last known weight, carried forward
     weight_measured_on: date | None  # when that weight was measured
+    steps: int | None
+    floors_ascended: int | None
+    floors_descended: int | None
 
 
 class RegularityOut(BaseModel):
@@ -158,4 +166,54 @@ def read_intensity_minutes(
             for item in weekly_intensity(db, period)
         ],
         target=_goal_target(db, last, GoalKind.INTENSITY_MINUTES),
+    )
+
+
+class WeekStepsOut(BaseModel):
+    week: str
+    monday: date
+    steps_per_day: int | None  # average of the days with data, None without data
+    steps: int  # total of the week
+    step_days: int
+    floors_ascended: int
+    floors_descended: int
+    floor_days: int
+
+
+class StepsAndFloorsOut(BaseModel):
+    weeks: list[WeekStepsOut]  # oldest first, current week last
+    steps_target: float | None  # steps per day of the steps goal, if any
+    floors_target: float | None  # floors per week of the floors goal, if any
+
+
+@router.get("/steps-floors", response_model=StepsAndFloorsOut)
+def read_steps_and_floors(
+    weeks: int = Query(default=12, ge=4, le=52),
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+) -> StepsAndFloorsOut:
+    """Garmin steps and floors per week, and the goals if there are some.
+
+    The daily values are in /api/health-metrics (one row per day).
+    """
+    last = current_week(settings.app_timezone, utc_now())
+    period = [last]
+    while len(period) < weeks:
+        period.insert(0, period[0].previous())
+    return StepsAndFloorsOut(
+        weeks=[
+            WeekStepsOut(
+                week=item.week.label,
+                monday=item.week.monday,
+                steps_per_day=item.steps_per_day,
+                steps=item.steps,
+                step_days=item.step_days,
+                floors_ascended=item.floors_ascended,
+                floors_descended=item.floors_descended,
+                floor_days=item.floor_days,
+            )
+            for item in weekly_steps(db, period)
+        ],
+        steps_target=_goal_target(db, last, GoalKind.STEPS),
+        floors_target=_goal_target(db, last, GoalKind.FLOORS),
     )

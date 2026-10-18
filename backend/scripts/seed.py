@@ -221,6 +221,8 @@ def seed_health(db: Session, start: date, end: date, rng: random.Random) -> int:
                 body_battery_min=rng.randint(5, 30),
                 intensity_moderate_min=rng.randint(0, 60),
                 intensity_vigorous_min=rng.randint(0, 30),
+                floors_ascended=rng.randint(3, 25),
+                floors_descended=rng.randint(3, 25),
             )
         )
         day += timedelta(days=1)

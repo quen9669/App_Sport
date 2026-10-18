@@ -146,6 +146,9 @@ def map_daily(
         # Field names from the Garmin user summary (unverified on real data).
         intensity_moderate_min=_int(stats.get("moderateIntensityMinutes")),
         intensity_vigorous_min=_int(stats.get("vigorousIntensityMinutes")),
+        # Garmin sends floors as decimals (10.4): rounded to whole floors.
+        floors_ascended=_int(stats.get("floorsAscended")),
+        floors_descended=_int(stats.get("floorsDescended")),
         raw={"stats": stats, "hrv": hrv, "max_metrics": max_metrics},
     )
 

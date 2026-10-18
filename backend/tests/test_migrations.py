@@ -122,3 +122,37 @@ def test_activity_town_and_start_are_read_back_from_raw_payloads(tmp_path: Path)
         ("strava", None, None, None),
     ]
     assert cities == ["Luxembourg", "Luxembourg"]  # the two default gyms
+
+
+def test_floors_are_read_back_from_raw_payloads(tmp_path: Path) -> None:
+    """Days synced before the floor columns existed get them from raw_payload."""
+    url = f"sqlite:///{tmp_path / 'migrated.db'}"
+    config = Config(str(BACKEND_DIR / "alembic.ini"))
+    config.set_main_option("script_location", str(BACKEND_DIR / "alembic"))
+    config.set_main_option("sqlalchemy.url", url)
+    command.upgrade(config, "4ae8dc6985f1")  # the revision just before
+
+    engine = create_engine(url)
+    stats = {"stats": {"floorsAscended": 12.4, "floorsDescended": 9.6}}
+    with engine.begin() as connection:
+        connection.execute(
+            text(
+                "INSERT INTO daily_health (source, day, created_at, updated_at) "
+                "VALUES ('garmin', '2026-10-17', '2026-10-17', '2026-10-17')"
+            )
+        )
+        connection.execute(
+            text(
+                "INSERT INTO raw_payload (source, kind, external_id, payload, fetched_at) "
+                "VALUES ('garmin', 'daily_health', '2026-10-17', :payload, '2026-10-17')"
+            ),
+            {"payload": json.dumps(stats)},
+        )
+    command.upgrade(config, "head")
+
+    with engine.connect() as connection:
+        row = connection.execute(
+            text("SELECT floors_ascended, floors_descended FROM daily_health")
+        ).one()
+    engine.dispose()
+    assert tuple(row) == (12, 10)

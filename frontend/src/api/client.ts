@@ -58,6 +58,8 @@ export type GoalKind =
   | 'distance_km'
   | 'training_load'
   | 'intensity_minutes'
+  | 'steps' // steps per day, averaged over the week
+  | 'floors' // floors climbed per week
 export type GoalSport = 'run' | 'ride'
 export type GoalStatus = 'active' | 'paused' | 'done'
 
@@ -212,6 +214,9 @@ export interface HealthDay {
   /** Last known weight, carried forward until the next weigh-in. */
   weight_kg: number | null
   weight_measured_on: string | null
+  steps: number | null
+  floors_ascended: number | null
+  floors_descended: number | null
 }
 
 export interface HealthMetrics {
@@ -254,6 +259,24 @@ export interface WeekIntensity {
 export interface IntensityMinutes {
   weeks: WeekIntensity[] // oldest first, current week last
   target: number | null // weekly target of the intensity minutes goal, if any
+}
+
+/** Garmin steps and floors of one week (mirrors WeekStepsOut). */
+export interface WeekSteps {
+  week: string
+  monday: string
+  steps_per_day: number | null // average of the days with data
+  steps: number
+  step_days: number
+  floors_ascended: number
+  floors_descended: number
+  floor_days: number
+}
+
+export interface StepsAndFloors {
+  weeks: WeekSteps[] // oldest first, current week last
+  steps_target: number | null // steps per day of the steps goal, if any
+  floors_target: number | null // floors per week of the floors goal, if any
 }
 
 // --- Map and activity detail (phase 3b) ---
@@ -511,6 +534,8 @@ export const deletePlace = (id: number) => request<void>('DELETE', `/api/places/
 
 export const fetchIntensityMinutes = (weeks = 12) =>
   request<IntensityMinutes>('GET', `/api/intensity-minutes?weeks=${weeks}`)
+export const fetchStepsAndFloors = (weeks = 12) =>
+  request<StepsAndFloors>('GET', `/api/steps-floors?weeks=${weeks}`)
 
 // --- Smoke-free tracking ---
 

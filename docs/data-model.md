@@ -89,6 +89,8 @@ erDiagram
         float vo2max
         int intensity_moderate_min "Garmin, toute la journée"
         int intensity_vigorous_min "compte double dans le total"
+        int floors_ascended "étages montés (Garmin, arrondis)"
+        int floors_descended "étages descendus"
     }
     sync_log {
         int id PK
@@ -159,7 +161,7 @@ erDiagram
     }
     goal {
         int id PK
-        string kind "strength_sessions, cardio_sessions, active_minutes, distance_km"
+        string kind "strength_sessions, cardio_sessions, active_minutes, distance_km, training_load, intensity_minutes, steps (par jour), floors"
         float target "par semaine"
         string sport "run, ride (objectifs en km)"
         date start_date

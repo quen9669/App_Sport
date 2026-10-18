@@ -14,6 +14,9 @@ function day(date: string, sleepHours: number | null): HealthDay {
     hrv_ms: null,
     weight_kg: null,
     weight_measured_on: null,
+    steps: null,
+    floors_ascended: null,
+    floors_descended: null,
   }
 }
 

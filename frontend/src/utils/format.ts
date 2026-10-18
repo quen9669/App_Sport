@@ -47,6 +47,8 @@ export const GOAL_KIND_LABELS: Record<string, string> = {
   distance_km: 'Kilomètres',
   training_load: 'Charge d’entraînement',
   intensity_minutes: 'Minutes d’intensité (Garmin)',
+  steps: 'Pas par jour (Garmin)',
+  floors: 'Étages montés (Garmin)',
 }
 
 export const GOAL_UNITS: Record<string, string> = {
@@ -56,6 +58,8 @@ export const GOAL_UNITS: Record<string, string> = {
   distance_km: 'km',
   training_load: 'points',
   intensity_minutes: 'min',
+  steps: 'pas',
+  floors: 'étages',
 }
 
 export const SPORT_LABELS: Record<string, string> = {

@@ -108,6 +108,8 @@
       dans la charge d'entraînement
 - [x] Suivi des jours sans cigarette (depuis le 1er septembre 2026, date modifiable) : jours avec
       cigarette saisis à la main, séries et bilan par mois, gardés pour la future partie longévité
+- [x] Pas et étages montés/descendus (Garmin) sur la page Santé, avec les objectifs « Pas par
+      jour » (moyenne de la semaine) et « Étages montés » (par semaine)
 
 ## Points à surveiller
 
