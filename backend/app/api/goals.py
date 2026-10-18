@@ -12,6 +12,7 @@ from app.db.models import Goal
 from app.db.session import get_db
 from app.repositories import goals as goals_repo
 from app.services.classification import automatic_category, effective_category
+from app.services.dedupe import DuplicateStatus
 from app.services.goals import (
     GoalKind,
     GoalSport,
@@ -96,6 +97,10 @@ class WeekActivityOut(BaseModel):
     distance_m: float | None
     category: str  # what is counted
     automatic_category: str  # what the rule says, to show "corrected by hand"
+    source: str  # "garmin", "strava"...
+    hidden: bool  # hidden by hand: listed greyed out, never counted
+    # Maybe the same session as another activity of the list (see services/dedupe.py).
+    possible_duplicate: bool
 
 
 class WeekSessionOut(BaseModel):
@@ -228,6 +233,9 @@ def read_progress(
                 distance_m=a.distance_m,
                 category=effective_category(a),
                 automatic_category=automatic_category(a.sport_type),
+                source=a.source,
+                hidden=a.hidden,
+                possible_duplicate=a.duplicate_status == DuplicateStatus.POSSIBLE,
             )
             for a in data.activities
         ],

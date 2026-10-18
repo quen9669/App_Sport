@@ -145,3 +145,32 @@ def test_progress_defaults_to_current_week(client: TestClient) -> None:
 def test_category_of_unknown_activity(client: TestClient) -> None:
     response = client.patch("/api/activities/999/category", json={"category": "cardio"})
     assert response.status_code == 404
+
+
+def test_hide_an_activity_removes_it_from_goals(client: TestClient, db: Session) -> None:
+    from app.repositories import activities as activities_repo
+
+    client.post("/api/goals", json={"kind": "cardio_sessions", "target": 3})
+    activity, _ = activities_repo.upsert_activity(
+        db,
+        "strava",
+        "1",
+        {
+            "name": "Run",
+            "sport_type": "Run",
+            "start_time": datetime.now(UTC),
+            "elapsed_time_s": 1800,
+        },
+    )
+    db.commit()
+
+    response = client.patch(f"/api/activities/{activity.id}/hidden", json={"hidden": True})
+    assert response.json() == {"id": activity.id, "hidden": True}
+
+    progress = client.get("/api/goals/progress").json()
+    assert progress["goals"][0]["done"] == 0
+    listed = progress["activities"][0]
+    assert listed["hidden"] is True
+    assert listed["possible_duplicate"] is False
+    assert listed["source"] == "strava"
+    assert client.patch("/api/activities/999/hidden", json={"hidden": True}).status_code == 404

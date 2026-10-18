@@ -64,3 +64,11 @@ def count_days(db: Session, source: str | None = None) -> int:
     if source is not None:
         query = query.where(DailyHealth.source == source)
     return db.scalar(query) or 0
+
+
+def resting_heartrates_since(db: Session, since: date) -> list[int]:
+    """Daily resting heart rates (any source) from ``since`` to today."""
+    query = select(DailyHealth.resting_heartrate).where(
+        DailyHealth.day >= since, DailyHealth.resting_heartrate.is_not(None)
+    )
+    return [value for value in db.scalars(query) if value is not None]

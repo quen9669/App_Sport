@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.models import Activity, Goal, StrengthSession
+from app.repositories import activities as activities_repo
 from app.repositories import strength as strength_repo
 from app.services.classification import (
     RIDE_SPORTS,
@@ -50,12 +51,7 @@ class GoalProgress:
 
 def activities_in_week(db: Session, week: Week, timezone: str) -> list[Activity]:
     start, end = week.utc_range(timezone)
-    query = (
-        select(Activity)
-        .where(Activity.start_time >= start, Activity.start_time < end)
-        .order_by(Activity.start_time)
-    )
-    return list(db.scalars(query))
+    return activities_repo.activities_between(db, start, end)
 
 
 def counted_goals(db: Session) -> list[Goal]:
@@ -128,10 +124,13 @@ def compute_progress(
     """Count the activities (and typed strength sessions) of the week for one goal.
 
     Several sessions on the same day each count: two classes on Saturday are
-    two sessions. A typed session already recorded on Strava counts once.
+    two sessions. A typed session already recorded by the watch counts once.
+    Hidden activities don't count.
     """
     progress = GoalProgress(goal=goal, done=0)
     for activity in activities:
+        if activity.hidden:
+            continue  # hidden by hand ("Masquer"): never counted
         amount = _amount(goal, activity)
         if amount is not None:
             progress.done += amount
@@ -181,13 +180,7 @@ def weeks_history(db: Session, last: Week, count: int, timezone: str) -> list[We
     start, _ = weeks[0].utc_range(timezone)
     _, end = last.utc_range(timezone)
 
-    activities = list(
-        db.scalars(
-            select(Activity)
-            .where(Activity.start_time >= start, Activity.start_time < end)
-            .order_by(Activity.start_time)
-        )
-    )
+    activities = activities_repo.activities_between(db, start, end)
     sessions = strength_repo.sessions_between(db, start, end)
     goals = counted_goals(db)
 

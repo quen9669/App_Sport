@@ -91,8 +91,8 @@ body {
 /* --- Navigation --- */
 .nav {
   display: flex;
-  gap: 1rem;
-  overflow-x: auto; /* five links: scroll sideways on a very narrow phone instead of wrapping */
+  flex-wrap: wrap; /* six links: a second line on a phone, rather than a hidden one */
+  gap: 0.5rem 1rem;
   white-space: nowrap;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border);
@@ -350,4 +350,55 @@ textarea {
   font-size: 1.125rem;
   font-weight: 700;
   color: var(--accent);
+}
+
+/* Small label next to an activity name ("Doublon possible", "Masquée"). */
+.badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Hidden by hand: still listed, so it can be shown again, but faded. */
+.activity--hidden {
+  opacity: 0.55;
+}
+
+/* Period buttons of the Santé page (7 / 30 / 90 days). */
+.segmented {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.segmented button.secondary[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0 0 0.5rem;
+}
+
+.stats div {
+  min-width: 7rem;
+}
+
+.stats dt {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.stats dd {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
 }

@@ -24,6 +24,8 @@ export interface GarminStatus {
   night_count: number
   day_count: number
   latest_day: string | null
+  activity_count: number
+  activity_history_complete: boolean
 }
 
 export type SyncStatus = 'running' | 'success' | 'partial' | 'failed'
@@ -112,6 +114,11 @@ export interface WeekActivity {
   distance_m: number | null
   category: Category
   automatic_category: Category
+  source: string
+  /** Hidden by hand: listed greyed out, never counted. */
+  hidden: boolean
+  /** Maybe the same session as another activity (Garmin and Strava): can be hidden. */
+  possible_duplicate: boolean
 }
 
 export interface WeekProgress {
@@ -190,6 +197,45 @@ export interface StrengthSessionInput {
   duration_min: number | null
   notes: string | null
   sets: StrengthSetInput[]
+}
+
+/** One day of the Santé screen; every value may be missing. */
+export interface HealthDay {
+  day: string
+  sleep_s: number | null
+  sleep_score: number | null
+  /** Minutes from midnight, negative the evening before (23:30 -> -30). */
+  bedtime_min: number | null
+  wake_min: number | null
+  resting_hr: number | null
+  hrv_ms: number | null
+  weight_kg: number | null
+}
+
+export interface HealthMetrics {
+  days: HealthDay[] // oldest first
+  regularity: { nights: number; bedtime_sd_min: number | null; wake_sd_min: number | null }
+}
+
+export interface WeekLoad {
+  week: string
+  monday: string
+  load: number
+  sessions: number
+  with_heart_rate: number
+}
+
+export interface TrainingLoad {
+  weeks: WeekLoad[] // oldest first, current week last
+  acute: number
+  chronic: number
+  acwr: number | null
+  heart_rate: {
+    max_hr: number | null
+    resting_hr: number | null
+    max_source: 'profile' | 'age' | null
+    resting_source: 'profile' | 'garmin' | null
+  }
 }
 
 export interface CategoryResult {
@@ -285,6 +331,9 @@ export const fetchWeekProgress = (week?: string) =>
 export const setActivityCategory = (id: number, category: Category | null) =>
   sendJson<CategoryResult>('PATCH', `/api/activities/${id}/category`, { category })
 
+export const setActivityHidden = (id: number, hidden: boolean) =>
+  sendJson<{ id: number; hidden: boolean }>('PATCH', `/api/activities/${id}/hidden`, { hidden })
+
 export const fetchGoalHistory = (weeks = 12) =>
   request<GoalHistory>('GET', `/api/goals/history?weeks=${weeks}`)
 
@@ -297,3 +346,10 @@ export const createStrengthSession = (session: StrengthSessionInput) =>
   sendJson<StrengthSession>('POST', '/api/strength/sessions', session)
 export const deleteStrengthSession = (id: number) =>
   request<void>('DELETE', `/api/strength/sessions/${id}`)
+
+// --- Santé screen (phase 3a) ---
+
+export const fetchHealthMetrics = (days = 30) =>
+  request<HealthMetrics>('GET', `/api/health-metrics?days=${days}`)
+export const fetchTrainingLoad = (weeks = 12) =>
+  request<TrainingLoad>('GET', `/api/training-load?weeks=${weeks}`)

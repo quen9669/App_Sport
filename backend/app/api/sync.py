@@ -12,6 +12,10 @@ from app.db.models.enums import DataSource, SyncKind
 from app.db.session import get_db, provide_session_factory
 from app.repositories import credentials as credentials_repo
 from app.repositories import sync as sync_repo
+from app.services.garmin_activity_sync import (
+    GarminActivitySyncAlreadyRunningError,
+    is_activity_sync_running,
+)
 from app.services.health_sync import HealthSyncAlreadyRunningError, is_garmin_sync_running
 from app.services.jobs import is_garmin_configured, run_garmin_sync, run_strava_sync
 from app.services.strava_sync import SyncAlreadyRunningError, is_sync_running
@@ -45,7 +49,7 @@ def _strava_in_background(factory: sessionmaker[Session]) -> None:
 
 
 def _garmin_in_background(factory: sessionmaker[Session]) -> None:
-    with contextlib.suppress(HealthSyncAlreadyRunningError):
+    with contextlib.suppress(HealthSyncAlreadyRunningError, GarminActivitySyncAlreadyRunningError):
         run_garmin_sync(factory, SyncKind.MANUAL)
 
 
@@ -74,13 +78,13 @@ def start_garmin_sync(
     factory: sessionmaker[Session] = Depends(provide_session_factory),
     settings: Settings = Depends(get_settings),
 ) -> SyncStarted:
-    """Start a Garmin sync in the background (same pattern as Strava)."""
+    """Start a Garmin sync (health data, then activities) in the background, like Strava."""
     if not is_garmin_configured(settings):
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
             "Garmin is not configured: set GARMIN_EMAIL and GARMIN_PASSWORD in .env.",
         )
-    if is_garmin_sync_running():
+    if is_garmin_sync_running() or is_activity_sync_running():
         raise HTTPException(status.HTTP_409_CONFLICT, "A Garmin sync is already running.")
     background.add_task(_garmin_in_background, factory)
     return SyncStarted(status="started")

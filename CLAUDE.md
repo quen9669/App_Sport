@@ -102,3 +102,18 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - The gym draft lives in `localStorage` (`src/utils/strengthDraft.ts`) until "Terminer la séance".
 - Chart series colors are CSS variables `--series-1..4` (fixed order, validated for color
   blindness, separate light/dark steps); legend and labels stay in text colors.
+
+## Garmin activities, health screen, load (phase 3a)
+
+- Garmin Connect is the **main activity source**; Strava only complements it (owner's decision).
+  `services/garmin_activity_sync.py` mirrors the Strava sync (new pages, offset-paged history with
+  cursor `garmin_activities_backfill`, missing details). Mapping in
+  `integrations/health/garmin_activities.py` (field names from `garminconnect`, unverified on real data).
+- `services/dedupe.py` runs after both syncs: Strava rows that duplicate a Garmin row get
+  `duplicate_status="confirmed"` and are excluded by `activities_repo.not_duplicate()`; "possible"
+  ones stay visible. `hidden` (manual) is never touched by syncs and never counted. Every new list or
+  count of activities must use `activities_repo.activities_between()` (or `not_duplicate()`) and skip
+  `hidden`.
+- Training load: `services/training_load.py` (Banister TRIMP, else minutes × effort per category);
+  no ACWR before 5 weeks of history. Health series: `services/health_dashboard.py` (one row per day,
+  Garmin preferred over other sources). Routes in `api/dashboards.py`; page `HealthPage` (`/sante`).

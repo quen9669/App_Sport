@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import ColumnElement, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.db.models import Activity, ActivityStream, RawPayload
@@ -28,6 +28,30 @@ def upsert_activity(
         setattr(activity, name, value)
     db.flush()  # sends the INSERT/UPDATE now so that activity.id is known
     return activity, created
+
+
+def not_duplicate() -> ColumnElement[bool]:
+    """SQL condition: the activity is not a confirmed copy of a Garmin one.
+
+    Every list or count of activities uses it (see app/services/dedupe.py).
+    Written by hand instead of importing DuplicateStatus to keep this layer
+    free of service code; "confirmed" is DuplicateStatus.CONFIRMED.
+    """
+    return or_(Activity.duplicate_status.is_(None), Activity.duplicate_status != "confirmed")
+
+
+def activities_between(db: Session, start: datetime, end: datetime) -> list[Activity]:
+    """Activities started in [start, end), oldest first, without confirmed duplicates.
+
+    Hidden activities are included (they are listed, greyed out); callers
+    that count must skip ``activity.hidden``.
+    """
+    query = (
+        select(Activity)
+        .where(Activity.start_time >= start, Activity.start_time < end, not_duplicate())
+        .order_by(Activity.start_time)
+    )
+    return list(db.scalars(query))
 
 
 def upsert_raw_payload(db: Session, source: str, kind: str, external_id: str, payload: Any) -> None:
@@ -72,6 +96,8 @@ def activities_missing_streams(db: Session, source: str, limit: int) -> list[Act
             Activity.source == source,
             ActivityStream.id.is_(None),
             Activity.is_manual.is_(False),
+            # Don't spend API quota on the details of a copy we never show.
+            not_duplicate(),
             (Activity.summary_polyline.is_not(None)) | (Activity.has_heartrate.is_(True)),
         )
         .order_by(Activity.start_time.desc())

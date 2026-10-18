@@ -5,6 +5,7 @@ already finished) and builds the clients it needs from the settings.
 """
 
 import logging
+from collections.abc import Callable
 
 import httpx
 from sqlalchemy.orm import Session, sessionmaker
@@ -13,10 +14,15 @@ from app.config import Settings, get_settings
 from app.db.models import SyncLog
 from app.db.models.enums import DataSource, SyncKind
 from app.dependencies import HTTP_TIMEOUT_S, build_strava_oauth
-from app.integrations.health.garmin_connect import GarminConnectProvider, login_with_library
+from app.integrations.health.garmin_connect import (
+    GarminApi,
+    GarminConnectProvider,
+    login_with_library,
+)
 from app.integrations.strava.client import StravaClient
 from app.repositories import credentials as credentials_repo
 from app.services.crypto import TokenCipher
+from app.services.garmin_activity_sync import GarminActivitySyncService
 from app.services.health_sync import run_provider_sync
 from app.services.strava_auth import StravaCredentialService
 from app.services.strava_sync import StravaSyncService, SyncLimits
@@ -42,22 +48,42 @@ def is_garmin_configured(settings: Settings) -> bool:
     return bool(settings.garmin_email and settings.garmin_password)
 
 
-def build_garmin_provider(settings: Settings) -> GarminConnectProvider:
-    return GarminConnectProvider(
-        login=lambda: login_with_library(
-            settings.garmin_email, settings.garmin_password, settings.garmin_tokenstore
-        )
-    )
+def garmin_login_once(settings: Settings) -> Callable[[], GarminApi]:
+    """A function that logs in to Garmin on its first call and then reuses the client.
+
+    Health data and activities share it, so one Garmin sync logs in only once.
+    """
+    client: list[GarminApi] = []  # a list so the inner function can fill it
+
+    def login() -> GarminApi:
+        if not client:
+            client.append(
+                login_with_library(
+                    settings.garmin_email, settings.garmin_password, settings.garmin_tokenstore
+                )
+            )
+        return client[0]
+
+    return login
 
 
 def run_garmin_sync(
-    session_factory: sessionmaker[Session], kind: SyncKind = SyncKind.MANUAL
+    session_factory: sessionmaker[Session],
+    kind: SyncKind = SyncKind.MANUAL,
+    login: Callable[[], GarminApi] | None = None,
 ) -> SyncLog:
+    """Health data first (sleep, HRV...), then activities. Returns the activities' log.
+
+    Each part has its own sync_log entry, so a failure in one is visible and
+    does not hide the result of the other.
+    """
     settings = get_settings()
+    login = login or garmin_login_once(settings)
     with session_factory() as db:
-        return run_provider_sync(
-            db, build_garmin_provider(settings), kind, settings.garmin_initial_days
+        run_provider_sync(
+            db, GarminConnectProvider(login=login), kind, settings.garmin_initial_days
         )
+        return GarminActivitySyncService(db, login).run(kind)
 
 
 def run_scheduled_syncs(session_factory: sessionmaker[Session]) -> None:

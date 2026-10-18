@@ -4,6 +4,7 @@ Pydantic validates the payload first: if Strava changes a field type, we get a
 clear validation error here instead of corrupted data in the database.
 """
 
+import re
 from datetime import datetime
 from typing import Any
 
@@ -38,6 +39,9 @@ class StravaActivitySummary(BaseModel):
     has_heartrate: bool = False
     manual: bool = False
     trainer: bool = False
+    # Identifier given by the uploader. For activities sent by Garmin Connect it
+    # looks like "garmin_ping_123456789" (to be confirmed on real data).
+    external_id: str | None = None
 
 
 def parse_timezone(value: str | None) -> str | None:
@@ -45,6 +49,16 @@ def parse_timezone(value: str | None) -> str | None:
     if not value:
         return None
     return value.rsplit(" ", 1)[-1] or None
+
+
+# "garmin_ping_123456789" or "garmin_push_123456789" -> "123456789".
+_GARMIN_EXTERNAL_ID = re.compile(r"^garmin_(?:ping|push)_(\d+)")
+
+
+def garmin_id_from_external_id(external_id: str | None) -> str | None:
+    """The Garmin Connect activity id hidden in Strava's ``external_id``, if any."""
+    match = _GARMIN_EXTERNAL_ID.match(external_id or "")
+    return match.group(1) if match else None
 
 
 def activity_fields(summary: StravaActivitySummary) -> dict[str, Any]:
@@ -67,6 +81,7 @@ def activity_fields(summary: StravaActivitySummary) -> dict[str, Any]:
         "has_heartrate": summary.has_heartrate,
         "is_manual": summary.manual,
         "is_trainer": summary.trainer,
+        "garmin_activity_id": garmin_id_from_external_id(summary.external_id),
     }
 
 

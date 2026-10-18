@@ -55,10 +55,15 @@ def week_of(day: date) -> Week:
     return Week(iso.year, iso.week)
 
 
+def local_today(timezone: str, now: datetime | None = None) -> date:
+    """Today's date in the user's timezone (in UTC it may still be yesterday)."""
+    moment = now or datetime.now(UTC)
+    return moment.astimezone(ZoneInfo(timezone)).date()
+
+
 def current_week(timezone: str, now: datetime | None = None) -> Week:
     """The week we are in right now, in the user's timezone."""
-    moment = now or datetime.now(UTC)
-    return week_of(moment.astimezone(ZoneInfo(timezone)).date())
+    return week_of(local_today(timezone, now))
 
 
 def parse_week(label: str) -> Week:

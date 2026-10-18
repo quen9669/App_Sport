@@ -7,6 +7,7 @@ import {
   fetchHealth,
   fetchWeekProgress,
   setActivityCategory,
+  setActivityHidden,
   type Category,
   type WeekActivity,
   type WeekProgress,
@@ -89,6 +90,15 @@ export default function HomePage() {
     }
   }
 
+  async function toggleHidden(activity: WeekActivity) {
+    try {
+      await setActivityHidden(activity.id, !activity.hidden)
+      setProgress(await loadWeek())
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Le backend ne répond pas.')
+    }
+  }
+
   return (
     <>
       <h1>App Sport</h1>
@@ -153,9 +163,14 @@ export default function HomePage() {
             {progress.activities.length > 0 && (
               <ul className="activity-list">
                 {progress.activities.map((activity) => (
-                  <li key={activity.id}>
+                  <li key={activity.id} className={activity.hidden ? 'activity--hidden' : ''}>
                     <div>
                       <strong>{activity.name}</strong>
+                      {/* Garmin and Strava may both have this session: let the user pick. */}
+                      {activity.possible_duplicate && !activity.hidden && (
+                        <span className="badge">Doublon possible</span>
+                      )}
+                      {activity.hidden && <span className="badge">Masquée</span>}
                       <span className="hint">
                         {' '}
                         {formatDayTime(activity.start_time)} ·{' '}
@@ -180,6 +195,16 @@ export default function HomePage() {
                         </option>
                       ))}
                     </select>
+                    {(activity.possible_duplicate || activity.hidden) && (
+                      <button
+                        type="button"
+                        className="secondary"
+                        aria-label={`${activity.hidden ? 'Réafficher' : 'Masquer'} ${activity.name}`}
+                        onClick={() => void toggleHidden(activity)}
+                      >
+                        {activity.hidden ? 'Réafficher' : 'Masquer'}
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -198,7 +223,7 @@ export default function HomePage() {
                           {session.set_count > 1 ? 's' : ''}
                         </span>
                       </div>
-                      {!session.counted && <span className="hint">Déjà comptée via Strava</span>}
+                      {!session.counted && <span className="hint">Déjà comptée via la montre</span>}
                     </li>
                   ))}
                 </ul>

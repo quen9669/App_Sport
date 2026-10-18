@@ -11,8 +11,11 @@ Deux possibilités. La première est automatique mais fragile, la seconde est ma
    ```
 2. Lance `make dev`, ouvre http://localhost:5173/sources et clique sur « Synchroniser maintenant »
    dans la carte Garmin.
-3. La première synchronisation récupère les 90 derniers jours (réglable avec `GARMIN_INITIAL_DAYS`),
-   puis chaque synchronisation ne relit que les derniers jours.
+3. La première synchronisation récupère les 90 derniers jours de santé (réglable avec
+   `GARMIN_INITIAL_DAYS`), puis chaque synchronisation ne relit que les derniers jours.
+4. Les **activités** (avec FC, GPS et courbes) arrivent dans la même synchro : les plus récentes
+   d'abord, puis l'historique complet petit à petit (500 activités par passage). Les mêmes séances
+   envoyées aussi à Strava ne sont comptées qu'une fois.
 
 Après la première connexion, l'app enregistre une session Garmin dans `~/.app_sport/garmin`
 (lisible par toi seul, hors du dépôt) : le mot de passe n'est plus réutilisé tant que la session

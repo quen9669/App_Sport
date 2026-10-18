@@ -1,7 +1,7 @@
 # App Sport
 
-Application de sport personnelle, utilisable sur PC et sur téléphone Android (PWA). Elle récupérera
-mes activités Strava et mes données de santé Garmin, suivra mes objectifs hebdomadaires, affichera
+Application de sport personnelle, utilisable sur PC et sur téléphone Android (PWA). Elle récupère
+mes activités et mes données de santé depuis Garmin Connect (Strava en complément), suivra mes objectifs hebdomadaires, affichera
 une carte de mes sorties, prédira mes temps de course et proposera deux coachs IA.
 
 > Cette application donne des conseils d'entraînement, pas un avis médical.
