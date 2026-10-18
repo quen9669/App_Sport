@@ -37,6 +37,18 @@ class Settings(BaseSettings):
     strava_client_secret: str = ""
     strava_redirect_uri: str = "http://localhost:8000/api/strava/callback"
 
+    # --- Garmin (unofficial `garminconnect` library) ---
+    garmin_email: str = ""
+    garmin_password: str = ""
+    # Folder where the Garmin session tokens are saved, outside the repository.
+    garmin_tokenstore: str = "~/.app_sport/garmin"
+    # How many days back the very first Garmin sync goes.
+    garmin_initial_days: int = Field(default=90, ge=1, le=3650)
+
+    # --- Scheduled synchronisation ---
+    scheduler_enabled: bool = True
+    sync_interval_hours: float = Field(default=3, gt=0, le=48)
+
     # --- Security ---
     # Fernet key used to encrypt OAuth tokens before they are written to the database.
     token_encryption_key: str = ""
