@@ -124,10 +124,15 @@ class LoadSummary:
     params: HeartRateParams
     acute: float = 0.0  # last 7 days
     chronic: float = 0.0  # weekly average of the 4 weeks before
+    # False while the history doesn't cover the 4 weeks before: the average
+    # would then be too low and the ratio misleadingly high.
+    enough_history: bool = False
 
     @property
     def acwr(self) -> float | None:
-        return round(self.acute / self.chronic, 2) if self.chronic > 0 else None
+        if not self.enough_history or self.chronic <= 0:
+            return None
+        return round(self.acute / self.chronic, 2)
 
 
 def training_load(db: Session, last: Week, count: int, timezone: str, now: datetime) -> LoadSummary:
@@ -156,6 +161,10 @@ def training_load(db: Session, last: Week, count: int, timezone: str, now: datet
     ranges = [week.utc_range(timezone) for week in weeks]
     acute_from = now - timedelta(days=ACUTE_DAYS)
     chronic_from = acute_from - timedelta(days=CHRONIC_DAYS)
+    # The oldest session must lie in the first week of the chronic window.
+    summary.enough_history = any(
+        started < chronic_from + timedelta(days=7) for started, _, _ in items
+    )
     for started, load, with_hr in items:
         for week_load, (low, high) in zip(summary.weeks, ranges, strict=True):
             if low <= started < high:

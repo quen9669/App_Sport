@@ -115,6 +115,15 @@ def test_no_history_means_no_acwr(db: Session) -> None:
     assert all(week.load == 0 for week in summary.weeks)
 
 
+def test_short_history_gives_no_misleading_acwr(db: Session) -> None:
+    # Only 2 weeks of data: the 4-week average would be half of the real one.
+    add_activity(db, "old", NOW - timedelta(days=12))
+    add_activity(db, "new", NOW - timedelta(days=1))
+    summary = training_load(db, week_of(NOW.date()), 4, TZ, NOW)
+    assert summary.chronic == 21
+    assert summary.acwr is None
+
+
 # --- Health series ----------------------------------------------------------------
 
 
