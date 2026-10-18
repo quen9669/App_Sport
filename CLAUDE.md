@@ -272,3 +272,16 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   without `APP_PASSWORD_HASH`. `make autostart-off` removes it, `make prod-restart` restarts the app.
 - `FRONTEND_URL` and `STRAVA_REDIRECT_URI` point at the ts.net address; production is same-origin,
   so `CORS_ORIGINS` is not needed there.
+
+## Runs sent to the Garmin watch (owner's request, running only)
+
+- A `run` session of the weekly plan carries `workout` (`services/workouts.py`, `RunWorkout`:
+  optional warm-up, 1-6 blocks of `repeats` × work + optional recovery, optional cool-down; each
+  step a duration OR a distance and a pace ZONE). The coach fills zones, never numbers; the app turns
+  them into ranges from the current VDOT (`pace_targets`, single Daniels paces widened by ±5 s/km),
+  served to the screen as `pace_targets` in `/api/coach/plans/current`.
+- `services/garmin_push.py` + routes in `api/plan_workouts.py` (`PUT .../sessions/{i}/workout`,
+  `POST|DELETE .../sessions/{i}/garmin`): accepted plans only, future days only, never sent twice,
+  no edit while sent. `integrations/health/garmin_workouts.py` is the ONLY Garmin write: create +
+  schedule (deleted again if scheduling fails), and remove only the ids stored in
+  `session["garmin"]`. Nothing is sent without FRANKS's click (`RunGarminActions`, Mon plan page).

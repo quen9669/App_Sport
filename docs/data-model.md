@@ -197,7 +197,9 @@ erDiagram
   appel (modèle, jetons, coût en euros, latence, outils) et sert au budget du mois ;
   `coach_plan` les plans de semaine proposés par le coach (`proposed`, puis `accepted`, `rejected`
   ou `replaced` : un seul plan accepté par semaine, affiché sur l'Accueil ; il reste si la
-  conversation est supprimée).
+  conversation est supprimée). Une séance de course y garde ses étapes (`workout` : échauffement,
+  blocs, retour au calme, avec des zones d'allure) et, une fois envoyée sur la montre, les
+  identifiants Garmin de la séance créée (`garmin`), pour pouvoir la retirer.
 - **Tabac** : seuls les jours avec cigarette sont enregistrés (`smoking_day`) ; tous les autres jours
   depuis `smoke_free_since` comptent comme sans cigarette.
 - **Pas de double comptage** : une séance saisie compte seule pour les objectifs seulement si elle

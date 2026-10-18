@@ -178,7 +178,7 @@ def test_profile_and_goals(db: Session, settings: Settings) -> None:
 
 def test_prompts_are_versioned_files() -> None:
     prompt = prompts.system_prompt("training")
-    assert prompt.version == "training-v2+common-v1"
+    assert prompt.version == "training-v3+common-v1"
     assert "médecin" in prompt.text and "propose_memory" in prompt.text
     assert "version:" not in prompt.text
 

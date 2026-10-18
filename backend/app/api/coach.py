@@ -34,8 +34,11 @@ from app.config import Settings, get_settings
 from app.db.models import CoachConversation, CoachMemory, CoachPlan
 from app.db.session import get_db, provide_session_factory
 from app.db.types import utc_now
+from app.dependencies import get_now
 from app.repositories import coach as coach_repo
+from app.services.race.predictor import race_report
 from app.services.weeks import current_week
+from app.services.workouts import RunWorkout, pace_targets
 
 router = APIRouter(prefix="/coach", tags=["coach"])
 
@@ -104,6 +107,16 @@ class ConversationOut(BaseModel):
     updated_at: datetime
 
 
+class GarminSentOut(BaseModel):
+    workout_id: int
+    sent_at: datetime
+
+
+class PaceRangeOut(BaseModel):
+    slow_s_per_km: float
+    fast_s_per_km: float
+
+
 class PlanSessionOut(BaseModel):
     day: date
     kind: str  # run, ride, strength, class, walk, mobility, rest, other
@@ -112,6 +125,8 @@ class PlanSessionOut(BaseModel):
     intensity: str
     details: str
     why: str
+    workout: RunWorkout | None = None  # runs: warm-up, blocks, cool-down (pace zones)
+    garmin: GarminSentOut | None = None  # set once sent to Garmin Connect
 
 
 class PlanOut(BaseModel):
@@ -293,6 +308,9 @@ def ask(
 class CurrentPlansOut(BaseModel):
     this_week: PlanOut | None  # the accepted plan of the current week
     next_week: PlanOut | None
+    # Pace range of each zone ("easy", "threshold"...) from the current form, to show
+    # the steps of the runs; empty while the form is unknown.
+    pace_targets: dict[str, PaceRangeOut] = {}
 
 
 class PlanDecision(BaseModel):
@@ -305,13 +323,20 @@ def _plan_out(plan: CoachPlan | None) -> PlanOut | None:
 
 @router.get("/plans/current", response_model=CurrentPlansOut)
 def read_current_plans(
-    db: Session = Depends(get_db), settings: Settings = Depends(get_settings)
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    now: datetime = Depends(get_now),
 ) -> CurrentPlansOut:
     """The accepted plans of this week and the next one (Accueil page)."""
-    monday = current_week(settings.app_timezone, utc_now()).monday
+    monday = current_week(settings.app_timezone, now).monday
+    zones = race_report(db, settings.app_timezone, now).zones
     return CurrentPlansOut(
         this_week=_plan_out(coach_repo.accepted_plan(db, monday)),
         next_week=_plan_out(coach_repo.accepted_plan(db, monday + timedelta(days=7))),
+        pace_targets={
+            key: PaceRangeOut(slow_s_per_km=slow, fast_s_per_km=fast)
+            for key, (slow, fast) in pace_targets(zones).items()
+        },
     )
 
 

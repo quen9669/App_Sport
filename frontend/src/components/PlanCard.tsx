@@ -1,8 +1,11 @@
 // A week of sessions proposed by the coach. In the chat it has "Accepter",
 // "Modifier" and "Refuser"; on the Accueil page (accepted plan) it is read-only.
 // Built from React elements only: the texts come from the model.
+import type { ReactNode } from 'react'
+
 import type { CoachPlan, PlanSessionKind } from '../api/client'
 import { formatShortDate } from '../utils/format'
+import { type PaceTargets, workoutLines } from '../utils/workout'
 
 const KINDS: Record<PlanSessionKind, { emoji: string; label: string }> = {
   run: { emoji: '🏃', label: 'Course' },
@@ -39,9 +42,20 @@ interface Props {
   /** Chat only: start a message asking the coach to change the plan. */
   onModify?: () => void
   disabled?: boolean
+  /** Pace range of each zone, to show the paces of the runs' steps. */
+  paceTargets?: PaceTargets
+  /** Mon plan page: buttons under a session (send a run to Garmin...). */
+  sessionActions?: (index: number) => ReactNode
 }
 
-export default function PlanCard({ plan, onDecide, onModify, disabled }: Props) {
+export default function PlanCard({
+  plan,
+  onDecide,
+  onModify,
+  disabled,
+  paceTargets = {},
+  sessionActions,
+}: Props) {
   const title = `Plan de la semaine du ${formatShortDate(plan.week_start)}`
   return (
     <article className="plan-card" aria-label={title}>
@@ -60,7 +74,15 @@ export default function PlanCard({ plan, onDecide, onModify, disabled }: Props) 
                 {session.duration_min > 0 && ` · ${session.duration_min} min`}
                 {session.intensity && ` · ${session.intensity}`}
                 {session.details && <span className="plan-details">{session.details}</span>}
+                {session.workout && (
+                  <ol className="workout-steps" aria-label={`Étapes : ${session.title}`}>
+                    {workoutLines(session.workout, paceTargets).map((line, j) => (
+                      <li key={j}>{line}</li>
+                    ))}
+                  </ol>
+                )}
                 <span className="hint plan-why">{session.why}</span>
+                {sessionActions?.(i)}
               </span>
             </li>
           )
