@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import activities, goals, health, health_data, profile, strava, sync
+from app.api import activities, goals, health, health_data, profile, strava, strength, sync
 from app.config import get_settings
 from app.db.session import get_session_factory
 from app.logging_config import configure_logging
@@ -59,6 +59,7 @@ def create_app() -> FastAPI:
     app.include_router(profile.router, prefix="/api")
     app.include_router(goals.router, prefix="/api")
     app.include_router(activities.router, prefix="/api")
+    app.include_router(strength.router, prefix="/api")
     return app
 
 

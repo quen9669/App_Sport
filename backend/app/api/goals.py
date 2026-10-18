@@ -12,7 +12,15 @@ from app.db.models import Goal
 from app.db.session import get_db
 from app.repositories import goals as goals_repo
 from app.services.classification import automatic_category, effective_category
-from app.services.goals import GoalKind, GoalSport, GoalStatus, week_progress
+from app.services.goals import (
+    GoalKind,
+    GoalSport,
+    GoalStatus,
+    streak,
+    week_progress,
+    weeks_history,
+)
+from app.services.strength import counts_on_its_own
 from app.services.weeks import current_week, parse_week
 
 router = APIRouter(prefix="/goals", tags=["goals"])
@@ -75,6 +83,7 @@ class GoalProgressOut(BaseModel):
     done: float
     achieved: bool
     activity_ids: list[int]
+    session_ids: list[int]  # typed strength sessions counted on their own
 
 
 class WeekActivityOut(BaseModel):
@@ -89,6 +98,17 @@ class WeekActivityOut(BaseModel):
     automatic_category: str  # what the rule says, to show "corrected by hand"
 
 
+class WeekSessionOut(BaseModel):
+    id: int
+    performed_at: datetime
+    duration_min: int | None
+    exercises: list[str]  # names, in the order they were done
+    set_count: int
+    # False when the same session was recorded on Strava: it is counted through
+    # that activity instead (no double counting).
+    counted: bool
+
+
 class WeekProgressOut(BaseModel):
     week: str
     previous_week: str
@@ -97,6 +117,28 @@ class WeekProgressOut(BaseModel):
     sunday: date
     goals: list[GoalProgressOut]
     activities: list[WeekActivityOut]
+    sessions: list[WeekSessionOut]
+
+
+class HistoryGoalOut(BaseModel):
+    goal_id: int
+    kind: str
+    sport: str | None
+    target: float
+    done: float
+    achieved: bool
+
+
+class HistoryWeekOut(BaseModel):
+    week: str
+    monday: date
+    goals: list[HistoryGoalOut]
+    all_achieved: bool
+
+
+class HistoryOut(BaseModel):
+    weeks: list[HistoryWeekOut]  # oldest first
+    streak: int  # consecutive weeks where every goal was reached
 
 
 def _get_goal(db: Session, goal_id: int) -> Goal:
@@ -158,7 +200,7 @@ def read_progress(
     except ValueError as exc:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from None
 
-    progress, activities = week_progress(db, selected, settings.app_timezone)
+    data = week_progress(db, selected, settings.app_timezone)
     return WeekProgressOut(
         week=selected.label,
         previous_week=selected.previous().label,
@@ -171,8 +213,9 @@ def read_progress(
                 done=item.done,
                 achieved=item.achieved,
                 activity_ids=item.activity_ids,
+                session_ids=item.session_ids,
             )
-            for item in progress
+            for item in data.progress
         ],
         activities=[
             WeekActivityOut(
@@ -186,6 +229,54 @@ def read_progress(
                 category=effective_category(a),
                 automatic_category=automatic_category(a.sport_type),
             )
-            for a in activities
+            for a in data.activities
         ],
+        sessions=[
+            WeekSessionOut(
+                id=session.id,
+                performed_at=session.performed_at,
+                duration_min=session.duration_min,
+                # dict.fromkeys keeps the first occurrence of each name, in order.
+                exercises=list(dict.fromkeys(s.exercise for s in session.sets)),
+                set_count=len(session.sets),
+                counted=counts_on_its_own(session, data.activities),
+            )
+            for session in data.sessions
+        ],
+    )
+
+
+@router.get("/history", response_model=HistoryOut)
+def read_history(
+    weeks: int = Query(default=12, ge=1, le=52),
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+) -> HistoryOut:
+    """The last ``weeks`` weeks (current one included) and the streak of successful weeks.
+
+    The streak is computed over up to a year, even when fewer weeks are shown.
+    """
+    current = current_week(settings.app_timezone)
+    history = weeks_history(db, current, max(weeks, 52), settings.app_timezone)
+    return HistoryOut(
+        weeks=[
+            HistoryWeekOut(
+                week=data.week.label,
+                monday=data.week.monday,
+                goals=[
+                    HistoryGoalOut(
+                        goal_id=item.goal.id,
+                        kind=item.goal.kind,
+                        sport=item.goal.sport,
+                        target=item.goal.target,
+                        done=item.done,
+                        achieved=item.achieved,
+                    )
+                    for item in data.progress
+                ],
+                all_achieved=data.all_achieved,
+            )
+            for data in history[-weeks:]
+        ],
+        streak=streak(history, current),
     )

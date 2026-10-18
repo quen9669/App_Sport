@@ -6,13 +6,15 @@ from enum import StrEnum
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db.models import Activity, Goal
+from app.db.models import Activity, Goal, StrengthSession
+from app.repositories import strength as strength_repo
 from app.services.classification import (
     RIDE_SPORTS,
     RUN_SPORTS,
     Category,
     effective_category,
 )
+from app.services.strength import counts_on_its_own
 from app.services.weeks import Week
 
 
@@ -39,6 +41,7 @@ class GoalProgress:
     goal: Goal
     done: float
     activity_ids: list[int] = field(default_factory=list)
+    session_ids: list[int] = field(default_factory=list)  # typed strength sessions counted
 
     @property
     def achieved(self) -> bool:
@@ -55,18 +58,26 @@ def activities_in_week(db: Session, week: Week, timezone: str) -> list[Activity]
     return list(db.scalars(query))
 
 
-def goals_for_week(db: Session, week: Week) -> list[Goal]:
-    """Active goals whose dates overlap the week (a goal starting mid-week counts)."""
-    query = (
-        select(Goal)
-        .where(
-            Goal.status == GoalStatus.ACTIVE,
-            Goal.start_date <= week.sunday,
-            (Goal.end_date.is_(None)) | (Goal.end_date >= week.monday),
-        )
-        .order_by(Goal.id)
-    )
+def counted_goals(db: Session) -> list[Goal]:
+    """Every goal except paused ones.
+
+    "Done" goals stay: they ended, but still count for the weeks they covered
+    (history). Note: a goal paused today also disappears from past weeks, as
+    the app does not keep the history of status changes.
+    """
+    query = select(Goal).where(Goal.status != GoalStatus.PAUSED).order_by(Goal.id)
     return list(db.scalars(query))
+
+
+def overlaps(goal: Goal, week: Week) -> bool:
+    """A goal starting or ending mid-week counts for that whole week."""
+    return goal.start_date <= week.sunday and (
+        goal.end_date is None or goal.end_date >= week.monday
+    )
+
+
+def goals_for_week(db: Session, week: Week) -> list[Goal]:
+    return [goal for goal in counted_goals(db) if overlaps(goal, week)]
 
 
 def _matches_sport(activity: Activity, sport: str | None) -> bool:
@@ -100,11 +111,24 @@ def _amount(goal: Goal, activity: Activity) -> float | None:
     return None
 
 
-def compute_progress(goal: Goal, activities: list[Activity]) -> GoalProgress:
-    """Count the activities of the week for one goal.
+def _session_amount(goal: Goal, session: StrengthSession) -> float | None:
+    """How much one typed strength session (not recorded on Strava) adds to a goal."""
+    if goal.kind == GoalKind.STRENGTH_SESSIONS:
+        return 1.0
+    if goal.kind == GoalKind.ACTIVE_MINUTES:
+        return float(session.duration_min or 0)
+    return None  # no cardio, no distance in a typed strength session
+
+
+def compute_progress(
+    goal: Goal,
+    activities: list[Activity],
+    sessions: list[StrengthSession] | None = None,
+) -> GoalProgress:
+    """Count the activities (and typed strength sessions) of the week for one goal.
 
     Several sessions on the same day each count: two classes on Saturday are
-    two sessions.
+    two sessions. A typed session already recorded on Strava counts once.
     """
     progress = GoalProgress(goal=goal, done=0)
     for activity in activities:
@@ -112,13 +136,87 @@ def compute_progress(goal: Goal, activities: list[Activity]) -> GoalProgress:
         if amount is not None:
             progress.done += amount
             progress.activity_ids.append(activity.id)
+    for session in sessions or []:
+        if not counts_on_its_own(session, activities):
+            continue
+        amount = _session_amount(goal, session)
+        if amount is not None:
+            progress.done += amount
+            progress.session_ids.append(session.id)
     progress.done = round(progress.done, 1)
     return progress
 
 
-def week_progress(
-    db: Session, week: Week, timezone: str
-) -> tuple[list[GoalProgress], list[Activity]]:
-    """Progress of every active goal for the week, plus the week's activities."""
+@dataclass
+class WeekData:
+    week: Week
+    progress: list[GoalProgress]
+    activities: list[Activity]
+    sessions: list[StrengthSession]
+
+    @property
+    def all_achieved(self) -> bool:
+        """Every goal of the week reached. A week without any goal is not a success."""
+        return bool(self.progress) and all(item.achieved for item in self.progress)
+
+
+def week_progress(db: Session, week: Week, timezone: str) -> WeekData:
+    """Progress of every counted goal for the week, with the week's activities and sessions."""
+    start, end = week.utc_range(timezone)
     activities = activities_in_week(db, week, timezone)
-    return [compute_progress(goal, activities) for goal in goals_for_week(db, week)], activities
+    sessions = strength_repo.sessions_between(db, start, end)
+    progress = [compute_progress(goal, activities, sessions) for goal in goals_for_week(db, week)]
+    return WeekData(week, progress, activities, sessions)
+
+
+def weeks_history(db: Session, last: Week, count: int, timezone: str) -> list[WeekData]:
+    """The ``count`` weeks ending with ``last``, oldest first.
+
+    Everything is loaded with three queries for the whole period, then split by
+    week in Python, instead of three queries per week.
+    """
+    weeks = [last]
+    while len(weeks) < count:
+        weeks.insert(0, weeks[0].previous())
+    start, _ = weeks[0].utc_range(timezone)
+    _, end = last.utc_range(timezone)
+
+    activities = list(
+        db.scalars(
+            select(Activity)
+            .where(Activity.start_time >= start, Activity.start_time < end)
+            .order_by(Activity.start_time)
+        )
+    )
+    sessions = strength_repo.sessions_between(db, start, end)
+    goals = counted_goals(db)
+
+    history = []
+    for week in weeks:
+        week_start, week_end = week.utc_range(timezone)
+        week_activities = [a for a in activities if week_start <= a.start_time < week_end]
+        week_sessions = [s for s in sessions if week_start <= s.performed_at < week_end]
+        progress = [
+            compute_progress(goal, week_activities, week_sessions)
+            for goal in goals
+            if overlaps(goal, week)
+        ]
+        history.append(WeekData(week, progress, week_activities, week_sessions))
+    return history
+
+
+def streak(history: list[WeekData], current: Week) -> int:
+    """Consecutive successful weeks, counting back from the most recent one.
+
+    The current week is still in progress: if it is already a success it
+    counts, otherwise it is simply ignored (it can't break the streak yet).
+    """
+    count = 0
+    for data in reversed(history):
+        if data.all_achieved:
+            count += 1
+        elif data.week == current:
+            continue
+        else:
+            break
+    return count
