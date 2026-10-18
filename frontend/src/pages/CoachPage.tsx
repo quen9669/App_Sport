@@ -201,7 +201,7 @@ function StatusLine({ status }: { status: CoachStatus }) {
   if (!status.configured) {
     return (
       <p className="notice" role="status">
-        Le coach attend ta clé API Anthropic : ajoute <code>ANTHROPIC_API_KEY</code> dans le fichier{' '}
+        Le coach attend ta clé API Gemini : ajoute <code>GEMINI_API_KEY</code> dans le fichier{' '}
         <code>.env</code> (voir le guide), puis relance l’app.
       </p>
     )

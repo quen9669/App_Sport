@@ -173,11 +173,11 @@ def test_prompts_are_versioned_files() -> None:
 
 def test_cost_estimate(settings: Settings) -> None:
     usage = Usage(input_tokens=1_000_000, output_tokens=100_000, cache_read_tokens=1_000_000)
-    # 3 $ input + 0.3 $ cache reads + 1.5 $ output = 4.8 $, x 0.92.
-    assert cost_eur(usage, settings.main_model, settings) == pytest.approx(4.8 * 0.92)
+    # Gemini 3.8 Flash by default: 1.5 $ input + 0.15 $ cache reads + 0.75 $ output = 2.4 $.
+    assert cost_eur(usage, settings.main_model, settings) == pytest.approx(2.4 * 0.92)
     assert cost_eur(
         Usage(output_tokens=1_000_000), settings.light_model, settings
-    ) == pytest.approx(5 * 0.92)
+    ) == pytest.approx(2.5 * 0.92)
 
 
 # --- The agent loop ----------------------------------------------------------------------
@@ -341,7 +341,7 @@ def test_ask_without_key_says_so(client: TestClient) -> None:
     )
     assert response.headers["content-type"].startswith("text/event-stream")
     assert sse(response.text) == [
-        ("error", {"message": "Le coach attend ta clé API : ajoute ANTHROPIC_API_KEY dans .env."})
+        ("error", {"message": "Le coach attend ta clé API : ajoute GEMINI_API_KEY dans .env."})
     ]
 
 

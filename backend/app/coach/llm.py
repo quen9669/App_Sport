@@ -1,8 +1,12 @@
-"""The only module that talks to the Anthropic API.
+"""What the engine needs from a model, and the Claude (Anthropic) implementation.
 
-The engine works with three small event types instead of the SDK's own
+The engine works with three small event types instead of an SDK's own
 classes, so tests can replace the model with a scripted fake (``FakeLLM`` in
-tests/fixtures/fake_llm.py) and never call the real API.
+tests/fixtures/fake_llm.py) and never call a real API. Gemini lives in
+``gemini.py`` and speaks the same language.
+
+Conversations are stored in Anthropic's message format (lists of ``text``,
+``tool_use`` and ``tool_result`` blocks); the Gemini class translates.
 """
 
 from collections.abc import Iterator
@@ -62,6 +66,20 @@ class LLMError(Exception):
     """The model API failed (network, quota, invalid key). The message is safe to show."""
 
 
+# Keys a provider adds to stored blocks for itself (Gemini's thought signatures).
+# They are removed before a block is sent to Claude, which rejects unknown fields.
+PROVIDER_KEYS = {"thought_signature"}
+
+
+def _for_claude(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def clean(content: Any) -> Any:
+        if isinstance(content, str):  # a plain text message
+            return content
+        return [{k: v for k, v in block.items() if k not in PROVIDER_KEYS} for block in content]
+
+    return [{**message, "content": clean(message["content"])} for message in messages]
+
+
 class AnthropicLLM:
     """The real model, through the official ``anthropic`` SDK."""
 
@@ -88,7 +106,7 @@ class AnthropicLLM:
                 model=model,
                 system=system,  # type: ignore[arg-type]
                 tools=tools,  # type: ignore[arg-type]
-                messages=messages,  # type: ignore[arg-type]
+                messages=_for_claude(messages),  # type: ignore[arg-type]
                 max_tokens=max_tokens,
             ) as stream:
                 for event in stream:

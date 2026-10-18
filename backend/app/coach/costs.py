@@ -1,8 +1,8 @@
 """What the coaches cost: token prices, the log of every call and the monthly budget.
 
 Prices come from the settings (see app/config.py), so a price change or a new
-model only needs a line in ``.env``. Costs are estimates: Anthropic's invoice
-is the reference.
+model only needs a line in ``.env``. Costs are estimates: the provider's
+invoice (Google or Anthropic) is the reference.
 """
 
 from dataclasses import dataclass
@@ -15,7 +15,8 @@ from app.coach.llm import Usage
 from app.config import Settings
 from app.db.models import CoachCall
 
-# Cached input costs 10 % of the input price to read and 125 % to write.
+# Cached input costs 10 % of the input price to read (both providers) and 125 %
+# to write (Anthropic only: Gemini's automatic cache has no write cost).
 CACHE_READ_FACTOR = 0.1
 CACHE_WRITE_FACTOR = 1.25
 # The coach shows a warning when the month's spending reaches this share of the budget.
@@ -24,13 +25,7 @@ WARNING_SHARE = 0.8
 
 def cost_eur(usage: Usage, model: str, settings: Settings) -> float:
     """Estimated cost of one call in euros."""
-    if model == settings.light_model:
-        price_in, price_out = (
-            settings.coach_light_price_input_usd,
-            settings.coach_light_price_output_usd,
-        )
-    else:
-        price_in, price_out = settings.coach_price_input_usd, settings.coach_price_output_usd
+    price_in, price_out = settings.prices(model)
     dollars = (
         usage.input_tokens * price_in
         + usage.cache_read_tokens * price_in * CACHE_READ_FACTOR

@@ -8,7 +8,7 @@ test('Coach page: waits for the API key, memories can be added', async ({ page }
   await page.goto('/')
   await page.getByRole('link', { name: 'Coach' }).click()
   await expect(page.getByRole('heading', { name: 'Coach muscu et cardio' })).toBeVisible()
-  await expect(page.getByText(/attend ta clé API Anthropic/)).toBeVisible()
+  await expect(page.getByText(/attend ta clé API Gemini/)).toBeVisible()
   await expect(page.getByRole('button', { name: 'Envoyer' })).toBeDisabled()
 
   const panel = page.getByRole('region', { name: 'Ce que le coach retient' })
@@ -26,7 +26,7 @@ test('Coach page: a streamed answer appears in the chat', async ({ page }, testI
     route.fulfill({
       json: {
         configured: true,
-        model: 'claude-sonnet-5-5',
+        model: 'gemini-3.8-flash',
         budget: {
           month: '2026-10',
           spent_eur: 0.42,

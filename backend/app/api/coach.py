@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.coach.costs import month_budget
 from app.coach.engine import CoachEvent, DoneEvent, Engine, ErrorEvent, TextEvent, ToolEvent
+from app.coach.gemini import GeminiLLM
 from app.coach.llm import LLM, AnthropicLLM
 from app.coach.tools import ALL_TOOLS
 from app.config import Settings, get_settings
@@ -37,10 +38,14 @@ class CoachName(StrEnum):
 
 
 def get_llm(settings: Settings = Depends(get_settings)) -> LLM | None:
-    """The real model, or None without an API key. Tests replace this dependency."""
-    if not settings.anthropic_api_key:
+    """The real model (Gemini or Claude, see Settings.provider), or None without a key.
+
+    Tests replace this dependency.
+    """
+    if settings.provider is None:
         return None
-    return AnthropicLLM(settings.anthropic_api_key)
+    key = settings.api_key_for(settings.provider)
+    return GeminiLLM(key) if settings.provider == "gemini" else AnthropicLLM(key)
 
 
 # --- Status --------------------------------------------------------------------------
@@ -66,7 +71,7 @@ def read_status(
 ) -> StatusOut:
     budget = month_budget(db, utc_now(), settings)
     return StatusOut(
-        configured=bool(settings.anthropic_api_key),
+        configured=settings.provider is not None,
         model=settings.main_model,
         budget=BudgetOut(
             month=budget.month,
@@ -204,7 +209,7 @@ def ask(
         # The stream outlives the request handler: it opens its own session.
         with factory() as db:
             if llm is None:
-                message = "Le coach attend ta clé API : ajoute ANTHROPIC_API_KEY dans .env."
+                message = "Le coach attend ta clé API : ajoute GEMINI_API_KEY dans .env."
                 yield _sse(ErrorEvent(message))
                 return
             conversation = _get(db, conversation_id)

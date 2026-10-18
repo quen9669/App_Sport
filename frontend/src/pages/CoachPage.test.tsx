@@ -14,7 +14,7 @@ afterEach(() => {
 
 const status: CoachStatus = {
   configured: true,
-  model: 'claude-sonnet-5-5',
+  model: 'gemini-3.8-flash',
   budget: { month: '2026-10', spent_eur: 0.12, limit_eur: 10, warning: false, exhausted: false },
 }
 
@@ -95,7 +95,7 @@ describe('CoachPage', () => {
       'GET /api/coach/training/memories': [],
     })
     render(<CoachPage />)
-    expect(await screen.findByText(/attend ta clé API Anthropic/)).toBeInTheDocument()
+    expect(await screen.findByText(/attend ta clé API Gemini/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Envoyer' })).toBeDisabled()
     expect(screen.getByRole('button', { name: /préparation du 10 km/ })).toBeDisabled()
   })
