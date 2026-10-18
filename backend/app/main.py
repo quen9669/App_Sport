@@ -17,6 +17,8 @@ from app.api import (
     goals,
     health,
     health_data,
+    maps,
+    places,
     profile,
     strava,
     strength,
@@ -71,6 +73,8 @@ def create_app() -> FastAPI:
     app.include_router(dashboards.router, prefix="/api")
     app.include_router(activities.router, prefix="/api")
     app.include_router(strength.router, prefix="/api")
+    app.include_router(maps.router, prefix="/api")
+    app.include_router(places.router, prefix="/api")
     return app
 
 
