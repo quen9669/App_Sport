@@ -36,6 +36,7 @@ keep functions short, and explain important choices in PR descriptions.
 | `make seed` / `make seed-clear` | Create / remove a year of synthetic data (`source="synthetic"`) |
 | `make set-password` | Choose the app password (Argon2 fingerprint written to `.env`) |
 | `make prod` | Build the interface and run one production server on 127.0.0.1:8000 |
+| `make autostart` / `make autostart-off` / `make prod-restart` | Windows: start `make prod` at each log-on / stop that / restart it (phase 6b) |
 | `make backup` / `make restore f=...` | Copy the database now / list or restore a copy |
 
 Single backend test: `cd backend && uv run pytest tests/test_health.py -k ok`.
@@ -259,3 +260,15 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   Install button: `pwa/install.ts` keeps Chrome's `beforeinstallprompt`.
 - CI job `security`: pip-audit on the locked export, `npm audit --omit=dev --audit-level=high`,
   gitleaks over the whole history. Dependabot weekly (uv, npm) and monthly (actions).
+
+## Hosting on the owner's PC (phase 6b)
+
+- Owner's choice: the app runs on his Windows PC (WSL2) and is reached through Tailscale only
+  (`tailscale serve --bg 8000`, HTTPS on `<machine>.<tailnet>.ts.net`; never `funnel`).
+  Guide: `docs/learning/06-telephone-tailscale.md`.
+- `make autostart` (`scripts/windows/autostart.sh`) puts an "App Sport" shortcut in the Windows
+  Startup folder (no admin rights needed, unlike a log-on scheduled task) that runs, hidden,
+  `scripts/windows/start-app.sh` -> `make prod`, log in `backend/data/prod.log`; it refuses
+  without `APP_PASSWORD_HASH`. `make autostart-off` removes it, `make prod-restart` restarts the app.
+- `FRONTEND_URL` and `STRAVA_REDIRECT_URI` point at the ts.net address; production is same-origin,
+  so `CORS_ORIGINS` is not needed there.

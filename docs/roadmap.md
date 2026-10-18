@@ -12,8 +12,8 @@
 | 4 | Prédicteur de course et allures | ✅ Terminé |
 | 5a | Moteur des coachs IA, coach musculation/cardio, écran de discussion | ✅ Terminé |
 | 5b | Coach longévité, plan de semaine proposé, banc d'évaluation | ✅ Terminé |
-| 6a | Connexion par mot de passe, durcissement, sauvegardes, PWA hors ligne | 🟡 En revue |
-| 6b | Mise en ligne (hébergement au choix) et installation sur le téléphone | ⚪ À faire |
+| 6a | Connexion par mot de passe, durcissement, sauvegardes, PWA hors ligne | ✅ Terminé |
+| 6b | Mise en ligne (PC + Tailscale) et installation sur le téléphone | 🟡 En revue |
 
 ## Phase 0 : critères d'acceptation
 
@@ -130,6 +130,17 @@
 - [x] CI : audit des dépendances Python et npm, recherche de secrets ; Dependabot chaque semaine
 - [x] PWA : bouton « Installer l'app », ouverture hors ligne avec les dernières données et la date,
       modifications refusées hors ligne avec un message clair, bannière « Nouvelle version »
+
+## Phase 6b : critères d'acceptation
+
+Hébergement choisi par FRANKS : son PC et Tailscale (guide `docs/learning/06-telephone-tailscale.md`).
+
+- [x] `make autostart` : l'app démarre en mode production à chaque ouverture de session Windows,
+      sans fenêtre, journal dans `backend/data/prod.log` ; refuse sans mot de passe
+- [ ] L'app s'ouvre en HTTPS depuis le téléphone (`tailscale serve`), visible seulement de ses
+      appareils, jamais publique
+- [ ] Retour Strava sur l'adresse Tailscale (`STRAVA_REDIRECT_URI`, domaine de rappel Strava)
+- [ ] L'app installée sur son Android, ouverture hors ligne avec les dernières données
 
 ## En plus (demandes de FRANKS)
 
