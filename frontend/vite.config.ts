@@ -13,7 +13,33 @@ export default defineConfig({
     // It generates the web manifest and a service worker that caches the app
     // files, so the interface still opens without network.
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt': a new version waits until FRANKS taps "Recharger" (AppBanners.tsx).
+      registerType: 'prompt',
+      workbox: {
+        // Files kept on the device so the app opens offline: code, styles, the
+        // logo and icons, and the bundled fonts (only their latin cuts).
+        globPatterns: ['**/*.{js,css,html,png,webmanifest}', 'assets/*latin-[0-9]*.woff2'],
+        // Addresses under /api are the backend's, never the app's pages.
+        navigateFallbackDenylist: [/^\/api\//],
+        runtimeCaching: [
+          {
+            // The last answer of each page's data, for offline use. Network first:
+            // the cache only answers when the backend cannot be reached.
+            // Never kept: sign-in, the coach (live answers) and Strava's redirects.
+            urlPattern: ({ url, request }) =>
+              request.method === 'GET' &&
+              url.pathname.startsWith('/api/') &&
+              !/^\/api\/(auth|coach|strava)\//.test(url.pathname),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache', // emptied by "Se déconnecter" (pwa/offlineData.ts)
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 300, maxAgeSeconds: 30 * 24 * 3600 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+        ],
+      },
       includeAssets: ['favicon.png', 'icons/apple-touch-icon.png'],
       manifest: {
         name: 'App Sport',
