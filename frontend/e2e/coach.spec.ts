@@ -155,6 +155,72 @@ test('Coach page: a weekly plan is accepted, then shown in Mon plan', async ({
   }
 })
 
+test('Mon plan: a run shows its steps and goes to the Garmin watch', async ({ page }, testInfo) => {
+  // Far in the future, so the run is never "past". Garmin is faked by the routes.
+  const session = {
+    day: '2099-01-06',
+    kind: 'run',
+    title: 'Fractionné 6 × 800 m',
+    duration_min: 50,
+    intensity: '',
+    details: '',
+    why: 'Travailler la VMA pour le 10 km',
+    workout: {
+      warmup: { duration_s: 900, distance_m: null, pace: 'easy' },
+      blocks: [
+        {
+          repeats: 6,
+          work: { duration_s: null, distance_m: 800, pace: 'interval' },
+          recovery: { duration_s: 120, distance_m: null, pace: 'none' },
+        },
+      ],
+      cooldown: { duration_s: 600, distance_m: null, pace: 'easy' },
+    },
+    garmin: null,
+  }
+  const plan = {
+    id: 902,
+    coach: 'training',
+    week_start: '2099-01-05',
+    summary: 'Une séance de qualité, le reste en endurance.',
+    status: 'accepted',
+    sessions: [session],
+  }
+  await page.route('**/api/coach/plans/current', (route) =>
+    route.fulfill({
+      json: {
+        this_week: plan,
+        next_week: null,
+        pace_targets: {
+          easy: { slow_s_per_km: 345, fast_s_per_km: 315 },
+          interval: { slow_s_per_km: 260, fast_s_per_km: 250 },
+        },
+      },
+    }),
+  )
+  await page.route('**/api/coach/plans/902/sessions/0/garmin', (route) =>
+    route.fulfill({
+      json: {
+        ...plan,
+        sessions: [{ ...session, garmin: { workout_id: 1, sent_at: '2099-01-04T18:00:00Z' } }],
+      },
+    }),
+  )
+
+  await page.goto('/')
+  await openTab(page, 'Coach', 'Mon plan')
+  const steps = page.getByRole('list', { name: 'Étapes : Fractionné 6 × 800 m' })
+  await expect(steps.getByText(/6 × 800 m · 4:10-4:20 \/km/)).toBeVisible()
+  if (process.env.E2E_SCREENSHOTS) {
+    await page.screenshot({
+      path: `${process.env.E2E_SCREENSHOTS}/plan-garmin-${testInfo.project.name}.png`,
+      fullPage: true,
+    })
+  }
+  await page.getByRole('button', { name: 'Envoyer sur ma Garmin' }).click()
+  await expect(page.getByText(/Sur ta Garmin/)).toBeVisible()
+})
+
 test('Longévité page: its own coach', async ({ page }) => {
   await page.goto('/')
   await openTab(page, 'Coach', 'Longévité')

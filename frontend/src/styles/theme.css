@@ -1059,6 +1059,55 @@ textarea {
   gap: 0.5rem;
 }
 
+/* The steps of a run (warm-up, blocks, cool-down) and its Garmin buttons. */
+.workout-steps {
+  margin: 0.3rem 0;
+  padding-left: 1.2rem;
+  font-size: 0.85rem;
+}
+
+.garmin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.garmin-sent {
+  color: var(--success);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.workout-editor {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.workout-block {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+
+.step-row,
+.step-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.step-fields input[type='number'],
+.workout-block input[type='number'] {
+  width: 5rem;
+}
+
 /* Read by screen readers, invisible on screen. */
 .visually-hidden {
   position: absolute;

@@ -766,6 +766,42 @@ export interface PlanSession {
   intensity: string
   details: string
   why: string
+  workout?: RunWorkout | null // runs: warm-up, blocks, cool-down
+  garmin?: GarminSent | null // set once sent to Garmin Connect
+}
+
+/** Pace zones of a workout step; "none" = no pace target (free jog). */
+export type PaceKey = 'none' | 'easy' | 'marathon' | 'threshold' | 'interval' | 'repetition'
+
+/** One step: a duration OR a distance (mirrors app/services/workouts.py). */
+export interface WorkoutStep {
+  duration_s: number | null
+  distance_m: number | null
+  pace: PaceKey
+}
+
+/** `repeats` × (work, then recovery). */
+export interface WorkoutBlock {
+  repeats: number
+  work: WorkoutStep
+  recovery: WorkoutStep | null
+}
+
+export interface RunWorkout {
+  warmup: WorkoutStep | null
+  blocks: WorkoutBlock[]
+  cooldown: WorkoutStep | null
+}
+
+export interface GarminSent {
+  workout_id: number
+  sent_at: string
+}
+
+/** A zone's pace range in seconds per km (slow end first). */
+export interface PaceRange {
+  slow_s_per_km: number
+  fast_s_per_km: number
 }
 
 /** A week proposed by the coach (mirrors PlanOut). */
@@ -781,6 +817,7 @@ export interface CoachPlan {
 export interface CurrentPlans {
   this_week: CoachPlan | null
   next_week: CoachPlan | null
+  pace_targets: Partial<Record<PaceKey, PaceRange>> // empty while the form is unknown
 }
 
 export interface CoachShownMessage {
@@ -827,6 +864,15 @@ export const deleteMemory = (id: number) => request<void>('DELETE', `/api/coach/
 export const fetchCurrentPlans = () => request<CurrentPlans>('GET', '/api/coach/plans/current')
 export const decidePlan = (id: number, accepted: boolean) =>
   sendJson<CoachPlan>('PATCH', `/api/coach/plans/${id}`, { accepted })
+// The runs of an accepted plan: edit their steps, send them to Garmin, take them back.
+const sessionPath = (planId: number, index: number) =>
+  `/api/coach/plans/${planId}/sessions/${index}`
+export const updateSessionWorkout = (planId: number, index: number, workout: RunWorkout) =>
+  sendJson<CoachPlan>('PUT', `${sessionPath(planId, index)}/workout`, workout)
+export const sendSessionToGarmin = (planId: number, index: number) =>
+  request<CoachPlan>('POST', `${sessionPath(planId, index)}/garmin`)
+export const removeSessionFromGarmin = (planId: number, index: number) =>
+  request<CoachPlan>('DELETE', `${sessionPath(planId, index)}/garmin`)
 
 /**
  * Ask the coach and receive its answer piece by piece.
