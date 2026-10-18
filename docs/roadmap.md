@@ -79,6 +79,13 @@
 - [x] Détail d'une activité : carte, profil d'altitude, allure (ou vitesse) et FC ; le curseur des
       graphiques déplace un point sur la carte
 
+## En plus (demandes de FRANKS)
+
+- [x] Catégorie « Déplacement » : marche et vélo de moins de 5 km, hors objectifs de sport mais
+      dans la charge d'entraînement
+- [x] Suivi des jours sans cigarette (depuis le 1er septembre 2026, date modifiable) : jours avec
+      cigarette saisis à la main, séries et bilan par mois, gardés pour la future partie longévité
+
 ## Points à surveiller
 
 - **Garmin** : la bibliothèque `garminconnect` n'est pas officielle et peut casser. L'import de

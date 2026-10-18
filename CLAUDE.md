@@ -141,3 +141,10 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   when the source has none). Frontend: `MapPage` (`/carte`), `ActivityPage` (`/activites/:id`);
   Leaflet components (`RoutesMap`, `ActivityMap`) are lazy-loaded, use `preferCanvas`, and are
   mocked in unit tests (jsdom has no canvas); E2E stubs the OSM tiles.
+
+## Smoke-free tracking
+
+- `smoking_day` stores only the days WITH a cigarette (count + note); every other day since
+  `user_profile.smoke_free_since` (default `DEFAULT_QUIT_DATE` = 2026-09-01 in `services/smoking.py`)
+  is smoke-free, today included. Vaping is not tracked. Routes in `api/smoking.py` (every write answers
+  with the new counters); card `SmokeFreeSection` on the Santé page. Kept for the future longévité coach.

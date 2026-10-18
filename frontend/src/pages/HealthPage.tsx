@@ -12,6 +12,7 @@ import {
   type IntensityMinutes,
   type TrainingLoad,
 } from '../api/client'
+import SmokeFreeSection from '../components/SmokeFreeSection'
 import { formatDuration, formatNumber, formatShortDate } from '../utils/format'
 import {
   acwrLabel,
@@ -111,7 +112,7 @@ export default function HealthPage() {
   return (
     <>
       <h1>Santé</h1>
-      <p className="subtitle">Sommeil, récupération et charge d’entraînement</p>
+      <p className="subtitle">Sommeil, récupération, charge d’entraînement et tabac</p>
 
       {error && (
         <p className="field-error" role="alert">
@@ -227,6 +228,7 @@ export default function HealthPage() {
 
       {load && <LoadSection load={load} />}
       {intensity && <IntensitySection intensity={intensity} />}
+      <SmokeFreeSection />
     </>
   )
 }

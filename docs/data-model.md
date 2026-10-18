@@ -25,7 +25,7 @@ erDiagram
         float average_heartrate
         float max_heartrate
         text summary_polyline "tracé simplifié"
-        string category_override "correction manuelle : strength, cardio, other"
+        string category_override "correction manuelle : strength, cardio, transport, other"
         string garmin_activity_id "id Garmin (aussi lu dans l'external_id Strava)"
         int duplicate_of_id FK "activité Garmin dont c'est la copie"
         string duplicate_status "confirmed, possible"
@@ -111,6 +111,13 @@ erDiagram
         int resting_heartrate
         string experience_level
         text injuries
+        date smoke_free_since "date d'arrêt de la cigarette (vide = 1er sept. 2026)"
+    }
+    smoking_day {
+        int id PK
+        date day "unique : un jour local avec cigarette"
+        int cigarettes "1 à 60"
+        string note
     }
     body_metric {
         int id PK
@@ -159,7 +166,11 @@ erDiagram
   sans rappeler l'API.
 - **Tokens chiffrés** (Fernet) dans `source_credential` ; la clé est dans `.env`, jamais en base.
 - **Catégorie d'une activité** : calculée à partir de `sport_type` (`app/services/classification.py`),
-  sauf si `category_override` est rempli. Les synchros ne touchent jamais cette colonne.
+  sauf si `category_override` est rempli. Les synchros ne touchent jamais cette colonne. La marche et
+  les sorties vélo de moins de 5 km (hors home trainer) sont `transport` (« Déplacement ») : elles
+  comptent dans la charge, mais dans aucun objectif de séances, de minutes ou de kilomètres.
+- **Tabac** : seuls les jours avec cigarette sont enregistrés (`smoking_day`) ; tous les autres jours
+  depuis `smoke_free_since` comptent comme sans cigarette.
 - **Pas de double comptage** : une séance saisie compte seule pour les objectifs seulement si elle
   n'est pas liée à une activité et qu'aucune activité de musculation n'a commencé à moins de 3 h.
 - **Garmin d'abord, Strava en complément** (`app/services/dedupe.py`) : une activité Strava qui

@@ -507,3 +507,42 @@ export const deletePlace = (id: number) => request<void>('DELETE', `/api/places/
 
 export const fetchIntensityMinutes = (weeks = 12) =>
   request<IntensityMinutes>('GET', `/api/intensity-minutes?weeks=${weeks}`)
+
+// --- Smoke-free tracking ---
+
+/** A day with at least one cigarette (every other day since the quit date is smoke-free). */
+export interface CigaretteDay {
+  day: string // "2026-10-18", local date
+  cigarettes: number
+  note: string | null
+}
+
+export interface SmokingMonth {
+  month: string // "2026-09"
+  days: number // days of the month since the quit date, up to today
+  smoke_free_days: number
+  cigarettes: number
+}
+
+export interface Smoking {
+  quit_date: string
+  quit_date_is_default: boolean
+  today: string
+  days_since_quit: number
+  smoke_free_days: number
+  cigarette_days: number
+  cigarettes: number
+  current_streak: number
+  longest_streak: number
+  months: SmokingMonth[]
+  entries: CigaretteDay[] // newest first
+}
+
+export const fetchSmoking = () => request<Smoking>('GET', '/api/smoking')
+/** Write (or correct) the cigarettes of one day; returns the updated counters. */
+export const saveCigaretteDay = (day: string, cigarettes: number, note: string | null) =>
+  sendJson<Smoking>('PUT', `/api/smoking/days/${day}`, { cigarettes, note })
+export const deleteCigaretteDay = (day: string) =>
+  request<Smoking>('DELETE', `/api/smoking/days/${day}`)
+export const saveQuitDate = (quitDate: string) =>
+  sendJson<Smoking>('PUT', '/api/smoking/quit-date', { quit_date: quitDate })
