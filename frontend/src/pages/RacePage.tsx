@@ -18,7 +18,7 @@ import {
 } from '../api/client'
 import { formatKm } from '../utils/activity'
 import { RACE_BOUNDS, rangeError } from '../utils/bounds'
-import { formatNumber, formatShortDate, todayIso } from '../utils/format'
+import { formatHeartRate, formatNumber, formatShortDate, todayIso } from '../utils/format'
 import {
   FEASIBILITY_LABELS,
   formatPace,
@@ -454,6 +454,12 @@ function EffortsCard({
                 <th>Activité</th>
                 <th className="num">Distance</th>
                 <th className="num">Temps</th>
+                <th className="num">
+                  <abbr title="Fréquence cardiaque moyenne de la sortie (bpm)">FC moy.</abbr>
+                </th>
+                <th className="num">
+                  <abbr title="Fréquence cardiaque maximale de la sortie (bpm)">FC max</abbr>
+                </th>
                 <th className="num">VDOT</th>
                 <th>Méthode</th>
                 <th>
@@ -476,6 +482,8 @@ function EffortsCard({
                       : formatKm(effort.distance_m)}
                   </td>
                   <td className="num">{formatRaceTime(effort.time_s)}</td>
+                  <td className="num">{formatHeartRate(effort.average_heartrate)}</td>
+                  <td className="num">{formatHeartRate(effort.max_heartrate)}</td>
                   <td className="num">{vdotText(effort.vdot)}</td>
                   <td>{effort.method === 'heart_rate' ? 'FC' : 'Chrono'}</td>
                   <td>

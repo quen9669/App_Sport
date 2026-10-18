@@ -21,7 +21,6 @@ class MapRouteOut(ActivityRowFields):
     sport_type: str
     elevation_gain_m: float | None
     average_speed_mps: float | None
-    average_heartrate: float | None
     polyline: str  # encoded, simplified for the zoom level
 
 
@@ -100,7 +99,6 @@ def read_routes(
                 sport_type=item.activity.sport_type,
                 elevation_gain_m=item.activity.elevation_gain_m,
                 average_speed_mps=item.activity.average_speed_mps,
-                average_heartrate=item.activity.average_heartrate,
                 polyline=item.polyline,
             )
             for item in result.routes

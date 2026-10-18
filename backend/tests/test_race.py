@@ -339,9 +339,13 @@ def test_heart_rate_from_the_profile_is_used(client: TestClient, db: Session) ->
     profile.max_heartrate, profile.resting_heartrate = 190, 50
     db.commit()
     for i in range(3):
-        add_run(db, str(i), days_ago=2 + i, pace_s=360, average_heartrate=150)
+        add_run(db, str(i), days_ago=2 + i, pace_s=360, average_heartrate=150, max_heartrate=168)
     body = client.get("/api/race").json()
     assert {e["method"] for e in body["form"]["efforts"]} == {"heart_rate"}
+    # Each listed run carries its heart rate, for the FC columns of the page.
+    assert {(e["average_heartrate"], e["max_heartrate"]) for e in body["form"]["efforts"]} == {
+        (150, 168)
+    }
 
 
 def test_target_race_plan_and_feasibility(client: TestClient, db: Session) -> None:

@@ -64,6 +64,8 @@ const week: WeekProgress = {
       moving_time_s: 3300,
       elapsed_time_s: 3300,
       distance_m: null,
+      average_heartrate: 132,
+      max_heartrate: 161,
       category: 'strength',
       automatic_category: 'strength',
       source: 'garmin',
@@ -139,6 +141,10 @@ describe('HomePage', () => {
 
     renderPage()
     const select = await screen.findByLabelText('Catégorie de Body Pump')
+    // Average and max heart rate columns of the row.
+    const row = select.closest('tr') as HTMLElement
+    expect(row).toHaveTextContent('132')
+    expect(row).toHaveTextContent('161')
     await userEvent.selectOptions(select, 'cardio')
 
     const patch = fetchMock.mock.calls.find(([, init]) => init?.method === 'PATCH')

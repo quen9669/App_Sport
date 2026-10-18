@@ -28,6 +28,8 @@ const form: Race['form'] = {
       vdot: 41.8,
       method: 'race',
       segment: true,
+      average_heartrate: 168,
+      max_heartrate: 181,
       weight: 0.95,
       used: true,
     },
@@ -40,6 +42,8 @@ const form: Race['form'] = {
       vdot: 40.1,
       method: 'heart_rate',
       segment: false,
+      average_heartrate: 141,
+      max_heartrate: 155,
       weight: 0.88,
       used: false,
     },
@@ -115,6 +119,8 @@ describe('RacePage', () => {
     const runs = screen.getByRole('table', { name: 'Sorties utilisées' })
     expect(within(runs).getByText('meilleur 5 km')).toBeInTheDocument()
     expect(within(runs).getByText('FC')).toBeInTheDocument()
+    expect(within(runs).getByText('168')).toBeInTheDocument() // average HR of the run
+    expect(within(runs).getByText('181')).toBeInTheDocument() // max HR
     expect(within(runs).getByRole('link', { name: 'Footing' })).toHaveAttribute(
       'href',
       '/activites/6',
