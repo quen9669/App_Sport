@@ -20,8 +20,10 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'uv run uvicorn app.main:app --port 8000',
+      // A separate database for E2E tests, created from the migrations, without scheduler.
+      command: 'uv run alembic upgrade head && uv run uvicorn app.main:app --port 8000',
       cwd: '../backend',
+      env: { DATABASE_URL: 'sqlite:///./data/e2e.db', SCHEDULER_ENABLED: 'false' },
       url: 'http://localhost:8000/api/health',
       reuseExistingServer: !process.env.CI,
     },
