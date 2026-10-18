@@ -49,5 +49,9 @@ class DailyHealth(Base):
     vo2max: Mapped[float | None] = mapped_column(Float)
     body_battery_max: Mapped[int | None] = mapped_column(Integer)
     body_battery_min: Mapped[int | None] = mapped_column(Integer)
+    # Garmin "intensity minutes" of the day, counted all day long (not only in
+    # workouts). Garmin counts a vigorous minute twice in its weekly total.
+    intensity_moderate_min: Mapped[int | None] = mapped_column(Integer)
+    intensity_vigorous_min: Mapped[int | None] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now, onupdate=utc_now)

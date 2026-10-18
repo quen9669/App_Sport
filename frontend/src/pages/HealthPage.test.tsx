@@ -1,10 +1,10 @@
 // Unit tests for <HealthPage />, against a fake backend.
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import type { HealthDay, HealthMetrics, TrainingLoad } from '../api/client'
+import type { HealthDay, HealthMetrics, IntensityMinutes, TrainingLoad } from '../api/client'
 import { fakeBackend } from '../test/fakeBackend'
 import HealthPage from './HealthPage'
 
@@ -41,6 +41,15 @@ const load: TrainingLoad = {
   chronic: 280,
   acwr: 1.5,
   heart_rate: { max_hr: 185, resting_hr: 50, max_source: 'age', resting_source: 'garmin' },
+  target: null,
+}
+
+const intensity: IntensityMinutes = {
+  weeks: [
+    { week: '2026-W41', monday: '2026-10-05', moderate: 200, vigorous: 100, total: 400, days: 7 },
+    { week: '2026-W42', monday: '2026-10-12', moderate: 150, vigorous: 90, total: 330, days: 7 },
+  ],
+  target: 350,
 }
 
 function renderPage() {
@@ -53,7 +62,11 @@ function renderPage() {
 
 describe('HealthPage', () => {
   it('summarises sleep and recovery over the period', async () => {
-    fakeBackend({ 'GET /api/health-metrics': metrics, 'GET /api/training-load': load })
+    fakeBackend({
+      'GET /api/health-metrics': metrics,
+      'GET /api/training-load': load,
+      'GET /api/intensity-minutes': intensity,
+    })
 
     renderPage()
 
@@ -72,6 +85,7 @@ describe('HealthPage', () => {
         days: metrics.days.map((d) => ({ ...d, ...weighed })),
       },
       'GET /api/training-load': load,
+      'GET /api/intensity-minutes': intensity,
     })
 
     renderPage()
@@ -81,7 +95,11 @@ describe('HealthPage', () => {
   })
 
   it('says when there is no weigh-in at all', async () => {
-    fakeBackend({ 'GET /api/health-metrics': metrics, 'GET /api/training-load': load })
+    fakeBackend({
+      'GET /api/health-metrics': metrics,
+      'GET /api/training-load': load,
+      'GET /api/intensity-minutes': intensity,
+    })
 
     renderPage()
 
@@ -92,6 +110,7 @@ describe('HealthPage', () => {
     const fetchMock = fakeBackend({
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
+      'GET /api/intensity-minutes': intensity,
     })
 
     renderPage()
@@ -102,7 +121,11 @@ describe('HealthPage', () => {
   })
 
   it('shows the training load with its caution and how heart rate was found', async () => {
-    fakeBackend({ 'GET /api/health-metrics': metrics, 'GET /api/training-load': load })
+    fakeBackend({
+      'GET /api/health-metrics': metrics,
+      'GET /api/training-load': load,
+      'GET /api/intensity-minutes': intensity,
+    })
 
     renderPage()
 
@@ -114,10 +137,51 @@ describe('HealthPage', () => {
 
   it('says when the max heart rate is the highest one the watch recorded', async () => {
     const observed = { ...load, heart_rate: { ...load.heart_rate, max_source: 'observed' } }
-    fakeBackend({ 'GET /api/health-metrics': metrics, 'GET /api/training-load': observed })
+    fakeBackend({
+      'GET /api/health-metrics': metrics,
+      'GET /api/training-load': observed,
+      'GET /api/intensity-minutes': intensity,
+    })
 
     renderPage()
 
     expect(await screen.findByText(/la plus haute mesurée par ta montre/)).toBeInTheDocument()
+  })
+
+  it('shows the weekly training load target, or how to add one', async () => {
+    fakeBackend({
+      'GET /api/health-metrics': metrics,
+      'GET /api/training-load': load,
+      'GET /api/intensity-minutes': intensity,
+    })
+    const { unmount } = renderPage()
+    expect(
+      await screen.findByRole('link', { name: /objectif « Charge d’entraînement »/ }),
+    ).toBeInTheDocument()
+    unmount()
+
+    fakeBackend({
+      'GET /api/health-metrics': metrics,
+      'GET /api/training-load': { ...load, target: 350 },
+      'GET /api/intensity-minutes': intensity,
+    })
+    renderPage()
+    const section = await screen.findByRole('region', { name: 'Charge d’entraînement' })
+    expect(within(section).getByText('Objectif par semaine')).toBeInTheDocument()
+    expect(within(section).getByText('350')).toBeInTheDocument()
+  })
+
+  it('shows the weekly Garmin intensity minutes with their goal', async () => {
+    fakeBackend({
+      'GET /api/health-metrics': metrics,
+      'GET /api/training-load': load,
+      'GET /api/intensity-minutes': intensity,
+    })
+    renderPage()
+
+    const section = await screen.findByRole('region', { name: 'Minutes d’intensité' })
+    expect(within(section).getByText('330 min')).toBeInTheDocument()
+    expect(within(section).getByText('350 min')).toBeInTheDocument()
+    expect(within(section).getByText(/compte double/)).toBeInTheDocument()
   })
 })

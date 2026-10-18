@@ -14,7 +14,8 @@ class Goal(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # What is counted, see app.services.goals.GoalKind:
-    # strength_sessions, cardio_sessions, active_minutes, distance_km.
+    # strength_sessions, cardio_sessions, active_minutes, distance_km, training_load,
+    # intensity_minutes.
     kind: Mapped[str] = mapped_column(String(32))
     target: Mapped[float] = mapped_column(Float)
     # Only for distance goals: "run", "ride" or None (all sports).

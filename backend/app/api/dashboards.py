@@ -9,9 +9,10 @@ from sqlalchemy.orm import Session
 from app.config import Settings, get_settings
 from app.db.session import get_db
 from app.db.types import utc_now
-from app.services.health_dashboard import health_days, sleep_regularity
+from app.services.goals import GoalKind, goals_for_week
+from app.services.health_dashboard import health_days, sleep_regularity, weekly_intensity
 from app.services.training_load import training_load
-from app.services.weeks import current_week, local_today
+from app.services.weeks import Week, current_week, local_today
 
 router = APIRouter(tags=["dashboards"])
 
@@ -60,6 +61,27 @@ class TrainingLoadOut(BaseModel):
     chronic: float  # weekly average of the 4 weeks before
     acwr: float | None  # acute / chronic, None without history
     heart_rate: HeartRateParamsOut
+    target: float | None  # weekly target of the current training load goal, if any
+
+
+class WeekIntensityOut(BaseModel):
+    week: str
+    monday: date
+    moderate: int  # minutes
+    vigorous: int  # minutes
+    total: int  # moderate + 2 x vigorous, like Garmin
+    days: int  # days with data in the week
+
+
+class IntensityMinutesOut(BaseModel):
+    weeks: list[WeekIntensityOut]  # oldest first, current week last
+    target: float | None  # weekly target of the intensity minutes goal, if any
+
+
+def _goal_target(db: Session, week: Week, kind: GoalKind) -> float | None:
+    """Target of the goal of this kind counted this week (the most recent one)."""
+    goals = [g for g in goals_for_week(db, week) if g.kind == kind]
+    return goals[-1].target if goals else None
 
 
 @router.get("/health-metrics", response_model=HealthMetricsOut)
@@ -108,4 +130,32 @@ def read_training_load(
             max_source=params.max_source,
             resting_source=params.resting_source,
         ),
+        target=_goal_target(db, last, GoalKind.TRAINING_LOAD),
+    )
+
+
+@router.get("/intensity-minutes", response_model=IntensityMinutesOut)
+def read_intensity_minutes(
+    weeks: int = Query(default=12, ge=4, le=52),
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+) -> IntensityMinutesOut:
+    """Garmin intensity minutes per week, and the weekly goal if there is one."""
+    last = current_week(settings.app_timezone, utc_now())
+    period = [last]
+    while len(period) < weeks:
+        period.insert(0, period[0].previous())
+    return IntensityMinutesOut(
+        weeks=[
+            WeekIntensityOut(
+                week=item.week.label,
+                monday=item.week.monday,
+                moderate=item.moderate,
+                vigorous=item.vigorous,
+                total=item.total,
+                days=item.days,
+            )
+            for item in weekly_intensity(db, period)
+        ],
+        target=_goal_target(db, last, GoalKind.INTENSITY_MINUTES),
     )

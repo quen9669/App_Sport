@@ -32,6 +32,8 @@ TARGET_BOUNDS: dict[GoalKind, tuple[float, float]] = {
     GoalKind.CARDIO_SESSIONS: (1, 14),
     GoalKind.ACTIVE_MINUTES: (10, 3000),
     GoalKind.DISTANCE_KM: (1, 1000),
+    GoalKind.TRAINING_LOAD: (10, 5000),
+    GoalKind.INTENSITY_MINUTES: (10, 3000),
 }
 
 

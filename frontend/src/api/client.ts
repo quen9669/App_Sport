@@ -51,7 +51,13 @@ export interface ImportResult {
 }
 
 export type Category = 'strength' | 'cardio' | 'other'
-export type GoalKind = 'strength_sessions' | 'cardio_sessions' | 'active_minutes' | 'distance_km'
+export type GoalKind =
+  | 'strength_sessions'
+  | 'cardio_sessions'
+  | 'active_minutes'
+  | 'distance_km'
+  | 'training_load'
+  | 'intensity_minutes'
 export type GoalSport = 'run' | 'ride'
 export type GoalStatus = 'active' | 'paused' | 'done'
 
@@ -238,6 +244,22 @@ export interface TrainingLoad {
     max_source: 'profile' | 'observed' | 'age' | null
     resting_source: 'profile' | 'garmin' | null
   }
+  target: number | null // weekly target of the training load goal, if any
+}
+
+/** Garmin intensity minutes of one week (mirrors WeekIntensityOut). */
+export interface WeekIntensity {
+  week: string
+  monday: string
+  moderate: number
+  vigorous: number
+  total: number // moderate + 2 x vigorous, like Garmin
+  days: number // days with data in the week
+}
+
+export interface IntensityMinutes {
+  weeks: WeekIntensity[] // oldest first, current week last
+  target: number | null // weekly target of the intensity minutes goal, if any
 }
 
 export interface CategoryResult {
@@ -355,3 +377,6 @@ export const fetchHealthMetrics = (days = 30) =>
   request<HealthMetrics>('GET', `/api/health-metrics?days=${days}`)
 export const fetchTrainingLoad = (weeks = 12) =>
   request<TrainingLoad>('GET', `/api/training-load?weeks=${weeks}`)
+
+export const fetchIntensityMinutes = (weeks = 12) =>
+  request<IntensityMinutes>('GET', `/api/intensity-minutes?weeks=${weeks}`)

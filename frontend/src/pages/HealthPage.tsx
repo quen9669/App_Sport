@@ -5,9 +5,11 @@ import { Link } from 'react-router-dom'
 
 import {
   fetchHealthMetrics,
+  fetchIntensityMinutes,
   fetchTrainingLoad,
   type HealthDay,
   type HealthMetrics,
+  type IntensityMinutes,
   type TrainingLoad,
 } from '../api/client'
 import { formatDuration, formatNumber, formatShortDate } from '../utils/format'
@@ -23,7 +25,7 @@ import {
 
 // Loaded on demand: Recharts is only downloaded when this page is opened.
 const TrendChart = lazy(() => import('../components/TrendChart'))
-const LoadChart = lazy(() => import('../components/LoadChart'))
+const WeeklyBarChart = lazy(() => import('../components/WeeklyBarChart'))
 
 const PERIODS = [7, 30, 90] as const
 type Period = (typeof PERIODS)[number]
@@ -61,6 +63,7 @@ export default function HealthPage() {
   const [period, setPeriod] = useState<Period>(30)
   const [metrics, setMetrics] = useState<HealthMetrics | null>(null)
   const [load, setLoad] = useState<TrainingLoad | null>(null)
+  const [intensity, setIntensity] = useState<IntensityMinutes | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -85,6 +88,13 @@ export default function HealthPage() {
       })
       .catch(() => {
         if (!cancelled) setError('Impossible de charger la charge d’entraînement.')
+      })
+    fetchIntensityMinutes()
+      .then((data) => {
+        if (!cancelled) setIntensity(data)
+      })
+      .catch(() => {
+        if (!cancelled) setError('Impossible de charger les minutes d’intensité.')
       })
     return () => {
       cancelled = true
@@ -216,6 +226,7 @@ export default function HealthPage() {
       )}
 
       {load && <LoadSection load={load} />}
+      {intensity && <IntensitySection intensity={intensity} />}
     </>
   )
 }
@@ -229,6 +240,7 @@ function LoadSection({ load }: { load: TrainingLoad }) {
         <Stat label="7 derniers jours" value={String(load.acute)} />
         <Stat label="Moyenne des 4 semaines avant" value={String(load.chronic)} />
         <Stat label="Ratio" value={formatOrNull(load.acwr, 2)} />
+        {load.target !== null && <Stat label="Objectif par semaine" value={String(load.target)} />}
       </dl>
       <p>{acwrLabel(load.acwr)}</p>
       <p className="hint">
@@ -244,8 +256,13 @@ function LoadSection({ load }: { load: TrainingLoad }) {
         )}
       </p>
       <Suspense fallback={<p className="hint">Chargement du graphique…</p>}>
-        <LoadChart weeks={load.weeks} />
+        <WeeklyBarChart
+          weeks={load.weeks.map((week) => ({ monday: week.monday, value: week.load }))}
+          name="Charge"
+          target={load.target}
+        />
       </Suspense>
+      {load.target === null && <GoalHint kind="Charge d’entraînement" />}
       <details>
         <summary>Voir le tableau</summary>
         <div className="table-wrapper">
@@ -272,6 +289,72 @@ function LoadSection({ load }: { load: TrainingLoad }) {
         </div>
       </details>
     </section>
+  )
+}
+
+function IntensitySection({ intensity }: { intensity: IntensityMinutes }) {
+  const current = intensity.weeks.at(-1)
+  const hasData = intensity.weeks.some((week) => week.days > 0)
+  return (
+    <section className="card" aria-labelledby="intensity-title">
+      <h2 id="intensity-title">Minutes d’intensité</h2>
+      <dl className="stats">
+        <Stat label="Cette semaine" value={current ? `${current.total} min` : null} />
+        {intensity.target !== null && (
+          <Stat label="Objectif par semaine" value={`${intensity.target} min`} />
+        )}
+      </dl>
+      <p className="hint">
+        Comptées par ta montre Garmin sur toute la journée : une minute intense compte double.
+      </p>
+      {hasData ? (
+        <Suspense fallback={<p className="hint">Chargement du graphique…</p>}>
+          <WeeklyBarChart
+            weeks={intensity.weeks.map((week) => ({ monday: week.monday, value: week.total }))}
+            name="Minutes d’intensité"
+            unit="min"
+            target={intensity.target}
+          />
+        </Suspense>
+      ) : (
+        <p className="hint">Pas encore de minutes d’intensité : lance une synchro Garmin.</p>
+      )}
+      {intensity.target === null && <GoalHint kind="Minutes d’intensité (Garmin)" />}
+      <details>
+        <summary>Voir le tableau</summary>
+        <div className="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Semaine du</th>
+                <th scope="col">Total</th>
+                <th scope="col">Modérées</th>
+                <th scope="col">Intenses</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...intensity.weeks].reverse().map((week) => (
+                <tr key={week.week}>
+                  <td>{formatShortDate(week.monday)}</td>
+                  <td>{week.days > 0 ? week.total : '–'}</td>
+                  <td>{week.days > 0 ? week.moderate : '–'}</td>
+                  <td>{week.days > 0 ? week.vigorous : '–'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+  )
+}
+
+/** Link to the goals page when a chart has no goal line yet. */
+function GoalHint({ kind }: { kind: string }) {
+  return (
+    <p className="hint">
+      <Link to="/objectifs">Ajoute un objectif « {kind} »</Link> pour le voir sur ce graphique.
+    </p>
   )
 }
 
