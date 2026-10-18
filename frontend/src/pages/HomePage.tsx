@@ -147,9 +147,10 @@ export default function HomePage() {
         {progress && (
           <>
             <h3>Séances de la semaine</h3>
-            {progress.activities.length === 0 ? (
+            {progress.activities.length === 0 && progress.sessions.length === 0 && (
               <p className="hint">Aucune séance pour l’instant.</p>
-            ) : (
+            )}
+            {progress.activities.length > 0 && (
               <ul className="activity-list">
                 {progress.activities.map((activity) => (
                   <li key={activity.id}>
@@ -182,6 +183,26 @@ export default function HomePage() {
                   </li>
                 ))}
               </ul>
+            )}
+            {progress.sessions.length > 0 && (
+              <>
+                <h3>Musculation saisie</h3>
+                <ul className="activity-list">
+                  {progress.sessions.map((session) => (
+                    <li key={session.id}>
+                      <div>
+                        <strong>{session.exercises.join(', ')}</strong>
+                        <span className="hint">
+                          {' '}
+                          {formatDayTime(session.performed_at)} · {session.set_count} série
+                          {session.set_count > 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      {!session.counted && <span className="hint">Déjà comptée via Strava</span>}
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
           </>
         )}

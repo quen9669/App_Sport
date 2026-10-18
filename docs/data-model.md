@@ -1,12 +1,14 @@
 # Modèle de données
 
 Schéma créé par les migrations Alembic (`backend/alembic/versions/`). Les modèles Python sont
-dans `backend/app/db/models/`. Les tables des phases suivantes (musculation, course, coachs)
-arriveront avec leur propre migration.
+dans `backend/app/db/models/`. Les tables des phases suivantes (course, coachs) arriveront avec
+leur propre migration.
 
 ```mermaid
 erDiagram
     activity ||--o| activity_stream : "a (0 ou 1)"
+    activity |o--o| strength_session : "même séance (lien optionnel)"
+    strength_session ||--|{ strength_set : contient
     activity {
         int id PK
         string source "strava, file_import..."
@@ -103,6 +105,23 @@ erDiagram
         float body_fat_pct
         float waist_cm
     }
+    strength_session {
+        int id PK
+        datetime performed_at "UTC"
+        int duration_min
+        text notes
+        int activity_id FK "unique, optionnel"
+    }
+    strength_set {
+        int id PK
+        int session_id FK
+        int position "ordre dans la séance"
+        string exercise "nom en français"
+        int set_number "1, 2, 3... par exercice"
+        int reps
+        float weight_kg "vide = poids du corps"
+        int rpe "effort ressenti, 1 à 10"
+    }
     goal {
         int id PK
         string kind "strength_sessions, cardio_sessions, active_minutes, distance_km"
@@ -126,6 +145,8 @@ erDiagram
 - **Tokens chiffrés** (Fernet) dans `source_credential` ; la clé est dans `.env`, jamais en base.
 - **Catégorie d'une activité** : calculée à partir de `sport_type` (`app/services/classification.py`),
   sauf si `category_override` est rempli. Les synchros ne touchent jamais cette colonne.
+- **Pas de double comptage** : une séance saisie compte seule pour les objectifs seulement si elle
+  n'est pas liée à une activité et qu'aucune activité de musculation n'a commencé à moins de 3 h.
 - **Semaines** : du lundi 00 h au lundi suivant 00 h, heure de Luxembourg, converties en UTC pour
   interroger la base.
 - **Streams compacts** : un seul blob compressé par activité plutôt qu'une ligne par seconde

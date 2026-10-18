@@ -11,6 +11,11 @@
   --accent: #16a34a;
   --danger: #dc2626;
   --border: #e2e8f0;
+  /* Chart series, in fixed order (validated for color blindness, see the dataviz notes). */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
 
   color-scheme: light dark;
   font-family:
@@ -31,6 +36,10 @@
     --accent: #22c55e;
     --danger: #f87171;
     --border: #334155;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
   }
 }
 
@@ -83,6 +92,8 @@ body {
 .nav {
   display: flex;
   gap: 1rem;
+  overflow-x: auto; /* five links: scroll sideways on a very narrow phone instead of wrapping */
+  white-space: nowrap;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
@@ -317,4 +328,26 @@ textarea {
 
 .chart {
   margin: 1rem 0;
+}
+
+/* --- Strength page --- */
+.set-list {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.set-list li {
+  padding: 0.25rem 0;
+}
+
+.set-list li button {
+  min-height: 2rem;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.6rem;
+}
+
+.streak {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--accent);
 }

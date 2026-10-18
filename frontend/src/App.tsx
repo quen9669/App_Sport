@@ -5,6 +5,7 @@ import GoalsPage from './pages/GoalsPage'
 import HomePage from './pages/HomePage'
 import ProfilePage from './pages/ProfilePage'
 import SourcesPage from './pages/SourcesPage'
+import StrengthPage from './pages/StrengthPage'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <NavLink to="/" end>
           Accueil
         </NavLink>
+        <NavLink to="/muscu">Muscu</NavLink>
         <NavLink to="/objectifs">Objectifs</NavLink>
         <NavLink to="/profil">Profil</NavLink>
         <NavLink to="/sources">Sources</NavLink>
@@ -20,6 +22,7 @@ export default function App() {
       <main className="app">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/muscu" element={<StrengthPage />} />
           <Route path="/objectifs" element={<GoalsPage />} />
           <Route path="/profil" element={<ProfilePage />} />
           <Route path="/sources" element={<SourcesPage />} />

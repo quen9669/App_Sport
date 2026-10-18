@@ -1,19 +1,25 @@
 // "Objectifs" page: list, add, pause or delete weekly goals.
-import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useState, type FormEvent } from 'react'
 
 import {
   ApiError,
   createGoal,
   deleteGoal,
+  fetchGoalHistory,
   fetchGoals,
   updateGoal,
   type Goal,
+  type GoalHistory,
   type GoalInput,
   type GoalKind,
   type GoalSport,
 } from '../api/client'
 import { GOAL_TARGET_BOUNDS, rangeError } from '../utils/bounds'
 import { formatNumber, GOAL_KIND_LABELS, GOAL_UNITS, goalTitle } from '../utils/format'
+import { historyRows } from '../utils/history'
+
+// Loaded on demand: Recharts is only downloaded when the history is shown.
+const HistoryChart = lazy(() => import('../components/HistoryChart'))
 
 const KINDS = Object.keys(GOAL_TARGET_BOUNDS) as GoalKind[]
 
@@ -31,6 +37,7 @@ function errorText(error: unknown): string {
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<Goal[]>([])
+  const [history, setHistory] = useState<GoalHistory | null>(null)
   const [kind, setKind] = useState<GoalKind>('strength_sessions')
   const [target, setTarget] = useState('3')
   const [sport, setSport] = useState<GoalSport | ''>('')
@@ -38,7 +45,9 @@ export default function GoalsPage() {
 
   const reload = useCallback(async () => {
     try {
-      setGoals(await fetchGoals())
+      const [list, weeks] = await Promise.all([fetchGoals(), fetchGoalHistory()])
+      setGoals(list)
+      setHistory(weeks)
     } catch (err) {
       setError(errorText(err))
     }
@@ -46,9 +55,12 @@ export default function GoalsPage() {
 
   useEffect(() => {
     let cancelled = false
-    fetchGoals()
-      .then((data) => {
-        if (!cancelled) setGoals(data)
+    Promise.all([fetchGoals(), fetchGoalHistory()])
+      .then(([list, weeks]) => {
+        if (!cancelled) {
+          setGoals(list)
+          setHistory(weeks)
+        }
       })
       .catch((err: unknown) => {
         if (!cancelled) setError(errorText(err))
@@ -82,6 +94,7 @@ export default function GoalsPage() {
   }
 
   const active = goals.filter((goal) => goal.status === 'active')
+  const chart = history ? historyRows(history) : null
 
   return (
     <>
@@ -142,6 +155,61 @@ export default function GoalsPage() {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {history && chart && chart.series.length > 0 && (
+        <section className="card" aria-labelledby="history-title">
+          <h2 id="history-title">Mes 12 dernières semaines</h2>
+          <p className="streak">
+            {history.streak === 0
+              ? 'Pas encore de série en cours : chaque semaine réussie compte !'
+              : `${history.streak} semaine${history.streak > 1 ? 's' : ''} réussie${
+                  history.streak > 1 ? 's' : ''
+                } d’affilée`}
+          </p>
+          <p className="hint">
+            Pourcentage de chaque objectif atteint par semaine. Une semaine est réussie quand tous
+            ses objectifs atteignent 100 %.
+          </p>
+          <Suspense fallback={<p className="hint">Chargement du graphique…</p>}>
+            <HistoryChart rows={chart.rows} series={chart.series} />
+          </Suspense>
+          {/* The same numbers as a table: readable without colors and by screen readers. */}
+          <details>
+            <summary>Voir le tableau</summary>
+            <div className="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Semaine</th>
+                    {chart.series.map((item) => (
+                      <th key={item.key}>{item.label}</th>
+                    ))}
+                    <th>Réussie</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.weeks.map((week) => (
+                    <tr key={week.week}>
+                      <td>{week.week}</td>
+                      {chart.series.map((item) => {
+                        const goal = week.goals.find((g) => g.goal_id === item.goalId)
+                        return (
+                          <td key={item.key}>
+                            {goal
+                              ? `${formatNumber(goal.done)} / ${formatNumber(goal.target)}`
+                              : '–'}
+                          </td>
+                        )
+                      })}
+                      <td>{week.all_achieved ? 'Oui' : 'Non'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </details>
         </section>
       )}
 
