@@ -2,7 +2,13 @@
 // Every call to the backend goes through this file, so the base URL and error
 // handling live in one place. The interfaces mirror the backend's Pydantic models.
 
+// In production the interface and the API share one address: the build sets it to ''.
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
+
+/** Fired when the backend answers 401: the app then shows the login screen. */
+export const AUTH_REQUIRED_EVENT = 'app-sport:auth-required'
+// Where the time of the last answer from the backend is kept (offline banner).
+const LAST_SYNC_KEY = 'app-sport:last-online'
 
 /** Shape of the JSON returned by `GET /api/health` (mirrors the backend's HealthResponse). */
 export interface HealthResponse {
@@ -416,6 +422,9 @@ export class ApiError extends Error {
   }
 }
 
+/** Message shown when a change is tried without network. */
+export const OFFLINE_MESSAGE = 'Hors ligne : cette action attendra le retour du réseau.'
+
 /** Send a request and parse the JSON answer. Errors carry the backend's `detail` message. */
 async function request<T>(
   method: string,
@@ -423,7 +432,19 @@ async function request<T>(
   body?: BodyInit,
   headers?: HeadersInit,
 ): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, { method, body, headers })
+  // Offline, reading may still work (the service worker keeps the last answers),
+  // but a change cannot reach the backend: say so instead of a cryptic error.
+  if (method !== 'GET' && !navigator.onLine) throw new ApiError(0, OFFLINE_MESSAGE)
+  // credentials: the session cookie travels with every call (phase 6 login).
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method,
+    body,
+    headers,
+    credentials: 'include',
+  })
+  if (response.status === 401 && !path.startsWith('/api/auth/')) {
+    window.dispatchEvent(new Event(AUTH_REQUIRED_EVENT))
+  }
   if (!response.ok) {
     let message = `${method} ${path} failed with status ${response.status}`
     try {
@@ -439,9 +460,29 @@ async function request<T>(
     }
     throw new ApiError(response.status, message)
   }
+  // Offline, the answer came from the service worker's cache: not a fresh one.
+  if (navigator.onLine) rememberOnline()
   if (response.status === 204) return undefined as T // "No Content"
   // The caller chooses T; the backend's Pydantic models guarantee the shape.
   return (await response.json()) as T
+}
+
+function rememberOnline() {
+  try {
+    localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString())
+  } catch {
+    // Private mode or full storage: the offline banner just shows no time.
+  }
+}
+
+/** When the backend last answered (for "Hors ligne : données du …"), or null. */
+export function lastOnline(): Date | null {
+  try {
+    const value = localStorage.getItem(LAST_SYNC_KEY)
+    return value ? new Date(value) : null
+  } catch {
+    return null
+  }
 }
 
 /** Same as `request`, with a JSON body. */
@@ -449,6 +490,19 @@ const sendJson = <T>(method: string, path: string, data: unknown) =>
   request<T>(method, path, JSON.stringify(data), { 'Content-Type': 'application/json' })
 
 export const fetchHealth = () => request<HealthResponse>('GET', '/api/health')
+
+// --- Sign-in (phase 6) ---
+
+export interface AuthStatus {
+  /** False = no password set: the app opens without a login screen. */
+  enabled: boolean
+  authenticated: boolean
+}
+
+export const fetchAuthStatus = () => request<AuthStatus>('GET', '/api/auth/status')
+export const login = (password: string) =>
+  sendJson<AuthStatus>('POST', '/api/auth/login', { password })
+export const logout = () => request<void>('POST', '/api/auth/logout')
 export const fetchStravaStatus = () => request<StravaStatus>('GET', '/api/strava/status')
 export const fetchGarminStatus = () => request<GarminStatus>('GET', '/api/garmin/status')
 export const fetchSyncLogs = (limit = 15) =>
@@ -792,6 +846,7 @@ export async function askCoach(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text }),
+      credentials: 'include',
     },
   )
   if (!response.ok || !response.body) {

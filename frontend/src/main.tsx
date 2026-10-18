@@ -14,11 +14,15 @@ import '@fontsource/barlow-semi-condensed/600.css'
 import '@fontsource/barlow-semi-condensed/700.css'
 
 import App from './App'
+import { captureInstallPrompt } from './pwa/install'
 import './styles/theme.css'
 
 // Windows draws flag emojis as two letters ("LU"): on such browsers only, load a
 // small font with the flags. It is served by the app itself, not by a CDN.
 polyfillCountryFlagEmojis('Twemoji Country Flags', flagFont)
+
+// Keep Chrome's "install this app" offer for the button on the Profil page.
+captureInstallPrompt()
 
 const rootElement = document.getElementById('root')
 if (!rootElement) {

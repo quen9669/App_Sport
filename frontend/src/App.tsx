@@ -4,6 +4,7 @@ import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes, useParams } from 'react-router-dom'
 
 import AppShell from './components/AppShell'
+import AuthGate from './components/AuthGate'
 import CoachPage from './pages/CoachPage'
 import GoalsPage from './pages/GoalsPage'
 import { isHealthSection } from './navigation'
@@ -33,29 +34,31 @@ function HealthSection() {
 
 export default function App() {
   return (
-    <AppShell>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/activites" element={<Lazy page={<MapPage />} />} />
-        {/* The old address of the map, kept so a bookmark still works. */}
-        <Route path="/carte" element={<Navigate to="/activites" replace />} />
-        <Route path="/activites/:id" element={<Lazy page={<ActivityPage />} />} />
-        <Route path="/muscu" element={<StrengthPage />} />
-        <Route path="/course" element={<RacePage />} />
-        <Route path="/objectifs" element={<GoalsPage />} />
-        <Route path="/sante" element={<HealthPage section="resume" />} />
-        <Route path="/sante/:section" element={<HealthSection />} />
-        {/* A key per coach: switching page starts from a fresh screen. */}
-        <Route path="/coach" element={<CoachPage key="training" coach="training" />} />
-        <Route path="/longevite" element={<CoachPage key="longevity" coach="longevity" />} />
-        <Route path="/plan" element={<PlanPage />} />
-        <Route path="/profil" element={<ProfilePage />} />
-        <Route path="/sources" element={<SourcesPage />} />
-        <Route path="/lieux" element={<PlacesPage />} />
-      </Routes>
-      <p className="disclaimer">
-        Cette application donne des conseils d’entraînement, pas un avis médical.
-      </p>
-    </AppShell>
+    <AuthGate>
+      <AppShell>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/activites" element={<Lazy page={<MapPage />} />} />
+          {/* The old address of the map, kept so a bookmark still works. */}
+          <Route path="/carte" element={<Navigate to="/activites" replace />} />
+          <Route path="/activites/:id" element={<Lazy page={<ActivityPage />} />} />
+          <Route path="/muscu" element={<StrengthPage />} />
+          <Route path="/course" element={<RacePage />} />
+          <Route path="/objectifs" element={<GoalsPage />} />
+          <Route path="/sante" element={<HealthPage section="resume" />} />
+          <Route path="/sante/:section" element={<HealthSection />} />
+          {/* A key per coach: switching page starts from a fresh screen. */}
+          <Route path="/coach" element={<CoachPage key="training" coach="training" />} />
+          <Route path="/longevite" element={<CoachPage key="longevity" coach="longevity" />} />
+          <Route path="/plan" element={<PlanPage />} />
+          <Route path="/profil" element={<ProfilePage />} />
+          <Route path="/sources" element={<SourcesPage />} />
+          <Route path="/lieux" element={<PlacesPage />} />
+        </Routes>
+        <p className="disclaimer">
+          Cette application donne des conseils d’entraînement, pas un avis médical.
+        </p>
+      </AppShell>
+    </AuthGate>
   )
 }
