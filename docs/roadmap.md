@@ -153,6 +153,9 @@ Hébergement choisi par FRANKS : son PC et Tailscale (guide `docs/learning/06-te
 - [x] Nouvelle interface épurée, esprit Garmin Connect en rouge, avec le logo QF : menu en 3
       dossiers (Entraînement, Santé, Coach) et leurs onglets, Réglages derrière la roue dentée,
       barre du bas sur téléphone et barre latérale sur PC, Santé découpée en onglets
+- [x] Séances de course du plan détaillées en étapes (échauffement, fractions, récupération,
+      retour au calme) avec allures cibles calculées par l'app, modifiables, et envoyées une par
+      une sur la montre Garmin depuis Mon plan
 
 ## Points à surveiller
 
