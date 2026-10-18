@@ -9,7 +9,7 @@
 | 2b | Saisie des séances de musculation, historique des semaines | ✅ Terminé |
 | 3a | Activités Garmin (Strava en complément), écran Santé, charge d'entraînement | ✅ Terminé |
 | 3b | Carte interactive, heatmap, détail d'une activité, lieux des séances sans GPS | ✅ Terminé |
-| 4 | Prédicteur de course et allures | ⚪ À faire |
+| 4 | Prédicteur de course et allures | ✅ Terminé |
 | 5 | Coachs IA (musculation/cardio et longévité) | ⚪ À faire |
 | 6 | PWA complète, sécurité, déploiement | ⚪ À faire |
 
@@ -78,6 +78,16 @@
       modifiable par séance et dans « Mes lieux »
 - [x] Détail d'une activité : carte, profil d'altitude, allure (ou vitesse) et FC ; le curseur des
       graphiques déplace un point sur la carte
+
+## Phase 4 : critères d'acceptation
+
+- [x] VDOT (Jack Daniels) et Riegel, testés sur les tables VDOT publiées (40, 50, 60 : à 0,5 % près)
+- [x] Forme estimée sur les sorties des 120 derniers jours (sorties entières et meilleurs 5/10 km,
+      FC par la méthode de Swain), poids divisé par deux tous les 45 jours, avec une fourchette
+- [x] Message clair et aucun temps affiché si les données sont insuffisantes
+- [x] Temps prédits (5 km, 10 km, semi, marathon) avec fourchette, zones d'allure d'entraînement
+- [x] Course visée : plan d'allure (négative split, dénivelé), passages au km, faisabilité
+- [x] Une sortie peut être exclue du calcul à la main
 
 ## En plus (demandes de FRANKS)
 

@@ -152,6 +152,19 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   (`country-flag-emoji-polyfill`, loaded from the app itself).
 - Motorcycle trips (`motorcycling_v2`...) are `transport` with zero training load.
 
+## Race predictor (phase 4)
+
+- `app/services/race/`: pure calculations (`daniels.py` VDOT and paces, `riegel.py`, `plan.py` pace
+  plan and feasibility, `efforts.py` form estimate) tested against Daniels' published tables;
+  `predictor.py` reads the database. Routes in `api/race.py`, page `RacePage` (`/course`).
+- Efforts: runs (`RUN_SPORTS`, not hidden, not duplicate, not treadmill, not `excluded_from_race`)
+  of the last 120 days, plus their best 5/10 km from the streams; one effort per run (the best).
+  Each gives max(race VDOT, Swain heart-rate VDOT); weight halves every 45 days (owner's choice);
+  the estimate is the weighted mean of the better half. Fewer than 3 runs or none in 60 days:
+  `insufficient`, and no time is shown.
+- `race_target` holds one race at most (owner's: 10 km under 50:00 on 2026-12-13); its target time
+  includes hills (0.6 s per metre climbed), so feasibility compares the flat-equivalent time.
+
 ## Smoke-free tracking
 
 - `smoking_day` stores only the days WITH a cigarette (count + note); every other day since

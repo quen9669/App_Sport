@@ -31,6 +31,7 @@ erDiagram
         string duplicate_status "confirmed, possible"
         bool hidden "masquée à la main"
         int place_id FK "lieu choisi à la main (séance sans GPS)"
+        bool excluded_from_race "exclue du prédicteur de course à la main"
         string location_name "ville donnée par la source"
         float start_latitude "point de départ"
         float start_longitude
@@ -116,6 +117,14 @@ erDiagram
         string experience_level
         text injuries
         date smoke_free_since "date d'arrêt de la cigarette (vide = 1er sept. 2026)"
+    }
+    race_target {
+        int id PK
+        string name
+        float distance_m
+        date race_date "jour local"
+        int target_time_s "vide = pas de temps visé"
+        float elevation_gain_m "0 = plat"
     }
     smoking_day {
         int id PK
