@@ -12,15 +12,10 @@ import {
   type WeekActivity,
   type WeekProgress,
 } from '../api/client'
+import ActivityTable from '../components/ActivityTable'
 import GoalRing from '../components/GoalRing'
 import QuickWeight from '../components/QuickWeight'
-import {
-  CATEGORY_LABELS,
-  formatDayTime,
-  formatDuration,
-  formatNumber,
-  formatShortDate,
-} from '../utils/format'
+import { CATEGORY_LABELS, formatDayTime, formatShortDate } from '../utils/format'
 
 /** The three states of the backend check, shown with different messages. */
 type BackendStatus = 'loading' | 'ok' | 'error'
@@ -161,55 +156,23 @@ export default function HomePage() {
               <p className="hint">Aucune séance pour l’instant.</p>
             )}
             {progress.activities.length > 0 && (
-              <ul className="activity-list">
-                {progress.activities.map((activity) => (
-                  <li key={activity.id} className={activity.hidden ? 'activity--hidden' : ''}>
-                    <div>
-                      <strong>
-                        <Link to={`/activites/${activity.id}`}>{activity.name}</Link>
-                      </strong>
-                      {/* Garmin and Strava may both have this session: let the user pick. */}
-                      {activity.possible_duplicate && !activity.hidden && (
-                        <span className="badge">Doublon possible</span>
-                      )}
-                      {activity.hidden && <span className="badge">Masquée</span>}
-                      <span className="hint">
-                        {' '}
-                        {formatDayTime(activity.start_time)} ·{' '}
-                        {formatDuration(activity.moving_time_s ?? activity.elapsed_time_s)}
-                        {activity.distance_m
-                          ? ` · ${formatNumber(activity.distance_m / 1000)} km`
-                          : ''}
-                      </span>
-                    </div>
-                    {/* A correction is one tap on the list, a second one on the new category. */}
-                    <select
-                      aria-label={`Catégorie de ${activity.name}`}
-                      value={activity.category}
-                      onChange={(event) =>
-                        void changeCategory(activity, event.target.value as Category)
-                      }
-                    >
-                      {CATEGORIES.map((category) => (
-                        <option key={category} value={category}>
-                          {CATEGORY_LABELS[category]}
-                          {category === activity.automatic_category ? ' (auto)' : ''}
-                        </option>
-                      ))}
-                    </select>
-                    {(activity.possible_duplicate || activity.hidden) && (
-                      <button
-                        type="button"
-                        className="secondary"
-                        aria-label={`${activity.hidden ? 'Réafficher' : 'Masquer'} ${activity.name}`}
-                        onClick={() => void toggleHidden(activity)}
-                      >
-                        {activity.hidden ? 'Réafficher' : 'Masquer'}
-                      </button>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <ActivityTable
+                rows={progress.activities}
+                label="Séances de la semaine"
+                rowClass={(activity) => (activity.hidden ? 'row--hidden' : undefined)}
+                extra={[
+                  {
+                    header: 'Catégorie',
+                    cell: (activity) => (
+                      <CategoryCell
+                        activity={activity}
+                        onCategory={(category) => void changeCategory(activity, category)}
+                        onToggleHidden={() => void toggleHidden(activity)}
+                      />
+                    ),
+                  },
+                ]}
+              />
             )}
             {progress.sessions.length > 0 && (
               <>
@@ -243,5 +206,49 @@ export default function HomePage() {
         </p>
       </section>
     </>
+  )
+}
+
+/** Category picker, plus the duplicate/hidden badges and the hide button. */
+function CategoryCell({
+  activity,
+  onCategory,
+  onToggleHidden,
+}: {
+  activity: WeekActivity
+  onCategory: (category: Category) => void
+  onToggleHidden: () => void
+}) {
+  return (
+    <span className="category-cell">
+      {/* A correction is one tap on the list, a second one on the new category. */}
+      <select
+        aria-label={`Catégorie de ${activity.name}`}
+        value={activity.category}
+        onChange={(event) => onCategory(event.target.value as Category)}
+      >
+        {CATEGORIES.map((category) => (
+          <option key={category} value={category}>
+            {CATEGORY_LABELS[category]}
+            {category === activity.automatic_category ? ' (auto)' : ''}
+          </option>
+        ))}
+      </select>
+      {/* Garmin and Strava may both have this session: let the user pick. */}
+      {activity.possible_duplicate && !activity.hidden && (
+        <span className="badge">Doublon possible</span>
+      )}
+      {activity.hidden && <span className="badge">Masquée</span>}
+      {(activity.possible_duplicate || activity.hidden) && (
+        <button
+          type="button"
+          className="secondary"
+          aria-label={`${activity.hidden ? 'Réafficher' : 'Masquer'} ${activity.name}`}
+          onClick={onToggleHidden}
+        >
+          {activity.hidden ? 'Réafficher' : 'Masquer'}
+        </button>
+      )}
+    </span>
   )
 }

@@ -110,14 +110,8 @@ export interface GoalProgress {
   session_ids: number[]
 }
 
-export interface WeekActivity {
-  id: number
-  name: string
+export interface WeekActivity extends ActivityRow {
   sport_type: string
-  start_time: string
-  moving_time_s: number | null
-  elapsed_time_s: number
-  distance_m: number | null
   category: Category
   automatic_category: Category
   source: string
@@ -264,18 +258,24 @@ export interface IntensityMinutes {
 
 // --- Map and activity detail (phase 3b) ---
 
-export type SportGroup = 'run' | 'ride' | 'strength' | 'other'
+export type SportGroup = 'run' | 'ride' | 'walk' | 'strength' | 'other'
 
-/** One route on the map (mirrors MapRouteOut). */
-export interface MapRoute {
+/** The columns of an activity table (mirrors ActivityRowFields). */
+export interface ActivityRow {
   id: number
   name: string
-  sport_type: string
   sport: SportGroup
   start_time: string
   distance_m: number | null
   moving_time_s: number | null
   elapsed_time_s: number
+  city: string | null
+  country_code: string | null // "LU", shown as a flag
+}
+
+/** One route on the map (mirrors MapRouteOut). */
+export interface MapRoute extends ActivityRow {
+  sport_type: string
   elevation_gain_m: number | null
   average_speed_mps: number | null
   average_heartrate: number | null
@@ -288,13 +288,13 @@ export interface MapPlace {
   latitude: number
   longitude: number
   activity_count: number
-  activities: {
-    id: number
-    name: string
-    sport: SportGroup
-    start_time: string
-    elapsed_time_s: number
-  }[]
+  activities: ActivityRow[] // the most recent ones, newest first
+}
+
+/** An activity with a start point but no route yet: a dot on the map. */
+export interface MapPoint extends ActivityRow {
+  latitude: number
+  longitude: number
 }
 
 export interface Bounds {
@@ -306,6 +306,7 @@ export interface Bounds {
 
 export interface MapRoutes {
   routes: MapRoute[]
+  points: MapPoint[]
   places: MapPlace[] // activities without GPS, grouped on their place
   bounds: Bounds | null // around every matching activity
   total: number
@@ -327,6 +328,7 @@ export interface Place {
   name: string
   latitude: number
   longitude: number
+  city: string | null
   role: PlaceRole | null
   chosen_count: number
 }
@@ -335,6 +337,7 @@ export interface PlaceInput {
   name?: string
   latitude?: number
   longitude?: number
+  city?: string | null
   role?: PlaceRole | null
 }
 

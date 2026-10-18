@@ -82,6 +82,20 @@ export function formatDayTime(iso: string): string {
   return dayFormat.format(new Date(iso))
 }
 
+const tableFormat = new Intl.DateTimeFormat('fr-FR', {
+  timeZone: 'Europe/Luxembourg',
+  weekday: 'short',
+  day: '2-digit',
+  month: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+})
+
+/** "sam. 17/10 09:49" for the activity tables (short, and keeps the month). */
+export function formatTableDate(iso: string): string {
+  return tableFormat.format(new Date(iso))
+}
+
 /** "18 oct." from a plain "2026-10-18" date (no time, no timezone shift). */
 export function formatShortDate(isoDate: string): string {
   const [year, month, day] = isoDate.split('-').map(Number) as [number, number, number]

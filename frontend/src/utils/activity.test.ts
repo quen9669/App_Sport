@@ -3,10 +3,12 @@ import { describe, expect, it } from 'vitest'
 import type { ActivitySeries } from '../api/client'
 import {
   decodePolyline,
+  flagEmoji,
   formatPace,
   parseCoordinates,
   positionAt,
   seriesRows,
+  shownDistance,
   speedText,
 } from './activity'
 
@@ -59,5 +61,20 @@ describe('activity helpers', () => {
     expect(parseCoordinates('95, 6')).toBeNull()
     expect(parseCoordinates('Luxembourg')).toBeNull()
     expect(parseCoordinates('')).toBeNull()
+  })
+})
+
+describe('flags and distances of the activity tables', () => {
+  it('turns a country code into its flag emoji', () => {
+    expect(flagEmoji('LU')).toBe('🇱🇺')
+    expect(flagEmoji('fr')).toBe('🇫🇷')
+    expect(flagEmoji(null)).toBe('')
+    expect(flagEmoji('XYZ')).toBe('')
+  })
+
+  it('shows no distance for an activity that moved nowhere', () => {
+    expect(shownDistance({ sport: 'strength', distance_m: 1200 })).toBeNull()
+    expect(shownDistance({ sport: 'other', distance_m: null })).toBeNull()
+    expect(shownDistance({ sport: 'run', distance_m: 5000 })).toBe(5000)
   })
 })

@@ -31,10 +31,14 @@ erDiagram
         string duplicate_status "confirmed, possible"
         bool hidden "masquée à la main"
         int place_id FK "lieu choisi à la main (séance sans GPS)"
+        string location_name "ville donnée par la source"
+        float start_latitude "point de départ"
+        float start_longitude
     }
     place {
         int id PK
         string name "ex. Jims Gare"
+        string city "ville affichée dans les listes"
         float latitude
         float longitude
         string role "strength_default, other_default (unique)"

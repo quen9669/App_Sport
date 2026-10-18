@@ -16,9 +16,17 @@
   --series-2: #eb6834;
   --series-3: #1baf7a;
   --series-4: #eda100;
+  /* Sport colours (FRANKS's choice), used by the activity tables and the map. */
+  --sport-run: #dc2626;
+  --sport-ride: #16a34a;
+  --sport-walk: #9333ea;
+  --sport-strength: #ca8a04;
+  --sport-other: #ea580c;
 
   color-scheme: light dark;
+  /* "Twemoji Country Flags" is only used for flags (see main.tsx). */
   font-family:
+    'Twemoji Country Flags',
     system-ui,
     -apple-system,
     'Segoe UI',
@@ -40,6 +48,11 @@
     --series-2: #d95926;
     --series-3: #199e70;
     --series-4: #c98500;
+    --sport-run: #f87171;
+    --sport-ride: #4ade80;
+    --sport-walk: #c084fc;
+    --sport-strength: #facc15;
+    --sport-other: #fb923c;
   }
 }
 
@@ -55,7 +68,7 @@ body {
 
 /* Mobile-first: designed for a phone screen, widened on larger screens. */
 .app {
-  max-width: 40rem;
+  max-width: 56rem;
   margin: 0 auto;
   padding: 1.5rem 1rem;
 }
@@ -449,4 +462,100 @@ textarea {
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
+}
+
+/* --- Activity tables (week, map) ------------------------------------------- */
+
+/* On a phone the table scrolls sideways inside the card, never the whole page. */
+.table-scroll {
+  overflow-x: auto;
+  margin: 0 -0.25rem;
+}
+
+.activity-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.activity-table th,
+.activity-table td {
+  padding: 0.4rem 0.35rem;
+  text-align: left;
+  white-space: nowrap; /* one activity = one line */
+  vertical-align: middle;
+}
+
+.activity-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+/* Discreet separators: a faint line between rows only. */
+.activity-table tbody tr + tr td {
+  border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+.activity-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.activity-table .flag {
+  font-size: 1.1rem;
+  width: 1.75rem;
+}
+
+.activity-table .name {
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-table select {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.85rem;
+}
+
+.activity-table .row--hidden td {
+  opacity: 0.55;
+}
+
+.sport-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.05rem 0.5rem 0.05rem 0.35rem;
+  border-radius: 999px;
+  border: 1px solid var(--sport-color);
+  background: color-mix(in srgb, var(--sport-color) 16%, transparent);
+  font-size: 0.85rem;
+}
+
+/* Read by screen readers, invisible on screen. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.category-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.category-cell .badge {
+  margin-left: 0;
+}
+
+/* On a phone, shorter names leave room for the sport, distance and duration. */
+@media (max-width: 30rem) {
+  .activity-table .name {
+    max-width: 8rem;
+  }
 }
