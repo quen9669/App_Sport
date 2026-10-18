@@ -85,13 +85,18 @@ function renderPage() {
 }
 
 describe('HomePage', () => {
-  it('shows "Backend OK" when the health check succeeds', async () => {
+  it('stays quiet when the backend answers, and sums up the week in tiles', async () => {
     fakeBackend({ 'GET /api/health': health, 'GET /api/goals/progress': week })
 
     renderPage()
 
     // findBy* waits until the text appears (the API call is asynchronous).
-    expect(await screen.findByText('Backend OK')).toBeInTheDocument()
+    const sessions = await screen.findByText('Séances', { selector: 'dt' })
+    expect(sessions.nextElementSibling).toHaveTextContent('1')
+    const active = screen.getByText('Temps actif', { selector: 'dt' })
+    expect(active.nextElementSibling).toHaveTextContent('55 min')
+    // Only a failure is announced.
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
   it('shows an error message when the backend is unreachable', async () => {
@@ -99,7 +104,7 @@ describe('HomePage', () => {
 
     renderPage()
 
-    expect(await screen.findByText('Backend injoignable')).toBeInTheDocument()
+    expect(await screen.findByText(/Backend injoignable/)).toBeInTheDocument()
   })
 
   it('shows one ring per goal with the week progress', async () => {
