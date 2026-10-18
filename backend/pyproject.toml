@@ -4,9 +4,13 @@ version = "0.1.0"
 description = "Backend API of the personal sport app (FastAPI)."
 requires-python = ">=3.12"
 dependencies = [
+    "alembic>=1.20.0",
+    "cryptography>=50.0.2",
     "fastapi>=0.143.3",
+    "httpx>=0.28.1",
     "pydantic>=2.14.1",
     "pydantic-settings>=2.16.0",
+    "sqlalchemy>=2.1.5",
     "uvicorn[standard]>=0.54.0",
 ]
 
@@ -17,6 +21,7 @@ dev = [
     "mypy>=2.4.0",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
+    "respx>=0.23.1",
     "ruff>=0.17.1",
 ]
 

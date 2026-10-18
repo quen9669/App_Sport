@@ -29,6 +29,17 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./data/app_sport.db"
     # Comma-separated in the env file, e.g. "http://localhost:5173,http://127.0.0.1:5173".
     cors_origins: str = Field(default="http://localhost:5173")
+    # Where the browser is sent back after connecting Strava.
+    frontend_url: str = "http://localhost:5173"
+
+    # --- Strava (https://www.strava.com/settings/api) ---
+    strava_client_id: str = ""
+    strava_client_secret: str = ""
+    strava_redirect_uri: str = "http://localhost:8000/api/strava/callback"
+
+    # --- Security ---
+    # Fernet key used to encrypt OAuth tokens before they are written to the database.
+    token_encryption_key: str = ""
 
     @property
     def cors_origin_list(self) -> list[str]:
