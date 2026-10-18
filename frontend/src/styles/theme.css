@@ -197,7 +197,14 @@ td {
 .form label {
   display: grid;
   gap: 0.25rem;
+  min-width: 0; /* lets grid columns shrink on a narrow phone screen */
   font-weight: 600;
+}
+
+.form input,
+.form select,
+.form textarea {
+  width: 100%;
 }
 
 input,
