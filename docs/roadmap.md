@@ -6,8 +6,9 @@
 | 1a | Modèle de données, connexion et synchro Strava | ✅ Terminé |
 | 1b | Garmin (bibliothèque + import de fichiers), synchro planifiée, données synthétiques, écran Sources | ✅ Terminé |
 | 2a | Profil, poids, classification des activités, objectifs et tableau de bord | ✅ Terminé |
-| 2b | Saisie des séances de musculation, historique des semaines | 🟡 En revue |
-| 3 | Carte interactive et tableaux de bord de santé | ⚪ À faire |
+| 2b | Saisie des séances de musculation, historique des semaines | ✅ Terminé |
+| 3a | Activités Garmin (Strava en complément), écran Santé, charge d'entraînement | 🟡 En revue |
+| 3b | Carte interactive, heatmap, détail d'une activité | ⚪ À faire |
 | 4 | Prédicteur de course et allures | ⚪ À faire |
 | 5 | Coachs IA (musculation/cardio et longévité) | ⚪ À faire |
 | 6 | PWA complète, sécurité, déploiement | ⚪ À faire |
@@ -53,6 +54,18 @@
 - [x] Pas de double comptage avec une activité Strava de musculation (liée, ou à moins de 3 h)
 - [x] Historique des 12 dernières semaines (barres en % de la cible, avec tableau) et série de
       semaines réussies
+
+## Phase 3a : critères d'acceptation
+
+- [x] Activités importées depuis Garmin Connect (FC, GPS, courbes), historique importé petit à petit
+- [x] Strava en complément : une copie d'une activité Garmin n'est comptée qu'une fois, les cas
+      douteux restent visibles avec « Masquer » en un tap
+- [x] Correction de catégorie et séance de muscu liée suivent l'activité gardée
+- [x] Écran Santé : sommeil (durée, score, régularité), FC repos, HRV, poids sur 7, 30 ou 90 jours
+- [x] Charge par semaine (TRIMP avec la FC, sinon durée × effort estimé) et ratio aigu/chronique
+      avec mise en garde
+- [ ] Vérifié sur tes vraies données Garmin (noms des champs de la bibliothèque, id Garmin dans
+      l'`external_id` Strava)
 
 ## Points à surveiller
 

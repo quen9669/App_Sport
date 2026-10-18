@@ -11,9 +11,9 @@ erDiagram
     strength_session ||--|{ strength_set : contient
     activity {
         int id PK
-        string source "strava, file_import..."
+        string source "garmin, strava, synthetic..."
         string external_id "id chez la source"
-        string sport_type "Run, Ride, WeightTraining, Workout..."
+        string sport_type "Strava: Run, Workout... Garmin: running, strength_training..."
         datetime start_time "UTC"
         string timezone "Europe/Luxembourg"
         int elapsed_time_s
@@ -25,6 +25,10 @@ erDiagram
         float max_heartrate
         text summary_polyline "tracé simplifié"
         string category_override "correction manuelle : strength, cardio, other"
+        string garmin_activity_id "id Garmin (aussi lu dans l'external_id Strava)"
+        int duplicate_of_id FK "activité Garmin dont c'est la copie"
+        string duplicate_status "confirmed, possible"
+        bool hidden "masquée à la main"
     }
     activity_stream {
         int id PK
@@ -147,6 +151,11 @@ erDiagram
   sauf si `category_override` est rempli. Les synchros ne touchent jamais cette colonne.
 - **Pas de double comptage** : une séance saisie compte seule pour les objectifs seulement si elle
   n'est pas liée à une activité et qu'aucune activité de musculation n'a commencé à moins de 3 h.
+- **Garmin d'abord, Strava en complément** (`app/services/dedupe.py`) : une activité Strava qui
+  existe aussi dans Garmin (même id Garmin, ou début à moins de 10 min et durée à moins de 20 %)
+  est marquée `duplicate_status = "confirmed"` et n'apparaît plus nulle part. S'il y a plusieurs
+  candidates, elle est `"possible"` : les deux restent visibles et l'utilisateur peut en masquer
+  une (`hidden`). Rien n'est supprimé, et si Garmin casse, les activités Strava comptent à nouveau.
 - **Semaines** : du lundi 00 h au lundi suivant 00 h, heure de Luxembourg, converties en UTC pour
   interroger la base.
 - **Streams compacts** : un seul blob compressé par activité plutôt qu'une ligne par seconde
