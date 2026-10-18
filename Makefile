@@ -10,7 +10,8 @@ BACKEND := backend
 FRONTEND := frontend
 
 .PHONY: help install dev dev-backend dev-frontend test test-backend test-frontend \
-	test-e2e e2e-install lint format typecheck check clean db-upgrade db-revision seed seed-clear eval
+	test-e2e e2e-install lint format typecheck check clean db-upgrade db-revision seed seed-clear eval \
+	set-password prod build backup restore
 
 help: ## Show this list of commands
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | \
@@ -47,6 +48,23 @@ eval: ## Grade the AI coaches with the real model (paid calls): make eval ARGS="
 
 db-revision: ## Create a migration from model changes: make db-revision m="add goal table"
 	cd $(BACKEND) && uv run alembic revision --autogenerate -m "$(m)"
+
+set-password: ## Choose the app password (only its fingerprint goes to .env)
+	cd $(BACKEND) && uv run python -m scripts.set_password
+
+build: ## Build the interface for production (frontend/dist)
+	@# Empty API address: in production the interface calls the API on its own address.
+	cd $(FRONTEND) && VITE_API_BASE_URL= npm run build
+
+prod: build db-upgrade ## Run the app like in production: one server on port 8000, password required
+	cd $(BACKEND) && APP_ENV=production FRONTEND_DIST=../$(FRONTEND)/dist \
+		uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 --proxy-headers
+
+backup: ## Copy the database now (also done every night at 03:30)
+	cd $(BACKEND) && uv run python -m scripts.backup
+
+restore: ## List backups, or put one back with the app stopped: make restore f=app_sport-....db
+	cd $(BACKEND) && uv run python -m scripts.backup --restore $(f)
 
 dev-frontend: ## Start only the frontend dev server
 	cd $(FRONTEND) && npm run dev -- --port 5173

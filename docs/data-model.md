@@ -128,6 +128,13 @@ erDiagram
         int target_time_s "vide = pas de temps visé"
         float elevation_gain_m "0 = plat"
     }
+    auth_session {
+        int id PK
+        string token_hash "SHA-256 du jeton du cookie, unique"
+        datetime expires_at "UTC, 30 jours après la connexion"
+        datetime last_seen_at "UTC, mis à jour au plus toutes les heures"
+        string user_agent "pour reconnaître l'appareil"
+    }
     smoking_day {
         int id PK
         date day "unique : un jour local avec cigarette"
@@ -204,6 +211,10 @@ erDiagram
   interroger la base.
 - **Streams compacts** : un seul blob compressé par activité plutôt qu'une ligne par seconde
   (une sortie d'une heure = environ 3 600 points par série).
+
+- **Connexion** (phase 6) : `auth_session` garde une ligne par appareil connecté, avec seulement
+  l'empreinte du jeton : une copie de la base ne permet pas de se connecter. Le mot de passe
+  n'est jamais en base, seule son empreinte Argon2 est dans `.env` (`APP_PASSWORD_HASH`).
 
 ## Commandes
 

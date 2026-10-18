@@ -34,6 +34,9 @@ keep functions short, and explain important choices in PR descriptions.
 | `make db-upgrade` | Apply Alembic migrations (also run by `make dev-backend`) |
 | `make db-revision m="..."` | Autogenerate a migration after changing a model |
 | `make seed` / `make seed-clear` | Create / remove a year of synthetic data (`source="synthetic"`) |
+| `make set-password` | Choose the app password (Argon2 fingerprint written to `.env`) |
+| `make prod` | Build the interface and run one production server on 127.0.0.1:8000 |
+| `make backup` / `make restore f=...` | Copy the database now / list or restore a copy |
 
 Single backend test: `cd backend && uv run pytest tests/test_health.py -k ok`.
 Single frontend test: `cd frontend && npx vitest run src/App.test.tsx`.
@@ -231,3 +234,28 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   bottom bar with the folders) and a PC sidebar (>= 60rem); CSS shows one. In unit tests both are in
   the DOM: scope queries by the nav's `aria-label`. E2E opens tabs through `e2e/nav.ts`.
 - Each page keeps its own `h1`. A new page needs a route in `App.tsx` and a tab in `navigation.ts`.
+
+## Security and PWA (phase 6a)
+
+- Sign-in: `services/auth.py` (Argon2 `APP_PASSWORD_HASH`, random session token whose SHA-256 is
+  stored in `auth_session`, `LoginThrottle`: 5 failures in 15 min lock 15 min, in memory, global).
+  Routes in `api/auth.py` (`status`, `login`, `logout`). `require_auth` (`dependencies.py`) guards
+  every router in `main.PROTECTED_ROUTERS` and the Strava routes except `/callback`. No password =
+  open (development only: `check_production` refuses to start production without one). A new
+  router goes into `PROTECTED_ROUTERS` unless it must be reachable signed out.
+- Cookie `app_sport_session`: HttpOnly, SameSite=Strict, Secure in production, 30 days
+  (`SESSION_DAYS`). Frontend calls use `credentials: 'include'`; a 401 fires
+  `AUTH_REQUIRED_EVENT` and `AuthGate` shows `LoginPage`. Tests inject time through `get_now`.
+- `security.py` adds the CSP (scripts `'self'` only, images also from tile.openstreetmap.org,
+  inline styles allowed for Leaflet/Recharts), nosniff, frame denial, HSTS in production. A new
+  external resource needs a CSP change, never a CDN script. `/docs` is off in production.
+- `make prod`: `FRONTEND_DIST` makes `frontend.py` serve the build (SPA fallback, `/api/*` stays
+  404, no path escape, `index.html`/`sw.js` not cached). Nightly backups: `services/backup.py`
+  (SQLite backup API) scheduled at 03:30 in `scheduler.py`.
+- PWA (`vite.config.ts`): `registerType: 'prompt'` (`AppBanners` "Recharger"), app files, logo and
+  latin fonts precached, API GETs `NetworkFirst` in `api-cache` (never `/api/auth|coach|strava`).
+  Offline: `OfflineBanner` shows the last answer time; non-GET requests fail with
+  `OFFLINE_MESSAGE`. "Se déconnecter" (`DeviceSection`, Profil page) empties `api-cache`.
+  Install button: `pwa/install.ts` keeps Chrome's `beforeinstallprompt`.
+- CI job `security`: pip-audit on the locked export, `npm audit --omit=dev --audit-level=high`,
+  gitleaks over the whole history. Dependabot weekly (uv, npm) and monthly (actions).

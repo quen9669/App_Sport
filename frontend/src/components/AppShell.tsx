@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 import logo from '../assets/logo.png'
+import AppBanners from './AppBanners'
 import { FOLDERS, locate, SETTINGS, type Folder } from '../navigation'
 import { FolderIcon, GearIcon } from './icons'
 
@@ -53,7 +54,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
           </nav>
         </header>
 
-        <main className="app">{children}</main>
+        <main className="app">
+          <AppBanners />
+          {children}
+        </main>
       </div>
 
       <nav aria-label="Dossiers" className="bottom-bar">

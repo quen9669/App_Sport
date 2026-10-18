@@ -12,7 +12,8 @@
 | 4 | Prédicteur de course et allures | ✅ Terminé |
 | 5a | Moteur des coachs IA, coach musculation/cardio, écran de discussion | ✅ Terminé |
 | 5b | Coach longévité, plan de semaine proposé, banc d'évaluation | ✅ Terminé |
-| 6 | PWA complète, sécurité, déploiement | ⚪ À faire |
+| 6a | Connexion par mot de passe, durcissement, sauvegardes, PWA hors ligne | 🟡 En revue |
+| 6b | Mise en ligne (hébergement au choix) et installation sur le téléphone | ⚪ À faire |
 
 ## Phase 0 : critères d'acceptation
 
@@ -113,6 +114,22 @@
       LLM-juge (pertinence, prudence, honnêteté), rapport comparant deux versions de prompt
 - [x] `make eval` se lance à la main (appels payants, plafond `--max-eur`) ; la CI le teste avec
       le faux modèle, sans jamais appeler l'API
+
+## Phase 6a : critères d'acceptation
+
+- [x] Un mot de passe (`make set-password`, seule son empreinte Argon2 va dans `.env`), écran de
+      connexion en français, session gardée 30 jours par appareil (cookie `HttpOnly`, `Secure` en
+      production, `SameSite=Strict`), « Se déconnecter » efface aussi les données hors ligne
+- [x] Après 5 mauvais mots de passe, connexion bloquée 15 minutes ; tentatives journalisées sans le
+      mot de passe ; toutes les routes `/api` protégées sauf la santé du serveur, la connexion et le
+      retour de Strava
+- [x] `make prod` : un seul serveur sert l'interface et l'API ; refuse de démarrer sans mot de passe
+- [x] En-têtes de sécurité (CSP stricte sans script tiers, HSTS en production, pas d'intégration
+      dans un autre site), documentation de l'API masquée en production
+- [x] Sauvegarde de la base chaque nuit (14 gardées), `make backup` et `make restore`
+- [x] CI : audit des dépendances Python et npm, recherche de secrets ; Dependabot chaque semaine
+- [x] PWA : bouton « Installer l'app », ouverture hors ligne avec les dernières données et la date,
+      modifications refusées hors ligne avec un message clair, bannière « Nouvelle version »
 
 ## En plus (demandes de FRANKS)
 

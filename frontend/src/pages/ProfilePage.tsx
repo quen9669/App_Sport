@@ -1,4 +1,5 @@
-// "Profil" page: personal data form, weight curve and body measurements.
+// "Profil" page: personal data form, weight curve, body measurements, and this
+// device (install the app, sign out).
 import { lazy, Suspense, useCallback, useEffect, useState, type FormEvent } from 'react'
 
 import {
@@ -10,6 +11,7 @@ import {
   saveProfile,
   type BodyMetric,
 } from '../api/client'
+import DeviceSection from '../components/DeviceSection'
 import { BODY_BOUNDS, rangeError } from '../utils/bounds'
 import { formatNumber, formatShortDate, todayIso } from '../utils/format'
 import {
@@ -314,6 +316,8 @@ export default function ProfilePage() {
         )}
         {message && <p role="status">{message}</p>}
       </section>
+
+      <DeviceSection />
     </>
   )
 }

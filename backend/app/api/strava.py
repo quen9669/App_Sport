@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.config import Settings, get_settings
 from app.db.models.enums import DataSource
 from app.db.session import get_db
-from app.dependencies import get_cipher, get_strava_oauth
+from app.dependencies import get_cipher, get_strava_oauth, require_auth
 from app.integrations.strava.oauth import StravaOAuth, StravaOAuthError, has_required_scopes
 from app.repositories import activities as activities_repo
 from app.repositories import credentials as credentials_repo
@@ -68,7 +68,7 @@ class StravaStatus(BaseModel):
     history_complete: bool
 
 
-@router.get("/status", response_model=StravaStatus)
+@router.get("/status", response_model=StravaStatus, dependencies=[Depends(require_auth)])
 def get_status(
     db: Session = Depends(get_db),
     oauth: StravaOAuth = Depends(get_strava_oauth),
@@ -84,7 +84,7 @@ def get_status(
     )
 
 
-@router.get("/connect")
+@router.get("/connect", dependencies=[Depends(require_auth)])
 def connect(oauth: StravaOAuth = Depends(get_strava_oauth)) -> RedirectResponse:
     """Send the browser to Strava's consent page."""
     if not oauth.is_configured:
@@ -130,7 +130,9 @@ def callback(
     return back_to_frontend("connected")
 
 
-@router.delete("/connection", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/connection", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_auth)]
+)
 def disconnect(
     db: Session = Depends(get_db),
     oauth: StravaOAuth = Depends(get_strava_oauth),
