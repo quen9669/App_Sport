@@ -182,3 +182,132 @@ td {
 .log-status--failed {
   color: var(--danger);
 }
+
+/* --- Forms --- */
+.form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.form--inline {
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  align-items: end;
+}
+
+.form label {
+  display: grid;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+input,
+select,
+textarea {
+  min-height: 2.75rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+/* --- Home dashboard --- */
+.week-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.week-header h2 {
+  margin: 0;
+  text-align: center;
+}
+
+.rings {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.ring {
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  max-width: 7rem;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.ring__track {
+  fill: none;
+  stroke: var(--border);
+}
+
+.ring__value {
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-linecap: round;
+}
+
+.ring--achieved .ring__value {
+  stroke: var(--accent);
+}
+
+.ring__text {
+  fill: var(--text);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.activity-list,
+.goal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.activity-list li,
+.goal-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.goal--inactive {
+  opacity: 0.6;
+}
+
+.quick-weight {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quick-weight input {
+  width: 5rem;
+  text-align: center;
+  font-size: 1.25rem;
+}
+
+.chart {
+  margin: 1rem 0;
+}
