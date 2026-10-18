@@ -32,6 +32,9 @@ class UserProfile(Base):
     )  # beginner/intermediate/advanced
     # Free text: injuries and limitations the coaches must respect.
     injuries: Mapped[str | None] = mapped_column(Text)
+    # Quit date of cigarettes (see app/db/models/smoking.py). None = the default
+    # date in app/services/smoking.py, so a fresh database needs no setup.
+    smoke_free_since: Mapped[date | None] = mapped_column(Date)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now, onupdate=utc_now)
 

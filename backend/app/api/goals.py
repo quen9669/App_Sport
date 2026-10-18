@@ -11,7 +11,7 @@ from app.config import Settings, get_settings
 from app.db.models import Goal
 from app.db.session import get_db
 from app.repositories import goals as goals_repo
-from app.services.classification import automatic_category, effective_category
+from app.services.classification import activity_automatic_category, effective_category
 from app.services.dedupe import DuplicateStatus
 from app.services.goals import (
     GoalKind,
@@ -234,7 +234,7 @@ def read_progress(
                 elapsed_time_s=a.elapsed_time_s,
                 distance_m=a.distance_m,
                 category=effective_category(a),
-                automatic_category=automatic_category(a.sport_type),
+                automatic_category=activity_automatic_category(a),
                 source=a.source,
                 hidden=a.hidden,
                 possible_duplicate=a.duplicate_status == DuplicateStatus.POSSIBLE,

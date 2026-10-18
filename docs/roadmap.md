@@ -8,7 +8,7 @@
 | 2a | Profil, poids, classification des activités, objectifs et tableau de bord | ✅ Terminé |
 | 2b | Saisie des séances de musculation, historique des semaines | ✅ Terminé |
 | 3a | Activités Garmin (Strava en complément), écran Santé, charge d'entraînement | ✅ Terminé |
-| 3b | Carte interactive, heatmap, détail d'une activité, lieux des séances sans GPS | 🟡 En revue |
+| 3b | Carte interactive, heatmap, détail d'une activité, lieux des séances sans GPS | ✅ Terminé |
 | 4 | Prédicteur de course et allures | ⚪ À faire |
 | 5 | Coachs IA (musculation/cardio et longévité) | ⚪ À faire |
 | 6 | PWA complète, sécurité, déploiement | ⚪ À faire |
@@ -78,6 +78,13 @@
       modifiable par séance et dans « Mes lieux »
 - [x] Détail d'une activité : carte, profil d'altitude, allure (ou vitesse) et FC ; le curseur des
       graphiques déplace un point sur la carte
+
+## En plus (demandes de FRANKS)
+
+- [x] Catégorie « Déplacement » : marche et vélo de moins de 5 km, hors objectifs de sport mais
+      dans la charge d'entraînement
+- [x] Suivi des jours sans cigarette (depuis le 1er septembre 2026, date modifiable) : jours avec
+      cigarette saisis à la main, séries et bilan par mois, gardés pour la future partie longévité
 
 ## Points à surveiller
 

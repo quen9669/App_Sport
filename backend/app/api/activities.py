@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.db.models import Activity, Place
 from app.db.session import get_db
 from app.services.activity_map import SportGroup, activity_series, detail_route, sport_group
-from app.services.classification import automatic_category, effective_category
+from app.services.classification import activity_automatic_category, effective_category
 from app.services.places import PlaceBook
 
 router = APIRouter(prefix="/activities", tags=["activities"])
@@ -125,7 +125,7 @@ def set_place(
 
 class CategoryIn(BaseModel):
     # None = forget the correction and go back to the automatic rule.
-    category: Literal["strength", "cardio", "other"] | None
+    category: Literal["strength", "cardio", "transport", "other"] | None
 
 
 class CategoryOut(BaseModel):
@@ -142,7 +142,7 @@ def set_category(
     activity = db.get(Activity, activity_id)
     if activity is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Activity not found")
-    automatic = automatic_category(activity.sport_type)
+    automatic = activity_automatic_category(activity)
     # Choosing the automatic value again is the same as removing the correction.
     activity.category_override = None if payload.category == automatic else payload.category
     db.commit()

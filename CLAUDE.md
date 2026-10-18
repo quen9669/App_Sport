@@ -86,6 +86,9 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   strength / cardio / other. Group classes (`Workout`, `Crossfit`, `HighIntensityIntervalTraining`)
   count as strength (owner's decision). `Activity.category_override` (manual) always wins and is never
   touched by syncs; `effective_category()` is what every count must use.
+- Category `transport` ("Déplacement", owner's decision): walks (Strava `Walk`, Garmin `walking`...)
+  and outdoor rides under 5 km. Counts in no session, minute or distance goal, but still in the
+  training load. Use `activity_automatic_category(activity)`: the rule needs the distance.
 - Weeks are ISO weeks (Monday-Sunday) in `APP_TIMEZONE`: `app/services/weeks.py` converts local
   boundaries to UTC separately, so DST weeks are 167/169 h. Labels look like `2026-W42`.
 - `app/services/goals.py` computes progress; only `active` goals overlapping the week count.
@@ -138,3 +141,10 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   when the source has none). Frontend: `MapPage` (`/carte`), `ActivityPage` (`/activites/:id`);
   Leaflet components (`RoutesMap`, `ActivityMap`) are lazy-loaded, use `preferCanvas`, and are
   mocked in unit tests (jsdom has no canvas); E2E stubs the OSM tiles.
+
+## Smoke-free tracking
+
+- `smoking_day` stores only the days WITH a cigarette (count + note); every other day since
+  `user_profile.smoke_free_since` (default `DEFAULT_QUIT_DATE` = 2026-09-01 in `services/smoking.py`)
+  is smoke-free, today included. Vaping is not tracked. Routes in `api/smoking.py` (every write answers
+  with the new counters); card `SmokeFreeSection` on the Santé page. Kept for the future longévité coach.

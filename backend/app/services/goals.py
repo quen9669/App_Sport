@@ -107,11 +107,14 @@ def _amount(goal: Goal, activity: Activity, load_of: LoadOf | None) -> float | N
     if goal.kind in _SESSION_CATEGORY:
         return 1.0 if category == _SESSION_CATEGORY[GoalKind(goal.kind)] else None
     if goal.kind == GoalKind.ACTIVE_MINUTES:
-        if category == Category.OTHER:
+        # Walks and short rides (transport) are not sport: no active minutes.
+        if category in (Category.OTHER, Category.TRANSPORT):
             return None
         return (activity.moving_time_s or activity.elapsed_time_s) / 60
     if goal.kind == GoalKind.DISTANCE_KM:
         if not activity.distance_m or not _matches_sport(activity, goal.sport):
+            return None
+        if category == Category.TRANSPORT:  # a trip, not training kilometres
             return None
         return activity.distance_m / 1000
     return None

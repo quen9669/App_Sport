@@ -4,7 +4,13 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import type { HealthDay, HealthMetrics, IntensityMinutes, TrainingLoad } from '../api/client'
+import type {
+  HealthDay,
+  HealthMetrics,
+  IntensityMinutes,
+  Smoking,
+  TrainingLoad,
+} from '../api/client'
 import { fakeBackend } from '../test/fakeBackend'
 import HealthPage from './HealthPage'
 
@@ -52,6 +58,21 @@ const intensity: IntensityMinutes = {
   target: 350,
 }
 
+// The smoke-free card has its own tests (components/SmokeFreeSection.test.tsx).
+const smoking: Smoking = {
+  quit_date: '2026-09-01',
+  quit_date_is_default: true,
+  today: '2026-10-18',
+  days_since_quit: 48,
+  smoke_free_days: 48,
+  cigarette_days: 0,
+  cigarettes: 0,
+  current_streak: 48,
+  longest_streak: 48,
+  months: [],
+  entries: [],
+}
+
 function renderPage() {
   return render(
     <MemoryRouter>
@@ -66,6 +87,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/smoking': smoking,
     })
 
     renderPage()
@@ -86,6 +108,7 @@ describe('HealthPage', () => {
       },
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/smoking': smoking,
     })
 
     renderPage()
@@ -99,6 +122,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/smoking': smoking,
     })
 
     renderPage()
@@ -111,6 +135,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/smoking': smoking,
     })
 
     renderPage()
@@ -125,6 +150,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/smoking': smoking,
     })
 
     renderPage()
@@ -141,6 +167,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': observed,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/smoking': smoking,
     })
 
     renderPage()
@@ -153,6 +180,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/smoking': smoking,
     })
     const { unmount } = renderPage()
     expect(
@@ -164,6 +192,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': { ...load, target: 350 },
       'GET /api/intensity-minutes': intensity,
+      'GET /api/smoking': smoking,
     })
     renderPage()
     const section = await screen.findByRole('region', { name: 'Charge d’entraînement' })
@@ -176,6 +205,7 @@ describe('HealthPage', () => {
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
       'GET /api/intensity-minutes': intensity,
+      'GET /api/smoking': smoking,
     })
     renderPage()
 

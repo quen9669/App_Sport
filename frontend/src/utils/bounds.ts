@@ -56,3 +56,6 @@ export function ageOn(birthDate: string, today: Date = new Date()): number {
     today.getMonth() + 1 < month || (today.getMonth() + 1 === month && today.getDate() < day)
   return today.getFullYear() - year - (beforeBirthday ? 1 : 0)
 }
+
+// Same as backend/app/api/smoking.py.
+export const CIGARETTE_BOUNDS: Range = { min: 1, max: 60 }

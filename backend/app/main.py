@@ -20,6 +20,7 @@ from app.api import (
     maps,
     places,
     profile,
+    smoking,
     strava,
     strength,
     sync,
@@ -75,6 +76,7 @@ def create_app() -> FastAPI:
     app.include_router(strength.router, prefix="/api")
     app.include_router(maps.router, prefix="/api")
     app.include_router(places.router, prefix="/api")
+    app.include_router(smoking.router, prefix="/api")
     return app
 
 

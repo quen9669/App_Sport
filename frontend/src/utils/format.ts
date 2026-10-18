@@ -36,6 +36,7 @@ export const STATUS_LABELS: Record<string, string> = {
 export const CATEGORY_LABELS: Record<string, string> = {
   strength: 'Musculation',
   cardio: 'Cardio',
+  transport: 'Déplacement', // walks and short rides: not sport
   other: 'Autre',
 }
 
