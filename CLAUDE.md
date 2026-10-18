@@ -172,3 +172,19 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   `user_profile.smoke_free_since` (default `DEFAULT_QUIT_DATE` = 2026-09-01 in `services/smoking.py`)
   is smoke-free, today included. Vaping is not tracked. Routes in `api/smoking.py` (every write answers
   with the new counters); card `SmokeFreeSection` on the Santé page. Kept for the future longévité coach.
+
+## AI coaches (phase 5a)
+
+- Package `app/coach/`: `llm.py` (Anthropic SDK wrapper, streaming events, French error messages;
+  the SDK uses **httpx2**, so tests pass `http_client=httpx2.Client(transport=MockTransport)`, not
+  respx), `engine.py` (tool loop, max 8 rounds, logs every call), `costs.py` (cost in EUR, monthly
+  budget: warning at 80 %, hard stop at 100 %), `history.py` (summaries by the light model,
+  compaction), `prompts/*.md` (versioned with `<!-- version: ... -->`), `tools/` (typed inputs,
+  `extra="forbid"`, results capped at 20,000 chars).
+- The model only sees data through tools, never GPS positions; tool results are data, not
+  instructions. Memories are proposed by the coach and sent to the model only once accepted.
+- Settings: `ANTHROPIC_API_KEY` (empty = coach disabled, screen explains it), `COACH_MODEL`,
+  `COACH_LIGHT_MODEL`, `COACH_MONTHLY_BUDGET_EUR`, prices per million tokens.
+- Routes in `api/coach.py`; the answer is SSE (`text` / `tool` / `done` / `error`) with its own DB
+  session. Tests use `tests/fixtures/fake_llm.py`. Page `CoachPage` (`/coach`), answers rendered by
+  `CoachText` (mini-Markdown built from React elements, never raw HTML).
