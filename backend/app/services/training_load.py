@@ -31,7 +31,7 @@ from app.repositories import activities as activities_repo
 from app.repositories import health as health_repo
 from app.repositories import profile as profile_repo
 from app.repositories import strength as strength_repo
-from app.services.classification import Category, effective_category
+from app.services.classification import Category, effective_category, is_motorized
 from app.services.strength import counts_on_its_own
 from app.services.weeks import Week
 
@@ -81,6 +81,9 @@ def banister_trimp(
 
 def activity_load(activity: Activity, params: HeartRateParams) -> tuple[float, bool]:
     """Load of one activity and whether it was computed from heart rate."""
+    if is_motorized(activity.sport_type):
+        # A motorcycle ride raises the heart rate a little, but it is not training.
+        return 0.0, False
     minutes = (activity.moving_time_s or activity.elapsed_time_s) / 60
     if activity.average_heartrate and params.usable:
         assert params.max_hr is not None and params.resting_hr is not None  # for mypy

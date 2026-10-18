@@ -64,6 +64,10 @@ def garmin_activity(
         "maxHR": 171.0 if average_hr else None,
         "hasPolyline": distance_m > 0,
         "manualActivity": False,
+        # Real summaries carry the town and the start point (checked on FRANKS's data).
+        "locationName": "Luxembourg" if distance_m > 0 else None,
+        "startLatitude": 49.6116 if distance_m > 0 else None,
+        "startLongitude": 6.1319 if distance_m > 0 else None,
     }
 
 

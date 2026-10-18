@@ -21,6 +21,7 @@ class Place(Base):
     name: Mapped[str] = mapped_column(String(120))
     latitude: Mapped[float] = mapped_column(Float)
     longitude: Mapped[float] = mapped_column(Float)
+    city: Mapped[str | None] = mapped_column(String(120))  # shown in the activity lists
     # Default place for activities without GPS, see app.services.places.PlaceRole:
     # "strength_default", "other_default", or None. At most one place per role.
     role: Mapped[str | None] = mapped_column(String(32), unique=True)

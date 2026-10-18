@@ -87,6 +87,11 @@ CATEGORY_BY_SPORT.update(
 # Hikes stay OTHER: they are an outing, not a trip to work.
 _WALKING = ("Walk", "walking", "casual_walking", "speed_walking")
 CATEGORY_BY_SPORT.update(dict.fromkeys(_WALKING, Category.TRANSPORT))
+# Motor sports are a way of travelling, not an effort: transport, and no
+# training load at all (see training_load.activity_load). FRANKS's motorcycle
+# trips are recorded by the watch as "motorcycling_v2".
+_MOTORIZED = ("motorcycling", "motorcycling_v2", "motocross", "motocross_v2", "atv", "atv_v2")
+CATEGORY_BY_SPORT.update(dict.fromkeys(_MOTORIZED, Category.TRANSPORT))
 # Everything else (Yoga, Pilates, Hike, Garmin "hiking", "yoga"...) is OTHER.
 
 # Sport groups used by distance goals ("km of running per week").
@@ -94,6 +99,12 @@ RUN_SPORTS = frozenset({"Run", "TrailRun", "VirtualRun", *_GARMIN_RUN})
 RIDE_SPORTS = frozenset(
     {"Ride", "VirtualRide", "GravelRide", "MountainBikeRide", "EBikeRide", *_GARMIN_RIDE}
 )
+# Walks and hikes: one group in the lists and on the map ("Marche").
+WALK_SPORTS = frozenset({*_WALKING, "Hike", "hiking"})
+
+
+def is_motorized(sport_type: str) -> bool:
+    return sport_type in _MOTORIZED
 
 
 # A ride shorter than this is a trip (to work, to the shops), not a workout.

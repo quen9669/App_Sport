@@ -60,6 +60,9 @@ class GarminActivitySummary(BaseModel):
     average_running_cadence_in_steps_per_minute: float | None = None
     average_biking_cadence_in_rev_per_minute: float | None = None
     manual_activity: bool = False
+    location_name: str | None = None  # town, e.g. "Luxembourg"
+    start_latitude: float | None = None
+    start_longitude: float | None = None
 
     @field_validator("start_time_gmt", mode="after")
     @classmethod
@@ -101,6 +104,9 @@ def activity_fields(summary: GarminActivitySummary) -> dict[str, Any]:
         "is_trainer": type_key in INDOOR_TYPES,
         # Garmin rows carry their own id here, which is what Strava rows are compared to.
         "garmin_activity_id": str(summary.activity_id),
+        "location_name": summary.location_name or None,
+        "start_latitude": summary.start_latitude,
+        "start_longitude": summary.start_longitude,
     }
 
 
