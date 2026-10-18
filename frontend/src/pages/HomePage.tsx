@@ -1,32 +1,36 @@
-// Home page: the week's goal rings, the week's sessions, the coach's accepted
-// plan and the quick weigh-in.
+// "Ma semaine" (home page of the Entraînement folder): the week's goal rings,
+// its numbers in tiles, today's session of the plan, the week's sessions and the
+// quick weigh-in.
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import {
   ApiError,
   fetchHealth,
+  fetchTrainingLoad,
   fetchWeekProgress,
   setActivityCategory,
   setActivityHidden,
   type Category,
+  type TrainingLoad,
   type WeekActivity,
   type WeekProgress,
 } from '../api/client'
 import ActivityTable from '../components/ActivityTable'
 import GoalRing from '../components/GoalRing'
 import QuickWeight from '../components/QuickWeight'
-import WeekPlanSection from '../components/WeekPlanSection'
-import { CATEGORY_LABELS, formatDayTime, formatShortDate } from '../utils/format'
+import TodayPlan from '../components/TodayPlan'
+import {
+  CATEGORY_LABELS,
+  formatDayTime,
+  formatDuration,
+  formatNumber,
+  formatShortDate,
+} from '../utils/format'
+import { weekTotals } from '../utils/week'
 
-/** The three states of the backend check, shown with different messages. */
+/** The backend check: only a failure is shown (a banner), success stays quiet. */
 type BackendStatus = 'loading' | 'ok' | 'error'
-
-const STATUS_LABELS: Record<BackendStatus, string> = {
-  loading: 'Connexion au backend…',
-  ok: 'Backend OK',
-  error: 'Backend injoignable',
-}
 
 const CATEGORIES: Category[] = ['strength', 'cardio', 'transport', 'other']
 
@@ -36,6 +40,7 @@ export default function HomePage() {
   const [week, setWeek] = useState<string | undefined>(undefined)
   const [progress, setProgress] = useState<WeekProgress | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [load, setLoad] = useState<TrainingLoad | null>(null)
 
   // useEffect runs after the first render: the right place to call the API.
   useEffect(() => {
@@ -48,6 +53,14 @@ export default function HomePage() {
       })
       .catch(() => {
         if (!cancelled) setStatus('error')
+      })
+    // The training load of the last weeks, for the "Charge" tile.
+    fetchTrainingLoad()
+      .then((data) => {
+        if (!cancelled) setLoad(data)
+      })
+      .catch(() => {
+        // Not essential: the tile shows "–".
       })
     return () => {
       cancelled = true
@@ -96,15 +109,19 @@ export default function HomePage() {
     }
   }
 
+  const totals = progress ? weekTotals(progress.activities) : null
+  const weekLoad = load?.weeks.find((w) => w.week === progress?.week)
+
   return (
     <>
-      <h1>App Sport</h1>
-      <p className="subtitle">Ton application de sport personnelle</p>
-      <p className={`status status--${status}`} role="status">
-        {STATUS_LABELS[status]}
-      </p>
+      <h1>Ma semaine</h1>
+      {status === 'error' && (
+        <p className="banner banner--error" role="alert">
+          Backend injoignable : vérifie que l’app tourne sur le PC.
+        </p>
+      )}
 
-      <section className="card" aria-labelledby="week-title">
+      <section aria-labelledby="week-title">
         <div className="week-header">
           <button
             type="button"
@@ -144,16 +161,29 @@ export default function HomePage() {
           </p>
         )}
         {progress && progress.goals.length > 0 && (
-          <div className="rings">
+          <div className="card rings">
             {progress.goals.map((item) => (
               <GoalRing key={item.goal.id} progress={item} />
             ))}
           </div>
         )}
 
+        {totals && (
+          <dl className="tiles">
+            <Tile label="Séances" value={String(totals.sessions + countedSessions(progress))} />
+            <Tile label="Distance" value={formatNumber(totals.distanceKm)} unit="km" />
+            <Tile label="Temps actif" value={formatDuration(totals.activeSeconds)} />
+            <Tile label="Charge" value={weekLoad ? String(Math.round(weekLoad.load)) : '–'} />
+          </dl>
+        )}
+      </section>
+
+      <TodayPlan />
+
+      <section className="card" aria-labelledby="sessions-title">
         {progress && (
           <>
-            <h3>Séances de la semaine</h3>
+            <h2 id="sessions-title">Séances de la semaine</h2>
             {progress.activities.length === 0 && progress.sessions.length === 0 && (
               <p className="hint">Aucune séance pour l’instant.</p>
             )}
@@ -200,8 +230,6 @@ export default function HomePage() {
         )}
       </section>
 
-      <WeekPlanSection />
-
       <section className="card" aria-labelledby="weight-title">
         <h2 id="weight-title">Poids</h2>
         <QuickWeight />
@@ -211,6 +239,24 @@ export default function HomePage() {
       </section>
     </>
   )
+}
+
+/** One number of the week, Garmin style: a small label over a big value. */
+function Tile({ label, value, unit }: { label: string; value: string; unit?: string }) {
+  return (
+    <div className="tile">
+      <dt>{label}</dt>
+      <dd>
+        {value}
+        {unit && <span className="tile-unit"> {unit}</span>}
+      </dd>
+    </div>
+  )
+}
+
+/** Typed gym sessions not already recorded by the watch count as sessions too. */
+function countedSessions(progress: WeekProgress | null): number {
+  return progress ? progress.sessions.filter((session) => session.counted).length : 0
 }
 
 /** Category picker, plus the duplicate/hidden badges and the hide button. */

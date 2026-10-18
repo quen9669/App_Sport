@@ -12,6 +12,7 @@ import type {
   StepsAndFloors,
   TrainingLoad,
 } from '../api/client'
+import type { HealthSection } from '../navigation'
 import { fakeBackend } from '../test/fakeBackend'
 import HealthPage from './HealthPage'
 
@@ -104,16 +105,45 @@ const smoking: Smoking = {
   entries: [],
 }
 
-function renderPage() {
+function renderPage(section: HealthSection) {
   return render(
     <MemoryRouter>
-      <HealthPage />
+      <HealthPage section={section} />
     </MemoryRouter>,
   )
 }
 
 describe('HealthPage', () => {
-  it('summarises sleep and recovery over the period', async () => {
+  it('sums up the week in tiles that open each tab', async () => {
+    fakeBackend({
+      'GET /api/health-metrics': {
+        ...metrics,
+        days: metrics.days.map((d) => ({
+          ...d,
+          weight_kg: 79.5,
+          weight_measured_on: '2026-10-16',
+        })),
+      },
+      'GET /api/training-load': load,
+      'GET /api/intensity-minutes': intensity,
+      'GET /api/steps-floors': steps,
+    })
+    renderPage('resume')
+
+    const tiles = await screen.findByRole('navigation', { name: 'Résumé santé' })
+    const tile = (name: RegExp) => within(tiles).getByRole('link', { name })
+    expect(await within(tiles).findByText('7 h 00')).toBeInTheDocument()
+    expect(tile(/Sommeil moyen/)).toHaveAttribute('href', '/sante/sommeil')
+    expect(tile(/FC au repos/)).toHaveTextContent('51 bpm')
+    expect(tile(/Intensité cette semaine/)).toHaveTextContent('330 min')
+    expect(tile(/Intensité cette semaine/)).toHaveAttribute('href', '/sante/activite')
+    expect(tile(/^Poids/)).toHaveTextContent('79,5 kg')
+    expect(tile(/^Poids/)).toHaveAttribute('href', '/sante/poids')
+    // The summary always covers 7 days: no period buttons.
+    expect(screen.queryByRole('group', { name: 'Période' })).not.toBeInTheDocument()
+  })
+
+  it('summarises sleep over the period', async () => {
     fakeBackend({
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
@@ -122,12 +152,11 @@ describe('HealthPage', () => {
       'GET /api/smoking': smoking,
     })
 
-    renderPage()
+    renderPage('sommeil')
 
     // Mean of 7 h 30 and 6 h 30.
     expect(await screen.findByText('7 h 00')).toBeInTheDocument()
     expect(screen.getByText('23:30')).toBeInTheDocument()
-    expect(screen.getByText('51 bpm')).toBeInTheDocument()
     expect(screen.getByText(/pas assez de nuits/)).toBeInTheDocument()
   })
 
@@ -144,7 +173,7 @@ describe('HealthPage', () => {
       'GET /api/smoking': smoking,
     })
 
-    renderPage()
+    renderPage('poids')
 
     expect(await screen.findByText('79,5 kg')).toBeInTheDocument()
     expect(screen.getByText('2 sept.')).toBeInTheDocument()
@@ -159,7 +188,7 @@ describe('HealthPage', () => {
       'GET /api/smoking': smoking,
     })
 
-    renderPage()
+    renderPage('poids')
 
     expect(await screen.findByText(/Aucune pesée pour l’instant/)).toBeInTheDocument()
   })
@@ -173,14 +202,14 @@ describe('HealthPage', () => {
       'GET /api/smoking': smoking,
     })
 
-    renderPage()
+    renderPage('sommeil')
     await userEvent.click(await screen.findByRole('button', { name: '90 jours' }))
 
     expect(screen.getByRole('button', { name: '90 jours' })).toHaveAttribute('aria-pressed', 'true')
     expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith('days=90'))).toBe(true)
   })
 
-  it('shows the training load with its caution and how heart rate was found', async () => {
+  it('shows the resting HR and the training load with its caution', async () => {
     fakeBackend({
       'GET /api/health-metrics': metrics,
       'GET /api/training-load': load,
@@ -189,9 +218,10 @@ describe('HealthPage', () => {
       'GET /api/smoking': smoking,
     })
 
-    renderPage()
+    renderPage('recuperation')
 
     expect(await screen.findByText('Un peu plus que d’habitude.')).toBeInTheDocument()
+    expect(await screen.findByText('51 bpm')).toBeInTheDocument() // mean resting HR
     expect(screen.getByText(/pas un diagnostic/)).toBeInTheDocument()
     expect(screen.getByText(/estimée d’après ton âge/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /FC max dans le profil/ })).toBeInTheDocument()
@@ -207,7 +237,7 @@ describe('HealthPage', () => {
       'GET /api/smoking': smoking,
     })
 
-    renderPage()
+    renderPage('recuperation')
 
     expect(await screen.findByText(/la plus haute mesurée par ta montre/)).toBeInTheDocument()
   })
@@ -220,7 +250,7 @@ describe('HealthPage', () => {
       'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
-    const { unmount } = renderPage()
+    const { unmount } = renderPage('recuperation')
     expect(
       await screen.findByRole('link', { name: /objectif « Charge d’entraînement »/ }),
     ).toBeInTheDocument()
@@ -233,7 +263,7 @@ describe('HealthPage', () => {
       'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
-    renderPage()
+    renderPage('recuperation')
     const section = await screen.findByRole('region', { name: 'Charge d’entraînement' })
     expect(within(section).getByText('Objectif par semaine')).toBeInTheDocument()
     expect(within(section).getByText('350')).toBeInTheDocument()
@@ -247,7 +277,7 @@ describe('HealthPage', () => {
       'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
-    renderPage()
+    renderPage('activite')
 
     const section = await screen.findByRole('region', { name: 'Minutes d’intensité' })
     expect(within(section).getByText('330 min')).toBeInTheDocument()
@@ -269,7 +299,7 @@ describe('HealthPage', () => {
       'GET /api/steps-floors': steps,
       'GET /api/smoking': smoking,
     })
-    renderPage()
+    renderPage('activite')
 
     const stepsCard = await screen.findByRole('region', { name: 'Pas' })
     expect(within(stepsCard).getByText(/11\s200/)).toBeInTheDocument() // this week

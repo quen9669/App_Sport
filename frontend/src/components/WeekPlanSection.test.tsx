@@ -1,4 +1,4 @@
-// Unit tests for the accepted plan on the Accueil page.
+// Unit tests for the accepted plans on the Mon plan page.
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'

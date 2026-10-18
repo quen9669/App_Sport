@@ -17,7 +17,7 @@ const KINDS: Record<PlanSessionKind, { emoji: string; label: string }> = {
 
 const STATUS_TEXT: Record<CoachPlan['status'], string> = {
   proposed: 'Proposé',
-  accepted: 'Accepté : il est sur l’Accueil',
+  accepted: 'Accepté : il est dans Mon plan',
   rejected: 'Refusé',
   replaced: 'Remplacé par un plan plus récent',
 }

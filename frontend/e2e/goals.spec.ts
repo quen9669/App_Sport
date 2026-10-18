@@ -2,6 +2,8 @@
 // with the synthetic activities created by the seed script.
 import { expect, test } from '@playwright/test'
 
+import { openTab } from './nav'
+
 const API = 'http://localhost:8000'
 
 // Tests share one database: start each one without goals.
@@ -14,14 +16,14 @@ test('define 3 strength + 3 cardio and see the rings on the home page', async ({
   await page.goto('/')
   await expect(page.getByRole('link', { name: 'Définis tes objectifs' })).toBeVisible()
 
-  await page.getByRole('link', { name: 'Objectifs', exact: true }).click()
+  await openTab(page, 'Entraînement', 'Objectifs')
   await page.getByRole('button', { name: '3 muscu + 3 cardio par semaine' }).click()
   await expect(page.getByRole('list')).toContainText('Séances de musculation : 3 séances')
   // The seed data fills the history chart of the last 12 weeks.
   await expect(page.getByRole('heading', { name: 'Mes 12 dernières semaines' })).toBeVisible()
   await expect(page.locator('.recharts-surface').first()).toBeVisible()
 
-  await page.getByRole('link', { name: 'Accueil' }).click()
+  await openTab(page, 'Entraînement', 'Ma semaine')
   await expect(page.getByLabel(/^Séances de musculation : .* sur 3 séances$/)).toBeVisible()
   await expect(page.getByLabel(/^Séances de cardio : .* sur 3 séances$/)).toBeVisible()
 

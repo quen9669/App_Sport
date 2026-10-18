@@ -2,6 +2,8 @@
 // session, and find it in the recent sessions and on the home page.
 import { expect, test } from '@playwright/test'
 
+import { openTab } from './nav'
+
 test('log a strength session at the gym', async ({ page }) => {
   await page.goto('/muscu')
   await page.getByLabel('Exercice').selectOption('Squat')
@@ -22,6 +24,6 @@ test('log a strength session at the gym', async ({ page }) => {
   // In "Dernières séances": the summary line is visible, the sets are folded inside.
   await expect(page.getByText(/^2 séries · Squat$/).first()).toBeVisible()
 
-  await page.getByRole('link', { name: 'Accueil' }).click()
+  await openTab(page, 'Entraînement', 'Ma semaine')
   await expect(page.getByRole('heading', { name: 'Musculation saisie' })).toBeVisible()
 })
