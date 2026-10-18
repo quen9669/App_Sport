@@ -56,6 +56,22 @@ class Activity(Base):
     # Manual correction of the automatic strength/cardio/other category (None = automatic).
     # Syncs never touch this column, so a correction survives every re-sync.
     category_override: Mapped[str | None] = mapped_column(String(16))
+    # Id of the same activity in Garmin Connect. For Garmin rows it equals
+    # ``external_id``; for Strava rows it is read from Strava's ``external_id``
+    # ("garmin_ping_123...") when the activity came from the watch. It is the
+    # surest way to recognise the same session in both sources.
+    garmin_activity_id: Mapped[str | None] = mapped_column(String(64), index=True)
+    # Duplicate handling (app/services/dedupe.py). Garmin is the main source, so a
+    # Strava activity that also exists in Garmin points to the Garmin row here:
+    # - duplicate_status "confirmed": same session for sure, never shown nor counted;
+    # - duplicate_status "possible": unsure (several candidates), both stay visible.
+    duplicate_of_id: Mapped[int | None] = mapped_column(
+        ForeignKey("activity.id", ondelete="SET NULL")
+    )
+    duplicate_status: Mapped[str | None] = mapped_column(String(16))
+    # Hidden by hand ("Masquer"): still stored, but not counted anywhere.
+    # Like category_override, syncs never touch it.
+    hidden: Mapped[bool] = mapped_column(default=False, server_default="0")
     created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now, onupdate=utc_now)
 

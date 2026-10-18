@@ -1,4 +1,4 @@
-"""Activity routes. For now: correct the category of an activity by hand."""
+"""Activity routes: correct the category of an activity, or hide it, by hand."""
 
 from typing import Literal
 
@@ -42,3 +42,27 @@ def set_category(
         automatic_category=automatic,
         overridden=activity.category_override is not None,
     )
+
+
+class HiddenIn(BaseModel):
+    hidden: bool
+
+
+class HiddenOut(BaseModel):
+    id: int
+    hidden: bool
+
+
+@router.patch("/{activity_id}/hidden", response_model=HiddenOut)
+def set_hidden(activity_id: int, payload: HiddenIn, db: Session = Depends(get_db)) -> HiddenOut:
+    """Hide an activity (e.g. one of two possible duplicates), or show it again.
+
+    Nothing is deleted: a hidden activity stays in the database and in the
+    week list (greyed out), but no goal or chart counts it.
+    """
+    activity = db.get(Activity, activity_id)
+    if activity is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Activity not found")
+    activity.hidden = payload.hidden
+    db.commit()
+    return HiddenOut(id=activity.id, hidden=activity.hidden)

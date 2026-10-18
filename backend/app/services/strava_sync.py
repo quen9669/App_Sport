@@ -8,8 +8,10 @@ One run does three things, in this order:
 2. **History**: a few more pages of older activities, going back in time from
    where the previous run stopped (stored in ``sync_cursor``), until the very
    first activity is reached. Then the history import is marked complete.
-3. **Streams**: the detailed time series of activities that don't have them yet,
-   a limited number per run to spare the quota.
+3. **Duplicates**: Garmin is the main source; Strava activities that also exist
+   in Garmin are recognised and left out (``app/services/dedupe.py``).
+4. **Streams**: the detailed time series of activities that don't have them yet,
+   a limited number per run to spare the quota (never for a duplicate).
 
 Every write is an upsert, so running the sync twice never creates duplicates.
 If the daily quota runs out, the run ends as "partial" and the next one simply
@@ -37,6 +39,7 @@ from app.integrations.strava.mappers import (
 from app.integrations.strava.rate_limit import DailyLimitReachedError
 from app.repositories import activities as activities_repo
 from app.repositories import sync as sync_repo
+from app.services.dedupe import reconcile_duplicates
 from app.services.stream_codec import encode_streams, point_count
 
 logger = logging.getLogger(__name__)
@@ -101,6 +104,7 @@ class StravaSyncService:
         try:
             self._sync_new_activities(counters)
             self._sync_history(counters)
+            reconcile_duplicates(self._db)  # before streams: copies need none
             self._sync_missing_streams()
         except DailyLimitReachedError:
             self._db.commit()  # keep everything imported so far

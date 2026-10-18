@@ -36,6 +36,12 @@ class GarminApi(Protocol):
     def get_stats(self, cdate: str) -> dict[str, Any]: ...
     def get_hrv_data(self, cdate: str) -> dict[str, Any] | None: ...
     def get_max_metrics(self, cdate: str) -> Any: ...
+    # Activities, newest first: ``start`` is an offset (0 = most recent).
+    def get_activities(self, start: int = 0, limit: int = 20) -> Any: ...
+    # Detailed samples (heart rate, GPS, altitude, speed) of one activity.
+    def get_activity_details(
+        self, activity_id: str, maxchart: int = 2000, maxpoly: int = 4000
+    ) -> Any: ...
 
 
 def login_with_library(email: str, password: str, tokenstore: str) -> GarminApi:
@@ -183,18 +189,23 @@ class GarminConnectProvider:
 
     @staticmethod
     def _call(method: Callable[[str], Any], cdate: str) -> Any:
-        """Call one library method, translating its errors into ours.
+        return call_garmin(method, cdate)
 
-        Missing data for one day (404) is normal and returns None; a rate limit
-        stops the run; anything else means the source is unusable right now.
-        """
-        try:
-            return method(cdate)
-        except Exception as exc:
-            name = type(exc).__name__
-            if "NotFound" in name:
-                return None
-            if "TooManyRequests" in name:
-                raise HealthRateLimitedError("Garmin rate limit") from None
-            logger.warning("Garmin call %s failed: %s", getattr(method, "__name__", "?"), name)
-            raise HealthProviderError(f"Garmin request failed: {name}") from None
+
+def call_garmin(method: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
+    """Call one library method, translating its errors into ours.
+
+    Missing data (404) is normal and returns None; a rate limit stops the run;
+    anything else means the source is unusable right now. We look at the
+    exception's class *name* so that this file never imports the library.
+    """
+    try:
+        return method(*args, **kwargs)
+    except Exception as exc:
+        name = type(exc).__name__
+        if "NotFound" in name:
+            return None
+        if "TooManyRequests" in name:
+            raise HealthRateLimitedError("Garmin rate limit") from None
+        logger.warning("Garmin call %s failed: %s", getattr(method, "__name__", "?"), name)
+        raise HealthProviderError(f"Garmin request failed: {name}") from None
