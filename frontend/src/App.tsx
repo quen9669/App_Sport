@@ -6,6 +6,7 @@ import GoalsPage from './pages/GoalsPage'
 import HealthPage from './pages/HealthPage'
 import HomePage from './pages/HomePage'
 import ProfilePage from './pages/ProfilePage'
+import RacePage from './pages/RacePage'
 import SourcesPage from './pages/SourcesPage'
 import StrengthPage from './pages/StrengthPage'
 
@@ -28,6 +29,7 @@ export default function App() {
         <NavLink to="/objectifs">Objectifs</NavLink>
         <NavLink to="/sante">Santé</NavLink>
         <NavLink to="/carte">Carte</NavLink>
+        <NavLink to="/course">Course</NavLink>
         <NavLink to="/profil">Profil</NavLink>
         <NavLink to="/sources">Sources</NavLink>
       </nav>
@@ -38,6 +40,7 @@ export default function App() {
           <Route path="/objectifs" element={<GoalsPage />} />
           <Route path="/sante" element={<HealthPage />} />
           <Route path="/carte" element={<Lazy page={<MapPage />} />} />
+          <Route path="/course" element={<RacePage />} />
           <Route path="/activites/:id" element={<Lazy page={<ActivityPage />} />} />
           <Route path="/profil" element={<ProfilePage />} />
           <Route path="/sources" element={<SourcesPage />} />

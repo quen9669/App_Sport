@@ -6,6 +6,7 @@ from app.db.models.goal import Goal
 from app.db.models.health import DailyHealth, SleepNight
 from app.db.models.place import Place
 from app.db.models.profile import BodyMetric, UserProfile
+from app.db.models.race import RaceTarget
 from app.db.models.raw import RawPayload
 from app.db.models.smoking import SmokingDay
 from app.db.models.strength import StrengthSession, StrengthSet
@@ -18,6 +19,7 @@ __all__ = [
     "DailyHealth",
     "Goal",
     "Place",
+    "RaceTarget",
     "RawPayload",
     "SleepNight",
     "SmokingDay",
