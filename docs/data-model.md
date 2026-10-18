@@ -1,8 +1,8 @@
 # Modèle de données
 
-Schéma créé par la migration Alembic initiale (`backend/alembic/versions/`). Les modèles Python sont
-dans `backend/app/db/models/`. Les tables des phases suivantes (objectifs, musculation, course,
-coachs) arriveront avec leur propre migration.
+Schéma créé par les migrations Alembic (`backend/alembic/versions/`). Les modèles Python sont
+dans `backend/app/db/models/`. Les tables des phases suivantes (musculation, course, coachs)
+arriveront avec leur propre migration.
 
 ```mermaid
 erDiagram
@@ -22,6 +22,7 @@ erDiagram
         float average_heartrate
         float max_heartrate
         text summary_polyline "tracé simplifié"
+        string category_override "correction manuelle : strength, cardio, other"
     }
     activity_stream {
         int id PK
@@ -83,9 +84,33 @@ erDiagram
         bool completed
     }
     user_profile {
-        int id PK
+        int id PK "toujours 1"
         string timezone
         string unit_system
+        float height_cm
+        string sex
+        date birth_date "l'âge est calculé"
+        int max_heartrate
+        int resting_heartrate
+        string experience_level
+        text injuries
+    }
+    body_metric {
+        int id PK
+        date measured_on "unique : une mesure par jour"
+        string source "manual, synthetic"
+        float weight_kg
+        float body_fat_pct
+        float waist_cm
+    }
+    goal {
+        int id PK
+        string kind "strength_sessions, cardio_sessions, active_minutes, distance_km"
+        float target "par semaine"
+        string sport "run, ride (objectifs en km)"
+        date start_date
+        date end_date
+        string status "active, paused, done"
     }
 ```
 
@@ -99,6 +124,10 @@ erDiagram
 - **Données brutes** dans `raw_payload`, séparées des tables normalisées : on peut tout reconstruire
   sans rappeler l'API.
 - **Tokens chiffrés** (Fernet) dans `source_credential` ; la clé est dans `.env`, jamais en base.
+- **Catégorie d'une activité** : calculée à partir de `sport_type` (`app/services/classification.py`),
+  sauf si `category_override` est rempli. Les synchros ne touchent jamais cette colonne.
+- **Semaines** : du lundi 00 h au lundi suivant 00 h, heure de Luxembourg, converties en UTC pour
+  interroger la base.
 - **Streams compacts** : un seul blob compressé par activité plutôt qu'une ligne par seconde
   (une sortie d'une heure = environ 3 600 points par série).
 
