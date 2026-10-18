@@ -1,7 +1,9 @@
 // Root component: navigation bar and the page matching the current URL.
 import { NavLink, Route, Routes } from 'react-router-dom'
 
+import GoalsPage from './pages/GoalsPage'
 import HomePage from './pages/HomePage'
+import ProfilePage from './pages/ProfilePage'
 import SourcesPage from './pages/SourcesPage'
 
 export default function App() {
@@ -11,11 +13,15 @@ export default function App() {
         <NavLink to="/" end>
           Accueil
         </NavLink>
+        <NavLink to="/objectifs">Objectifs</NavLink>
+        <NavLink to="/profil">Profil</NavLink>
         <NavLink to="/sources">Sources</NavLink>
       </nav>
       <main className="app">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/objectifs" element={<GoalsPage />} />
+          <Route path="/profil" element={<ProfilePage />} />
           <Route path="/sources" element={<SourcesPage />} />
         </Routes>
         <p className="disclaimer">

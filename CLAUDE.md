@@ -16,8 +16,8 @@ keep functions short, and explain important choices in PR descriptions.
 - **Backend** (`backend/`): Python 3.12+, `uv`, FastAPI, Pydantic v2, pydantic-settings,
   SQLAlchemy 2.x + Alembic (SQLite, PostgreSQL-compatible), httpx (sync client), cryptography (Fernet).
   APScheduler 3 (in-process scheduled syncs), garminconnect (unofficial Garmin library).
-- **Frontend** (`frontend/`): React 19, Vite, TypeScript strict, `vite-plugin-pwa`.
-  Coming later: react-leaflet (OpenStreetMap), Recharts.
+- **Frontend** (`frontend/`): React 19, Vite, TypeScript strict, `vite-plugin-pwa`, react-router,
+  Recharts (lazy-loaded with `React.lazy`). Coming later: react-leaflet (OpenStreetMap).
 - **Tests**: pytest + pytest-asyncio; Vitest + Testing Library; Playwright (E2E, desktop + Pixel 7).
 - **Quality**: ruff (lint + format) and mypy `--strict` for Python; oxlint + Prettier + `tsc` for TS.
 
@@ -79,3 +79,18 @@ scheduler (`app/scheduler.py`) runs them every `SYNC_INTERVAL_HOURS` and is disa
 `app/services/strava_sync.py`, one run = new activities (7-day overlap) → a few history pages
 (cursor `strava_backfill` in `sync_cursor`) → missing streams. Quotas: `integrations/strava/rate_limit.py`
 waits for the next 15-min window, stops the run as `partial` near the daily limit.
+
+## Goals and categories (phase 2)
+
+- `app/services/classification.py` is the single place mapping Strava `sport_type` to
+  strength / cardio / other. Group classes (`Workout`, `Crossfit`, `HighIntensityIntervalTraining`)
+  count as strength (owner's decision). `Activity.category_override` (manual) always wins and is never
+  touched by syncs; `effective_category()` is what every count must use.
+- Weeks are ISO weeks (Monday-Sunday) in `APP_TIMEZONE`: `app/services/weeks.py` converts local
+  boundaries to UTC separately, so DST weeks are 167/169 h. Labels look like `2026-W42`.
+- `app/services/goals.py` computes progress; only `active` goals overlapping the week count.
+- Validation bounds live in the Pydantic models (`app/api/profile.py`, `app/api/goals.py`) and are
+  mirrored in `frontend/src/utils/bounds.ts`: change both together.
+- `body_metric` has one row per day (upsert on `measured_on`) and a `source` column so `make seed`
+  weigh-ins can be removed without touching manual ones.
+- Frontend tests use `src/test/fakeBackend.ts` (fake `fetch` by "METHOD /path").

@@ -3,7 +3,7 @@
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.db.models import Activity, SleepNight
+from app.db.models import Activity, BodyMetric, SleepNight
 from app.services import polyline
 from scripts import seed
 
@@ -32,3 +32,20 @@ def test_seed_is_idempotent_and_clearable(db: Session) -> None:
 
     seed.clear(db)
     assert db.scalar(select(func.count()).select_from(Activity)) == 0
+
+
+def test_seed_weight_keeps_manual_weigh_ins(db: Session) -> None:
+    import random
+    from datetime import date
+
+    manual = BodyMetric(measured_on=date(2026, 9, 10), weight_kg=77.7, source="manual")
+    db.add(manual)
+    db.commit()
+
+    count = seed.seed_weight(db, date(2026, 9, 1), date(2026, 9, 30), random.Random(1))
+    assert count > 10
+    assert db.get(BodyMetric, manual.id).weight_kg == 77.7  # type: ignore[union-attr]
+
+    seed.clear(db)
+    remaining = list(db.scalars(select(BodyMetric)))
+    assert [m.weight_kg for m in remaining] == [77.7]
