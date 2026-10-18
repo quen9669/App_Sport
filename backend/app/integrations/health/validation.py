@@ -5,7 +5,7 @@ it is dropped (set to ``None``) rather than stored and later trusted by charts
 or coaches.
 """
 
-from app.integrations.health.provider import DailyHealthRecord, SleepRecord
+from app.integrations.health.provider import DailyHealthRecord, SleepRecord, WeightRecord
 
 MAX_SLEEP_S = 16 * 3600
 
@@ -53,3 +53,15 @@ def check_daily(record: DailyHealthRecord) -> list[str]:
             problems.append(f"{record.day}: {name}={value} out of range, ignored")
             setattr(record, name, None)
     return problems
+
+
+# Same bounds as a weigh-in typed in the app (app/api/profile.py).
+WEIGHT_KG_BOUNDS = (30, 300)
+
+
+def plausible_weight(record: WeightRecord) -> bool:
+    """A weigh-in outside the bounds is dropped entirely (it has no other value)."""
+    low, high = WEIGHT_KG_BOUNDS
+    if not _in_range(record.body_fat_pct, 2, 70):
+        record.body_fat_pct = None
+    return low <= record.weight_kg <= high

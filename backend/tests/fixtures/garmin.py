@@ -105,6 +105,8 @@ class FakeGarmin:
         )
         self.detail_calls: list[str] = []
         self.rate_limit_details = False
+        self.weight_range: tuple[str, str | None] | None = None
+        self.weigh_ins: list[dict[str, Any]] = []
 
     def _check(self, cdate: str) -> None:
         self.calls.append(cdate)
@@ -134,6 +136,11 @@ class FakeGarmin:
 
     def get_max_metrics(self, cdate: str) -> list[dict[str, Any]]:
         return [{"generic": {"calendarDate": cdate, "vo2MaxPreciseValue": 52.4, "vo2MaxValue": 52}}]
+
+    def get_body_composition(self, startdate: str, enddate: str | None = None) -> dict[str, Any]:
+        """Two weigh-ins on the same day (the later one counts) and an older one."""
+        self.weight_range = (startdate, enddate)
+        return {"dateWeightList": self.weigh_ins}
 
     def get_activities(self, start: int = 0, limit: int = 20) -> list[dict[str, Any]]:
         if self.broken:

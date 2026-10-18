@@ -117,3 +117,6 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - Training load: `services/training_load.py` (Banister TRIMP, else minutes × effort per category);
   no ACWR before 5 weeks of history. Health series: `services/health_dashboard.py` (one row per day,
   Garmin preferred over other sources). Routes in `api/dashboards.py`; page `HealthPage` (`/sante`).
+- Weight: Garmin weigh-ins (`get_body_composition`, grams, a year looked back at each sync) go to
+  `body_metric` with `source="garmin"`, never over a weigh-in typed in the app. The Santé page
+  carries the last weigh-in forward until the next one (owner's choice: no smoothing, no invented values).

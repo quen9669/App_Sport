@@ -22,6 +22,7 @@ from app.integrations.health.provider import (
 )
 from app.repositories import activities as activities_repo
 from app.repositories import health as health_repo
+from app.repositories import profile as profile_repo
 from app.repositories import sync as sync_repo
 
 logger = logging.getLogger(__name__)
@@ -65,6 +66,14 @@ def store_batch(db: Session, source: str, batch: HealthBatch) -> StoreResult:
         if daily.raw is not None:
             activities_repo.upsert_raw_payload(
                 db, source, "daily_health", daily.day.isoformat(), daily.raw
+            )
+    for weight in batch.weights:
+        stored = profile_repo.upsert_weight_from_source(db, source, weight)
+        if stored is not None:  # None: a weigh-in typed in the app was kept
+            _count(result, stored)
+        if weight.raw is not None:
+            activities_repo.upsert_raw_payload(
+                db, source, "weight", weight.day.isoformat(), weight.raw
             )
     db.commit()
     return result

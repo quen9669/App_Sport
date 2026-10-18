@@ -1,4 +1,6 @@
 // One health metric per day (thin line) and its 7-day rolling average (thick line).
+// With `smooth={false}` (weight), a single step line: the value stays flat
+// until the next measurement.
 // Loaded on demand (React.lazy in HealthPage): Recharts is only downloaded there.
 import {
   CartesianGrid,
@@ -22,11 +24,13 @@ export default function TrendChart({
   name,
   unit,
   digits = 0,
+  smooth = true,
 }: {
   points: TrendPoint[]
   name: string
   unit: string
   digits?: number
+  smooth?: boolean
 }) {
   return (
     <div className="chart">
@@ -57,24 +61,38 @@ export default function TrendChart({
           <Legend
             formatter={(value: string) => <span style={{ color: 'var(--text)' }}>{value}</span>}
           />
-          <Line
-            name={name}
-            dataKey="value"
-            stroke="var(--text-muted)"
-            strokeWidth={1}
-            dot={{ r: 2 }}
-            isAnimationActive={false}
-          />
+          {smooth ? (
+            <Line
+              name={name}
+              dataKey="value"
+              stroke="var(--text-muted)"
+              strokeWidth={1}
+              dot={{ r: 2 }}
+              isAnimationActive={false}
+            />
+          ) : (
+            <Line
+              name={name}
+              dataKey="value"
+              type="stepAfter"
+              stroke="var(--accent)"
+              strokeWidth={3}
+              dot={false}
+              isAnimationActive={false}
+            />
+          )}
           {/* connectNulls: the average line continues over a night without data. */}
-          <Line
-            name="Moyenne 7 jours"
-            dataKey="average"
-            stroke="var(--accent)"
-            strokeWidth={3}
-            dot={false}
-            connectNulls
-            isAnimationActive={false}
-          />
+          {smooth && (
+            <Line
+              name="Moyenne 7 jours"
+              dataKey="average"
+              stroke="var(--accent)"
+              strokeWidth={3}
+              dot={false}
+              connectNulls
+              isAnimationActive={false}
+            />
+          )}
         </LineChart>
       </ResponsiveContainer>
     </div>

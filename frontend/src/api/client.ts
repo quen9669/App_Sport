@@ -209,7 +209,9 @@ export interface HealthDay {
   wake_min: number | null
   resting_hr: number | null
   hrv_ms: number | null
+  /** Last known weight, carried forward until the next weigh-in. */
   weight_kg: number | null
+  weight_measured_on: string | null
 }
 
 export interface HealthMetrics {

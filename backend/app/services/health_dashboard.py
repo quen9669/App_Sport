@@ -38,7 +38,10 @@ class HealthDay:
     wake_min: int | None = None
     resting_hr: int | None = None
     hrv_ms: float | None = None
+    # The last known weight: weigh-ins are rare, so a value is carried forward
+    # until the next one. ``weight_measured_on`` says when it was measured.
     weight_kg: float | None = None
+    weight_measured_on: date | None = None
 
 
 @dataclass
@@ -85,17 +88,14 @@ def health_days(db: Session, start: date, end: date, timezone: str) -> list[Heal
         db.scalars(select(DailyHealth).where(DailyHealth.day.between(start, end))),
         lambda daily: daily.day,
     )
-    weights = {
-        metric.measured_on: metric.weight_kg
-        for metric in db.scalars(
-            select(BodyMetric).where(BodyMetric.measured_on.between(start, end))
-        )
-    }
+    weights = _weights_carried_forward(db, start, end)
 
     result = []
     day = start
     while day <= end:
-        point = HealthDay(day=day, weight_kg=weights.get(day))
+        point = HealthDay(day=day)
+        if day in weights:
+            point.weight_measured_on, point.weight_kg = weights[day]
         night, daily = nights.get(day), dailies.get(day)
         if night is not None:
             point.sleep_s = night.duration_s
@@ -110,6 +110,38 @@ def health_days(db: Session, start: date, end: date, timezone: str) -> list[Heal
         )
         point.hrv_ms = (daily.hrv_ms if daily else None) or (night.hrv_ms if night else None)
         result.append(point)
+        day += timedelta(days=1)
+    return result
+
+
+def _weights_carried_forward(db: Session, start: date, end: date) -> dict[date, tuple[date, float]]:
+    """For each day, the last weigh-in on or before it: ``{day: (measured_on, kg)}``.
+
+    The weigh-in just before ``start`` is included, so a period without any
+    new weigh-in still shows the last known weight instead of nothing.
+    """
+    previous = db.scalar(
+        select(BodyMetric)
+        .where(BodyMetric.measured_on < start)
+        .order_by(BodyMetric.measured_on.desc())
+        .limit(1)
+    )
+    in_range = db.scalars(
+        select(BodyMetric)
+        .where(BodyMetric.measured_on.between(start, end))
+        .order_by(BodyMetric.measured_on)
+    )
+    measured = {m.measured_on: m.weight_kg for m in ([previous] if previous else [])}
+    measured.update({m.measured_on: m.weight_kg for m in in_range})
+
+    result: dict[date, tuple[date, float]] = {}
+    last: tuple[date, float] | None = None
+    day = min([start, *measured])
+    while day <= end:
+        if day in measured:
+            last = (day, measured[day])
+        if last is not None and day >= start:
+            result[day] = last
         day += timedelta(days=1)
     return result
 

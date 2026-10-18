@@ -13,6 +13,7 @@ function day(date: string, sleepHours: number | null): HealthDay {
     resting_hr: null,
     hrv_ms: null,
     weight_kg: null,
+    weight_measured_on: null,
   }
 }
 

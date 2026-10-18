@@ -46,11 +46,22 @@ class DailyHealthRecord:
 
 
 @dataclass
+class WeightRecord:
+    """One weigh-in (e.g. from a Garmin Index scale or typed in Garmin Connect)."""
+
+    day: date
+    weight_kg: float
+    body_fat_pct: float | None = None
+    raw: Any = None
+
+
+@dataclass
 class HealthBatch:
     """What a provider returns: nights and days, plus problems it met along the way."""
 
     sleep: list[SleepRecord] = field(default_factory=list)
     daily: list[DailyHealthRecord] = field(default_factory=list)
+    weights: list[WeightRecord] = field(default_factory=list)
     # Human-readable, secret-free messages (e.g. "line 12: invalid date").
     warnings: list[str] = field(default_factory=list)
 

@@ -24,7 +24,8 @@ class HealthDayOut(BaseModel):
     wake_min: int | None
     resting_hr: int | None
     hrv_ms: float | None
-    weight_kg: float | None
+    weight_kg: float | None  # last known weight, carried forward
+    weight_measured_on: date | None  # when that weight was measured
 
 
 class RegularityOut(BaseModel):
