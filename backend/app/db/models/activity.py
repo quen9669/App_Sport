@@ -78,6 +78,9 @@ class Activity(Base):
     # Hidden by hand ("Masquer"): still stored, but not counted anywhere.
     # Like category_override, syncs never touch it.
     hidden: Mapped[bool] = mapped_column(default=False, server_default="0")
+    # Left out of the race predictor by hand (a jog with the dog, a wrong GPS
+    # distance): still counted everywhere else. Syncs never touch it either.
+    excluded_from_race: Mapped[bool] = mapped_column(default=False, server_default="0")
     # Where an activity without GPS happened, chosen by hand (None = the default
     # place for its kind, see app/services/places.py). Syncs never touch it.
     place_id: Mapped[int | None] = mapped_column(ForeignKey("place.id", ondelete="SET NULL"))
