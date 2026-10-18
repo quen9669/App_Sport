@@ -2,6 +2,8 @@
 // filter it, then open the detail of one activity (map + charts).
 import { expect, test } from '@playwright/test'
 
+import { openTab } from './nav'
+
 // No external requests in tests: the OpenStreetMap tiles are answered with an
 // empty response (the map just has no background).
 test.beforeEach(async ({ page }) => {
@@ -12,9 +14,9 @@ test.beforeEach(async ({ page }) => {
 
 test('map: routes, filters, heatmap, then the detail of an activity', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('link', { name: 'Carte' }).click()
+  await openTab(page, 'Entraînement', 'Activités')
 
-  await expect(page.getByRole('heading', { name: 'Carte' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Activités', level: 1 })).toBeVisible()
   // Leaflet draws the routes on a canvas inside the map.
   await expect(page.locator('.leaflet-container canvas')).toBeVisible()
   const summary = page.getByText(/correspond.* aux filtres/)
@@ -57,8 +59,9 @@ test('map: routes, filters, heatmap, then the detail of an activity', async ({ p
   await expect(page.locator('.leaflet-container canvas')).toBeVisible()
 })
 
-test('places: a gym session shows its place and it can be changed', async ({ page }) => {
-  await page.goto('/carte')
+test('places: the gyms are listed in Mes lieux', async ({ page }) => {
+  await page.goto('/')
+  await openTab(page, 'Réglages', 'Mes lieux')
   const panel = page.getByRole('region', { name: 'Mes lieux' })
   await expect(panel.getByRole('form', { name: 'Lieu Jims Gasperich' })).toBeVisible()
   await expect(panel.getByRole('form', { name: 'Lieu Jims Gare' })).toBeVisible()

@@ -2,9 +2,11 @@
 // runs, predicts race times and gives a pace plan for a target race.
 import { expect, test } from '@playwright/test'
 
+import { openTab } from './nav'
+
 test('Course page: form, predictions, and a pace plan for a 10 km', async ({ page }, testInfo) => {
   await page.goto('/')
-  await page.getByRole('link', { name: 'Course' }).click()
+  await openTab(page, 'Entraînement', 'Course')
   await expect(page.getByRole('heading', { name: 'Ta forme' })).toBeVisible()
   // The seed has regular runs: enough for an estimate.
   await expect(page.getByRole('term').filter({ hasText: 'VDOT' })).toBeVisible()

@@ -1,12 +1,17 @@
-// Acceptance test of phase 3a: the Santé page shows sleep, recovery and training
+// Acceptance test of phase 3a: the Santé tabs show sleep, recovery and training
 // load and intensity minutes from the synthetic data of the seed script (21 days).
 import { expect, test } from '@playwright/test'
 
-test('Santé page: sleep and recovery curves, then the training load', async ({ page }) => {
-  await page.goto('/')
-  await page.getByRole('link', { name: 'Santé' }).click()
+import { openTab } from './nav'
 
-  await expect(page.getByRole('heading', { name: 'Sommeil' })).toBeVisible()
+test('Santé: the summary, sleep, then recovery and activity tabs', async ({ page }) => {
+  await page.goto('/')
+  await openTab(page, 'Santé', 'Résumé')
+  const summary = page.getByRole('navigation', { name: 'Résumé santé' })
+  await expect(summary.getByRole('link', { name: /Sommeil moyen/ })).toBeVisible()
+
+  await summary.getByRole('link', { name: /Sommeil moyen/ }).click()
+  await expect(page.getByRole('heading', { name: 'Sommeil', level: 2 })).toBeVisible()
   await expect(page.getByText('Durée moyenne')).toBeVisible()
   await expect(page.getByText(/^Horaires : coucher /)).toBeVisible()
   // Sleep, resting HR and HRV charts are drawn from the seed nights.
@@ -19,17 +24,19 @@ test('Santé page: sleep and recovery curves, then the training load', async ({ 
   )
   await expect(page.getByText(/sur [1-7] nuits\.$/)).toBeVisible()
 
+  await openTab(page, 'Santé', 'Récupération')
   await expect(page.getByRole('heading', { name: 'Charge d’entraînement' })).toBeVisible()
   await expect(page.getByText(/pas un diagnostic/)).toBeVisible()
 
   // Intensity minutes: the seed has some every day, and no goal yet.
+  await openTab(page, 'Santé', 'Activité')
   const intensity = page.getByRole('region', { name: 'Minutes d’intensité' })
   await expect(intensity.locator('.recharts-surface')).toBeVisible()
   await expect(intensity.getByRole('link', { name: /Ajoute un objectif/ })).toBeVisible()
 })
 
 test('Santé page: steps per day and floors per week', async ({ page }, testInfo) => {
-  await page.goto('/sante')
+  await page.goto('/sante/activite')
   // The seed has steps and floors every day, and no goal for them.
   const steps = page.getByRole('region', { name: 'Pas' })
   await expect(steps.locator('.recharts-surface')).toBeVisible()
@@ -55,7 +62,7 @@ test('Santé page: write a day with a cigarette, then remove it', async ({ page 
   const day = new Date(Date.now() - daysAgo * 86_400_000).toLocaleDateString('sv-SE', {
     timeZone: 'Europe/Luxembourg',
   })
-  await page.goto('/sante')
+  await page.goto('/sante/tabac')
 
   const card = page.getByRole('region', { name: 'Sans cigarette' })
   await expect(card.getByText('Jours sans cigarette', { exact: true })).toBeVisible()

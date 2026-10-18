@@ -4,9 +4,11 @@
 // browser shows it piece by piece (the engine itself is tested in pytest).
 import { expect, test } from '@playwright/test'
 
+import { openTab } from './nav'
+
 test('Coach page: waits for the API key, memories can be added', async ({ page }, testInfo) => {
   await page.goto('/')
-  await page.getByRole('link', { name: 'Coach' }).click()
+  await openTab(page, 'Coach', 'Muscu et cardio')
   await expect(page.getByRole('heading', { name: 'Coach muscu et cardio' })).toBeVisible()
   await expect(page.getByText(/attend ta clé API Gemini/)).toBeVisible()
   await expect(page.getByRole('button', { name: 'Envoyer' })).toBeDisabled()
@@ -73,7 +75,9 @@ test('Coach page: a streamed answer appears in the chat', async ({ page }, testI
   }
 })
 
-test('Coach page: a weekly plan is accepted, then shown on Accueil', async ({ page }, testInfo) => {
+test('Coach page: a weekly plan is accepted, then shown in Mon plan', async ({
+  page,
+}, testInfo) => {
   const monday = '2026-10-19'
   const plan = {
     id: 901,
@@ -138,10 +142,10 @@ test('Coach page: a weekly plan is accepted, then shown on Accueil', async ({ pa
   const card = page.getByRole('article', { name: 'Plan de la semaine du 19 oct.' })
   await expect(card.getByText('3 x 10 min, 2 min de trot')).toBeVisible()
   await card.getByRole('button', { name: 'Accepter' }).click()
-  await expect(card.getByText(/il est sur l’Accueil/)).toBeVisible()
+  await expect(card.getByText(/il est dans Mon plan/)).toBeVisible()
 
-  await page.getByRole('link', { name: 'Accueil' }).click()
-  const home = page.getByRole('region', { name: 'Mon plan' })
+  await openTab(page, 'Coach', 'Mon plan')
+  const home = page.getByRole('region', { name: 'Semaines acceptées' })
   await expect(home.getByText('Body Pump')).toBeVisible()
   await expect(home.getByRole('button')).toHaveCount(0)
   if (process.env.E2E_SCREENSHOTS) {
@@ -153,7 +157,7 @@ test('Coach page: a weekly plan is accepted, then shown on Accueil', async ({ pa
 
 test('Longévité page: its own coach', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('link', { name: 'Longévité' }).click()
+  await openTab(page, 'Coach', 'Longévité')
   await expect(page.getByRole('heading', { name: 'Coach longévité' })).toBeVisible()
   await expect(page.getByRole('button', { name: /zone 2/ })).toBeVisible()
 })
