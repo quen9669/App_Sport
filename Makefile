@@ -11,7 +11,7 @@ FRONTEND := frontend
 
 .PHONY: help install dev dev-backend dev-frontend test test-backend test-frontend \
 	test-e2e e2e-install lint format typecheck check clean db-upgrade db-revision seed seed-clear eval \
-	set-password prod build backup restore
+	set-password prod build backup restore autostart autostart-off prod-restart
 
 help: ## Show this list of commands
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | \
@@ -59,6 +59,15 @@ build: ## Build the interface for production (frontend/dist)
 prod: build db-upgrade ## Run the app like in production: one server on port 8000, password required
 	cd $(BACKEND) && APP_ENV=production FRONTEND_DIST=../$(FRONTEND)/dist \
 		uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 --proxy-headers
+
+autostart: ## Windows only: start the app (make prod) now and each time you log in
+	bash scripts/windows/autostart.sh on
+
+autostart-off: ## Windows only: stop starting the app at log-in
+	bash scripts/windows/autostart.sh off
+
+prod-restart: ## Windows only: restart the app started by autostart (after an update)
+	bash scripts/windows/autostart.sh restart
 
 backup: ## Copy the database now (also done every night at 03:30)
 	cd $(BACKEND) && uv run python -m scripts.backup
