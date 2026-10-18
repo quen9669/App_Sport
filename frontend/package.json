@@ -16,6 +16,8 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@fontsource/barlow": "^5.3.0",
+    "@fontsource/barlow-semi-condensed": "^5.3.0",
     "country-flag-emoji-polyfill": "0.1.10",
     "leaflet": "^1.9.4",
     "react": "^19.2.8",
