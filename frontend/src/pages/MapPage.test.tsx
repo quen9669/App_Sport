@@ -46,6 +46,7 @@ const data: MapRoutes = {
       elevation_gain_m: 80,
       average_speed_mps: 3.1,
       average_heartrate: 148,
+      max_heartrate: 176,
       polyline: '_p~iF~ps|U_ulLnnqC',
       city: 'Luxembourg',
       country_code: 'LU',
@@ -62,6 +63,8 @@ const data: MapRoutes = {
       elapsed_time_s: 2500,
       city: 'Royan',
       country_code: 'FR',
+      average_heartrate: null,
+      max_heartrate: null,
       latitude: 45.62,
       longitude: -1.02,
     },
@@ -84,6 +87,8 @@ const data: MapRoutes = {
           elapsed_time_s: 900,
           city: 'Luxembourg',
           country_code: 'LU',
+          average_heartrate: 120,
+          max_heartrate: 150,
         },
       ],
     },
@@ -130,6 +135,10 @@ describe('MapPage', () => {
     expect(rows[0]).toHaveTextContent('Royan')
     expect(rows[0]).toHaveTextContent('Divers')
     expect(rows[2]).toHaveTextContent('10,2 km')
+    // Heart rate columns (after the duration); empty without a watch reading.
+    const cells = within(rows[2]!).getAllByRole('cell')
+    expect(cells.slice(7, 9).map((cell) => cell.textContent)).toEqual(['148', '176'])
+    expect(within(rows[0]!).getAllByRole('cell')[7]).toHaveTextContent(/^$/)
     // A gym session has no distance: the cell stays empty.
     expect(within(rows[1]!).getAllByRole('cell')[5]).toHaveTextContent(/^$/)
     expect(

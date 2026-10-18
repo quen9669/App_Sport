@@ -123,3 +123,8 @@ export function todayIso(now: Date = new Date()): string {
   // The "sv-SE" locale happens to format dates as YYYY-MM-DD.
   return now.toLocaleDateString('sv-SE', { timeZone: 'Europe/Luxembourg' })
 }
+
+/** Heart rate cell: "142" bpm, or an empty string when the activity has none. */
+export function formatHeartRate(bpm: number | null): string {
+  return bpm === null ? '' : String(Math.round(bpm))
+}

@@ -1,6 +1,7 @@
 // The activity table shared by the home page (week sessions) and the map page
 // (activities in view): one activity per line, with the columns FRANKS chose:
-// flag, town, date, name, sport (emoji + colour), distance and duration.
+// flag, town, date, name, sport (emoji + colour), distance, duration, then the
+// average and max heart rate (empty when the watch recorded none).
 // `extra` adds columns at the end (e.g. the category picker of the home page).
 import type { CSSProperties, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
@@ -15,7 +16,7 @@ import {
   SPORT_EMOJIS,
   SPORT_LABELS,
 } from '../utils/activity'
-import { formatDuration, formatTableDate } from '../utils/format'
+import { formatDuration, formatHeartRate, formatTableDate } from '../utils/format'
 
 export interface ExtraColumn<T> {
   header: string
@@ -49,6 +50,12 @@ export default function ActivityTable<T extends ActivityRow>({
             <th>Sport</th>
             <th className="num">Distance</th>
             <th className="num">Durée</th>
+            <th className="num">
+              <abbr title="Fréquence cardiaque moyenne (bpm)">FC moy.</abbr>
+            </th>
+            <th className="num">
+              <abbr title="Fréquence cardiaque maximale (bpm)">FC max</abbr>
+            </th>
             {extra.map((column) => (
               <th key={column.header}>{column.header}</th>
             ))}
@@ -74,6 +81,8 @@ export default function ActivityTable<T extends ActivityRow>({
                 {shownDistance(row) === null ? '' : formatKm(shownDistance(row) ?? 0)}
               </td>
               <td className="num">{formatDuration(row.moving_time_s ?? row.elapsed_time_s)}</td>
+              <td className="num">{formatHeartRate(row.average_heartrate)}</td>
+              <td className="num">{formatHeartRate(row.max_heartrate)}</td>
               {extra.map((column) => (
                 <td key={column.header}>{column.cell(row)}</td>
               ))}

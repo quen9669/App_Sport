@@ -160,6 +160,8 @@ def test_hide_an_activity_removes_it_from_goals(client: TestClient, db: Session)
             "sport_type": "Run",
             "start_time": datetime.now(UTC),
             "elapsed_time_s": 1800,
+            "average_heartrate": 142.0,
+            "max_heartrate": 171.0,
         },
     )
     db.commit()
@@ -173,6 +175,8 @@ def test_hide_an_activity_removes_it_from_goals(client: TestClient, db: Session)
     assert listed["hidden"] is True
     assert listed["possible_duplicate"] is False
     assert listed["source"] == "strava"
+    # Heart rate of each activity, for the FC columns of the table.
+    assert (listed["average_heartrate"], listed["max_heartrate"]) == (142.0, 171.0)
     assert client.patch("/api/activities/999/hidden", json={"hidden": True}).status_code == 404
 
 

@@ -1,7 +1,7 @@
 """Fields shared by every activity shown as a row of a table (week, map list).
 
 One definition so the "Séances de la semaine" table and the map's table show
-the same columns: flag, town, date, name, sport, distance, duration.
+the same columns: flag, town, date, name, sport, distance, duration, heart rate.
 """
 
 from datetime import datetime
@@ -24,6 +24,8 @@ class ActivityRowFields(BaseModel):
     elapsed_time_s: int
     city: str | None
     country_code: str | None  # "LU": the frontend turns it into a flag
+    average_heartrate: float | None  # bpm, from the watch (None without a HR sensor)
+    max_heartrate: float | None
 
 
 def row_fields(activity: Activity, location: Location) -> dict[str, Any]:
@@ -38,4 +40,6 @@ def row_fields(activity: Activity, location: Location) -> dict[str, Any]:
         "elapsed_time_s": activity.elapsed_time_s,
         "city": location.city,
         "country_code": location.country_code,
+        "average_heartrate": activity.average_heartrate,
+        "max_heartrate": activity.max_heartrate,
     }

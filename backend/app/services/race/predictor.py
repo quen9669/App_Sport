@@ -64,7 +64,7 @@ class TargetReport:
 @dataclass(frozen=True)
 class RaceReport:
     form: FormEstimate
-    names: dict[int, str]  # activity id -> name, for the list of efforts
+    runs: dict[int, Activity]  # activity id -> run, for the list of efforts (name, heart rate)
     excluded: list[Activity]
     predictions: list[Prediction]
     zones: list[daniels.PaceZone]
@@ -210,7 +210,7 @@ def race_report(db: Session, timezone: str, now: datetime | None = None) -> Race
     target = race_repo.get_target(db)
     return RaceReport(
         form=form,
-        names={run.id: run.name for run in kept},
+        runs={run.id: run for run in kept},
         excluded=[run for run in runs if run.excluded_from_race],
         predictions=predictions_for(form),
         zones=zones,

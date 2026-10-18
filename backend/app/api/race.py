@@ -17,7 +17,7 @@ from app.db.models import Activity
 from app.db.session import get_db
 from app.db.types import utc_now
 from app.repositories import race as race_repo
-from app.services.race.efforts import Method, Status
+from app.services.race.efforts import Method, ScoredEffort, Status
 from app.services.race.plan import Feasibility
 from app.services.race.predictor import RaceReport, race_report
 
@@ -42,6 +42,9 @@ class EffortOut(BaseModel):
     vdot: float
     method: Method  # "race" (distance and time) or "heart_rate" (pace and heart rate)
     segment: bool  # the best 5/10 km inside a longer run
+    # Heart rate of the whole run (for a segment too: the watch gives no per-km value here).
+    average_heartrate: float | None
+    max_heartrate: float | None
     weight: float  # 1 today, 0.5 after 45 days...
     used: bool  # part of the estimate (the better half)
 
@@ -117,6 +120,23 @@ class RaceOut(BaseModel):
     target: TargetOut | None
 
 
+def _effort_out(scored: ScoredEffort, run: Activity) -> EffortOut:
+    return EffortOut(
+        activity_id=run.id,
+        name=run.name,
+        day=scored.effort.day,
+        distance_m=scored.effort.distance_m,
+        time_s=scored.effort.time_s,
+        vdot=scored.vdot,
+        method=scored.method,
+        segment=scored.effort.segment,
+        average_heartrate=run.average_heartrate,
+        max_heartrate=run.max_heartrate,
+        weight=scored.weight,
+        used=scored.used,
+    )
+
+
 def _out(report: RaceReport, timezone: str) -> RaceOut:
     form = report.form
     target = None
@@ -150,18 +170,7 @@ def _out(report: RaceReport, timezone: str) -> RaceOut:
             high=form.high,
             reason=form.reason,
             efforts=[
-                EffortOut(
-                    activity_id=scored.effort.activity_id,
-                    name=report.names.get(scored.effort.activity_id, ""),
-                    day=scored.effort.day,
-                    distance_m=scored.effort.distance_m,
-                    time_s=scored.effort.time_s,
-                    vdot=scored.vdot,
-                    method=scored.method,
-                    segment=scored.effort.segment,
-                    weight=scored.weight,
-                    used=scored.used,
-                )
+                _effort_out(scored, report.runs[scored.effort.activity_id])
                 for scored in form.efforts
             ],
             excluded=[

@@ -271,6 +271,8 @@ export interface ActivityRow {
   elapsed_time_s: number
   city: string | null
   country_code: string | null // "LU", shown as a flag
+  average_heartrate: number | null // bpm, from the watch
+  max_heartrate: number | null
 }
 
 /** One route on the map (mirrors MapRouteOut). */
@@ -278,7 +280,6 @@ export interface MapRoute extends ActivityRow {
   sport_type: string
   elevation_gain_m: number | null
   average_speed_mps: number | null
-  average_heartrate: number | null
   polyline: string // encoded, simplified for the zoom level
 }
 
@@ -562,6 +563,8 @@ export interface RaceEffort {
   vdot: number
   method: 'race' | 'heart_rate'
   segment: boolean // the best 5/10 km inside a longer run
+  average_heartrate: number | null // of the whole run
+  max_heartrate: number | null
   weight: number // 1 today, 0.5 after 45 days
   used: boolean // part of the estimate
 }

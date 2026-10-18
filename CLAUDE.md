@@ -145,7 +145,8 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   yet (Garmin routes come with the details) are dots at their start, never at a gym.
 - Activity tables (`components/ActivityTable.tsx`, week list and map list): flag, town, date, name,
   sport (emoji + `--sport-*` colour: red run, green ride, purple walk, yellow strength, orange other),
-  distance (empty for strength / no distance), duration. Rows come from `api/rows.py`.
+  distance (empty for strength / no distance), duration, average and max HR (empty without a reading).
+  Rows come from `api/rows.py`. The Course page lists each run with its HR too.
 - Town: `activity.location_name` (Garmin `locationName`, Strava `location_city`), else the place's
   `city`. Country: `services/countries.py`, offline point-in-polygon on Natural Earth borders
   (`app/geodata/countries.json.gz`), never a web service. Flags on Windows: bundled font
