@@ -75,6 +75,19 @@ class Settings(BaseSettings):
     # --- Security ---
     # Fernet key used to encrypt OAuth tokens before they are written to the database.
     token_encryption_key: str = ""
+    # Argon2 fingerprint of the app password (`make set-password`), never the password
+    # itself. Empty = no login screen, only allowed outside production (phase 6).
+    app_password_hash: str = ""
+    # How long a device stays signed in.
+    session_days: int = Field(default=30, ge=1, le=365)
+
+    # --- Production (phase 6) ---
+    # Built interface (`npm run build`) served by FastAPI itself: one server, one port.
+    # Empty = not served (development uses the Vite server on port 5173).
+    frontend_dist: str = ""
+    # Nightly copies of the SQLite database; the most recent `backup_keep` are kept.
+    backup_dir: str = "./data/backups"
+    backup_keep: int = Field(default=14, ge=1, le=365)
 
     # --- AI coaches (phase 5) ---
     # Keys stay in .env (never in the code, never logged). Both empty = coaches disabled.
@@ -105,6 +118,15 @@ class Settings(BaseSettings):
     def _empty_is_default(cls, value: object) -> object:
         """``COACH_PROVIDER=`` (empty in .env) means "not set", not an invalid value."""
         return None if value == "" else value
+
+    @property
+    def auth_enabled(self) -> bool:
+        """The login screen is on as soon as a password has been set."""
+        return bool(self.app_password_hash)
+
+    @property
+    def is_production(self) -> bool:
+        return self.app_env == "production"
 
     @property
     def provider(self) -> CoachProvider | None:

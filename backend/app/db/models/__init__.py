@@ -1,6 +1,7 @@
 """All ORM models. Importing this package registers every table on ``Base.metadata``."""
 
 from app.db.models.activity import Activity, ActivityStream
+from app.db.models.auth import AuthSession
 from app.db.models.coach import (
     CoachCall,
     CoachConversation,
@@ -22,6 +23,7 @@ from app.db.models.sync import SyncCursor, SyncLog
 __all__ = [
     "Activity",
     "ActivityStream",
+    "AuthSession",
     "BodyMetric",
     "CoachCall",
     "CoachConversation",
