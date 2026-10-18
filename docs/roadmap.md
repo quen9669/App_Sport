@@ -2,8 +2,9 @@
 
 | Phase | Contenu | État |
 |---|---|---|
-| 0 | Cadrage et squelette : monorepo, outils, tests, CI | 🟡 En revue |
-| 1 | Ingestion : modèle de données, Strava, Garmin, synchros, données synthétiques | ⚪ À faire |
+| 0 | Cadrage et squelette : monorepo, outils, tests, CI | ✅ Terminé |
+| 1a | Modèle de données, connexion et synchro Strava | 🟡 En revue |
+| 1b | Garmin (bibliothèque + import de fichiers), synchro planifiée, données synthétiques, écran Sources | ⚪ À faire |
 | 2 | Profil, métriques et objectifs hebdomadaires | ⚪ À faire |
 | 3 | Carte interactive et tableaux de bord de santé | ⚪ À faire |
 | 4 | Prédicteur de course et allures | ⚪ À faire |
@@ -15,6 +16,14 @@
 - [x] `make test` passe sur le squelette
 - [x] `make dev` démarre backend et frontend, la page affiche « Backend OK »
 - [x] Lint, format et types vérifiés en local et en CI
+
+## Phase 1a : critères d'acceptation
+
+- [x] Modèle de données et migration Alembic, testée contre les modèles
+- [x] Connexion Strava OAuth avec tokens chiffrés et rafraîchis automatiquement
+- [x] Import incrémental et historique complet avec reprise, respect des quotas
+- [x] Resynchroniser ne crée aucun doublon (tests avec API Strava simulée)
+- [ ] Vérifié avec ton vrai compte Strava (quand l'application Strava sera créée)
 
 ## Points à surveiller
 
