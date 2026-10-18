@@ -73,6 +73,8 @@ erDiagram
         int stress_avg
         int steps
         float vo2max
+        int intensity_moderate_min "Garmin, toute la journée"
+        int intensity_vigorous_min "compte double dans le total"
     }
     sync_log {
         int id PK

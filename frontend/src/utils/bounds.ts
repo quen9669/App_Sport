@@ -27,6 +27,8 @@ export const GOAL_TARGET_BOUNDS: Record<GoalKind, Range> = {
   cardio_sessions: { min: 1, max: 14 },
   active_minutes: { min: 10, max: 3000 },
   distance_km: { min: 1, max: 1000 },
+  training_load: { min: 10, max: 5000 },
+  intensity_minutes: { min: 10, max: 3000 },
 }
 
 export const STRENGTH_BOUNDS = {

@@ -219,6 +219,8 @@ def seed_health(db: Session, start: date, end: date, rng: random.Random) -> int:
                 vo2max=round(49 + 2 * fitness_trend, 1),
                 body_battery_max=rng.randint(70, 100),
                 body_battery_min=rng.randint(5, 30),
+                intensity_moderate_min=rng.randint(0, 60),
+                intensity_vigorous_min=rng.randint(0, 30),
             )
         )
         day += timedelta(days=1)

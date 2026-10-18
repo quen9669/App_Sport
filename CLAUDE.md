@@ -121,3 +121,7 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - Weight: Garmin weigh-ins (`get_body_composition`, grams, a year looked back at each sync) go to
   `body_metric` with `source="garmin"`, never over a weigh-in typed in the app. The Santé page
   carries the last weigh-in forward until the next one (owner's choice: no smoothing, no invented values).
+- Goal kinds `training_load` (points, per-activity load from `training_load.activity_load`) and
+  `intensity_minutes` (Garmin daily `moderateIntensityMinutes` + 2 × `vigorousIntensityMinutes`,
+  summed per week by `health_dashboard.weekly_intensity`). Their targets are drawn as a dashed line
+  on the Santé charts (`WeeklyBarChart`); `/api/intensity-minutes` serves the weekly series.

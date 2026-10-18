@@ -1,5 +1,6 @@
 """Weekly goal progress: how much of each goal is done in a given week."""
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
 
@@ -15,8 +16,13 @@ from app.services.classification import (
     Category,
     effective_category,
 )
+from app.services.health_dashboard import weekly_intensity
 from app.services.strength import counts_on_its_own
-from app.services.weeks import Week
+from app.services.training_load import activity_load, heart_rate_params, session_load
+from app.services.weeks import Week, local_today
+
+# Load of one activity (TRIMP or estimate), see services/training_load.py.
+LoadOf = Callable[[Activity], float]
 
 
 class GoalKind(StrEnum):
@@ -24,6 +30,8 @@ class GoalKind(StrEnum):
     CARDIO_SESSIONS = "cardio_sessions"  # number of cardio sessions per week
     ACTIVE_MINUTES = "active_minutes"  # minutes of strength + cardio per week
     DISTANCE_KM = "distance_km"  # km per week, optionally only running or cycling
+    TRAINING_LOAD = "training_load"  # training load points per week (Santé page chart)
+    INTENSITY_MINUTES = "intensity_minutes"  # Garmin intensity minutes per week
 
 
 class GoalStatus(StrEnum):
@@ -91,8 +99,10 @@ _SESSION_CATEGORY = {
 }
 
 
-def _amount(goal: Goal, activity: Activity) -> float | None:
+def _amount(goal: Goal, activity: Activity, load_of: LoadOf | None) -> float | None:
     """How much one activity adds to a goal, or None if it does not count."""
+    if goal.kind == GoalKind.TRAINING_LOAD:
+        return load_of(activity) if load_of else None
     category = effective_category(activity)
     if goal.kind in _SESSION_CATEGORY:
         return 1.0 if category == _SESSION_CATEGORY[GoalKind(goal.kind)] else None
@@ -113,6 +123,8 @@ def _session_amount(goal: Goal, session: StrengthSession) -> float | None:
         return 1.0
     if goal.kind == GoalKind.ACTIVE_MINUTES:
         return float(session.duration_min or 0)
+    if goal.kind == GoalKind.TRAINING_LOAD:
+        return session_load(session)
     return None  # no cardio, no distance in a typed strength session
 
 
@@ -120,18 +132,26 @@ def compute_progress(
     goal: Goal,
     activities: list[Activity],
     sessions: list[StrengthSession] | None = None,
+    load_of: LoadOf | None = None,
+    intensity: float | None = None,
 ) -> GoalProgress:
     """Count the activities (and typed strength sessions) of the week for one goal.
 
     Several sessions on the same day each count: two classes on Saturday are
     two sessions. A typed session already recorded by the watch counts once.
-    Hidden activities don't count.
+    Hidden activities don't count. ``load_of`` is only needed by training
+    load goals: without it, they stay at 0. ``intensity`` is the week's Garmin
+    intensity minutes: they come from the watch's daily summary, not from
+    activities, so they are passed in already added up.
     """
     progress = GoalProgress(goal=goal, done=0)
+    if goal.kind == GoalKind.INTENSITY_MINUTES:
+        progress.done = float(intensity or 0)
+        return progress
     for activity in activities:
         if activity.hidden:
             continue  # hidden by hand ("Masquer"): never counted
-        amount = _amount(goal, activity)
+        amount = _amount(goal, activity, load_of)
         if amount is not None:
             progress.done += amount
             progress.activity_ids.append(activity.id)
@@ -159,12 +179,23 @@ class WeekData:
         return bool(self.progress) and all(item.achieved for item in self.progress)
 
 
+def load_function(db: Session, timezone: str) -> LoadOf:
+    """Per-activity load with today's heart rate parameters (looked up once)."""
+    params = heart_rate_params(db, local_today(timezone))
+    return lambda activity: activity_load(activity, params)[0]
+
+
 def week_progress(db: Session, week: Week, timezone: str) -> WeekData:
     """Progress of every counted goal for the week, with the week's activities and sessions."""
     start, end = week.utc_range(timezone)
     activities = activities_in_week(db, week, timezone)
     sessions = strength_repo.sessions_between(db, start, end)
-    progress = [compute_progress(goal, activities, sessions) for goal in goals_for_week(db, week)]
+    load_of = load_function(db, timezone)
+    intensity = weekly_intensity(db, [week])[0].total
+    progress = [
+        compute_progress(goal, activities, sessions, load_of, intensity)
+        for goal in goals_for_week(db, week)
+    ]
     return WeekData(week, progress, activities, sessions)
 
 
@@ -183,14 +214,16 @@ def weeks_history(db: Session, last: Week, count: int, timezone: str) -> list[We
     activities = activities_repo.activities_between(db, start, end)
     sessions = strength_repo.sessions_between(db, start, end)
     goals = counted_goals(db)
+    load_of = load_function(db, timezone)
+    intensities = weekly_intensity(db, weeks)
 
     history = []
-    for week in weeks:
+    for week, intensity in zip(weeks, intensities, strict=True):
         week_start, week_end = week.utc_range(timezone)
         week_activities = [a for a in activities if week_start <= a.start_time < week_end]
         week_sessions = [s for s in sessions if week_start <= s.performed_at < week_end]
         progress = [
-            compute_progress(goal, week_activities, week_sessions)
+            compute_progress(goal, week_activities, week_sessions, load_of, intensity.total)
             for goal in goals
             if overlaps(goal, week)
         ]

@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.db.models import BodyMetric, DailyHealth, SleepNight
 from app.db.models.enums import DataSource
+from app.services.weeks import Week
 
 # Lower number = preferred when two sources have the same day.
 SOURCE_PRIORITY: dict[str, int] = {
@@ -143,6 +144,48 @@ def _weights_carried_forward(db: Session, start: date, end: date) -> dict[date, 
         if last is not None and day >= start:
             result[day] = last
         day += timedelta(days=1)
+    return result
+
+
+@dataclass
+class WeekIntensity:
+    """Garmin intensity minutes of one week, counted like Garmin does."""
+
+    week: Week
+    moderate: int = 0
+    vigorous: int = 0
+    days: int = 0  # days with data: 0 means "no data", not "no effort"
+
+    @property
+    def total(self) -> int:
+        # Garmin's rule (WHO recommendation): a vigorous minute counts double.
+        return self.moderate + 2 * self.vigorous
+
+
+def weekly_intensity(db: Session, weeks: list[Week]) -> list[WeekIntensity]:
+    """Intensity minutes of each week in ``weeks`` (one query for all of them)."""
+    if not weeks:
+        return []
+    rows = db.scalars(
+        select(DailyHealth).where(DailyHealth.day.between(weeks[0].monday, weeks[-1].sunday))
+    )
+    by_day = _best_by_day(
+        (
+            r
+            for r in rows
+            if r.intensity_moderate_min is not None or r.intensity_vigorous_min is not None
+        ),
+        lambda daily: daily.day,
+    )
+    result = []
+    for week in weeks:
+        item = WeekIntensity(week)
+        for day, daily in by_day.items():
+            if week.monday <= day <= week.sunday:
+                item.moderate += daily.intensity_moderate_min or 0
+                item.vigorous += daily.intensity_vigorous_min or 0
+                item.days += 1
+        result.append(item)
     return result
 
 

@@ -17,6 +17,7 @@ from app.services.health_dashboard import (
     health_days,
     minutes_from_midnight,
     sleep_regularity,
+    weekly_intensity,
 )
 from app.services.training_load import (
     HeartRateParams,
@@ -25,7 +26,7 @@ from app.services.training_load import (
     heart_rate_params,
     training_load,
 )
-from app.services.weeks import week_of
+from app.services.weeks import Week, local_today, week_of
 
 TZ = "Europe/Luxembourg"
 NOW = datetime(2026, 10, 18, 18, 0, tzinfo=UTC)  # Sunday evening, week 2026-W42
@@ -203,4 +204,52 @@ def test_dashboard_routes(client: TestClient) -> None:
     assert len(load["weeks"]) == 12
     assert load["acwr"] is None
     assert load["heart_rate"]["max_hr"] is None
+    assert load["target"] is None  # no training load goal
     assert client.get("/api/health-metrics?days=3").status_code == 422
+
+
+def test_weekly_intensity_counts_vigorous_minutes_twice(db: Session) -> None:
+    w41, w42 = Week(2026, 41), Week(2026, 42)
+    # Monday and Sunday of week 42, and the Sunday before (week 41).
+    db.add(DailyHealth(source="garmin", day=date(2026, 10, 12), intensity_moderate_min=30))
+    db.add(
+        DailyHealth(
+            source="garmin",
+            day=date(2026, 10, 18),
+            intensity_moderate_min=20,
+            intensity_vigorous_min=40,
+        )
+    )
+    # Same day from a synthetic source: Garmin wins, it is not added twice.
+    db.add(DailyHealth(source="synthetic", day=date(2026, 10, 18), intensity_moderate_min=500))
+    db.add(DailyHealth(source="garmin", day=date(2026, 10, 11), intensity_vigorous_min=10))
+    db.add(DailyHealth(source="garmin", day=date(2026, 10, 13), resting_heartrate=50))  # no data
+    db.commit()
+
+    before, current = weekly_intensity(db, [w41, w42])
+
+    assert (before.total, before.days) == (20, 1)
+    assert (current.moderate, current.vigorous, current.days) == (50, 40, 2)
+    assert current.total == 50 + 2 * 40
+
+
+def test_intensity_minutes_route_and_goal(client: TestClient, db: Session) -> None:
+    body = client.get("/api/intensity-minutes").json()
+    assert len(body["weeks"]) == 12
+    assert body["target"] is None
+
+    today = week_of(local_today(TZ)).monday
+    db.add(
+        DailyHealth(
+            source="garmin", day=today, intensity_moderate_min=100, intensity_vigorous_min=50
+        )
+    )
+    db.commit()
+    goal = client.post("/api/goals", json={"kind": "intensity_minutes", "target": 350}).json()
+
+    body = client.get("/api/intensity-minutes").json()
+    assert body["target"] == 350
+    assert body["weeks"][-1]["total"] == 200
+    progress = client.get("/api/goals/progress").json()
+    item = next(i for i in progress["goals"] if i["goal"]["id"] == goal["id"])
+    assert item["done"] == 200

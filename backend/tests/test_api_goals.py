@@ -174,3 +174,21 @@ def test_hide_an_activity_removes_it_from_goals(client: TestClient, db: Session)
     assert listed["possible_duplicate"] is False
     assert listed["source"] == "strava"
     assert client.patch("/api/activities/999/hidden", json={"hidden": True}).status_code == 404
+
+
+def test_training_load_goal_uses_the_load_and_shows_on_the_chart(
+    client: TestClient, db: Session
+) -> None:
+    goal = add_goal(db, "training_load", 300)
+    # No heart rate here: the load is minutes x effort (cardio 1.4, strength 0.8).
+    add_activity(db, "Run", datetime(2026, 10, 13, 7, 0, tzinfo=UTC), 60)
+    add_activity(db, "WeightTraining", datetime(2026, 10, 15, 17, 0, tzinfo=UTC), 60)
+
+    body = client.get("/api/goals/progress", params={"week": "2026-W42"}).json()
+    item = next(i for i in body["goals"] if i["goal"]["id"] == goal.id)
+    assert item["done"] == 60 * 1.4 + 60 * 0.8
+    assert item["achieved"] is False
+
+    assert client.get("/api/training-load").json()["target"] == 300
+    too_high = client.post("/api/goals", json={"kind": "training_load", "target": 9000})
+    assert too_high.status_code == 422

@@ -34,6 +34,9 @@ def test_first_sync_imports_initial_window(db: Session) -> None:
 
     assert nights(db) == 10
     assert db.scalar(select(func.count()).select_from(DailyHealth)) == 10
+    day = db.scalars(select(DailyHealth)).first()
+    assert day is not None
+    assert (day.intensity_moderate_min, day.intensity_vigorous_min) == (22, 15)
 
 
 def test_resync_creates_no_duplicates_and_fetches_few_days(db: Session) -> None:

@@ -143,6 +143,9 @@ def map_daily(
         vo2max=_vo2max(max_metrics),
         body_battery_max=_int(stats.get("bodyBatteryHighestValue")),
         body_battery_min=_int(stats.get("bodyBatteryLowestValue")),
+        # Field names from the Garmin user summary (unverified on real data).
+        intensity_moderate_min=_int(stats.get("moderateIntensityMinutes")),
+        intensity_vigorous_min=_int(stats.get("vigorousIntensityMinutes")),
         raw={"stats": stats, "hrv": hrv, "max_metrics": max_metrics},
     )
 

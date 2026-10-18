@@ -42,6 +42,8 @@ class DailyHealthRecord:
     vo2max: float | None = None
     body_battery_max: int | None = None
     body_battery_min: int | None = None
+    intensity_moderate_min: int | None = None
+    intensity_vigorous_min: int | None = None
     raw: Any = None
 
 
