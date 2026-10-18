@@ -1,0 +1,44 @@
+# --- Secrets & local config (NEVER commit these) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+.app_sport/
+
+# --- Local data (health data is sensitive: keep it out of git) ---
+*.db
+*.sqlite
+*.sqlite3
+data/
+exports/
+*.fit
+*.FIT
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# --- Node / frontend ---
+node_modules/
+dist/
+dev-dist/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+# --- Editors & OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

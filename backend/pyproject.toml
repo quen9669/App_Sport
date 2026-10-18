@@ -1,0 +1,51 @@
+[project]
+name = "app-sport-backend"
+version = "0.1.0"
+description = "Backend API of the personal sport app (FastAPI)."
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.143.3",
+    "pydantic>=2.14.1",
+    "pydantic-settings>=2.16.0",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "httpx2>=2.13.1",
+    "mypy>=2.4.0",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "ruff>=0.17.1",
+]
+
+# ---------------------------------------------------------------------------
+# Tool configuration. Keeping it here means one file describes the project.
+# ---------------------------------------------------------------------------
+
+[tool.ruff]
+# Ruff is both our linter (finds bugs and bad patterns) and our formatter.
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# E/W: style errors, F: real bugs (unused names...), I: import order,
+# B: common pitfalls, UP: modern Python syntax, SIM: simpler code,
+# N: naming conventions, ASYNC: async mistakes.
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "N", "ASYNC"]
+
+[tool.mypy]
+# "strict" turns on every check: each function must have type annotations,
+# which makes the code easier to read and catches mistakes before running it.
+strict = true
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Makes `import app` work in tests without installing the package.
+pythonpath = ["."]
+# Lets us write `async def test_...` without decorating each test.
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
