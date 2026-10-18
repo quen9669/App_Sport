@@ -29,6 +29,7 @@ class ToolContext:
     settings: Settings
     coach: str
     now: datetime  # UTC, injected so tests can fix the date
+    conversation_id: int | None = None  # where a proposed plan comes from
 
     @property
     def timezone(self) -> str:
@@ -65,9 +66,30 @@ class Tool:
 
     def schema(self) -> dict[str, Any]:
         """Definition sent to the model."""
-        schema = self.input_model.model_json_schema()
+        schema = _inline_refs(self.input_model.model_json_schema())
         schema.pop("title", None)
         return {"name": self.name, "description": self.description, "input_schema": schema}
+
+
+def _inline_refs(schema: dict[str, Any]) -> dict[str, Any]:
+    """Replace ``{"$ref": "#/$defs/X"}`` by X itself.
+
+    Pydantic puts nested models (a plan's sessions) in ``$defs``; a flat schema
+    is understood the same way by every model provider.
+    """
+    definitions = schema.pop("$defs", {})
+
+    def resolve(node: Any) -> Any:
+        if isinstance(node, dict):
+            if "$ref" in node:
+                return resolve(definitions[node["$ref"].split("/")[-1]])
+            return {key: resolve(value) for key, value in node.items()}
+        if isinstance(node, list):
+            return [resolve(item) for item in node]
+        return node
+
+    result: dict[str, Any] = resolve(schema)
+    return result
 
 
 def run_tool(tool: Tool, ctx: ToolContext, raw_input: Any) -> tuple[str, bool]:

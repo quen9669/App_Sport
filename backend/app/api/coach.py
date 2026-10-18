@@ -7,7 +7,7 @@ coach writes, so the text appears word by word on screen.
 
 import json
 from collections.abc import Iterator
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from enum import StrEnum
 from typing import Annotated, Any
 
@@ -17,15 +17,25 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.coach.costs import month_budget
-from app.coach.engine import CoachEvent, DoneEvent, Engine, ErrorEvent, TextEvent, ToolEvent
+from app.coach.engine import (
+    CoachEvent,
+    DoneEvent,
+    Engine,
+    ErrorEvent,
+    PlanEvent,
+    TextEvent,
+    ToolEvent,
+)
 from app.coach.gemini import GeminiLLM
 from app.coach.llm import LLM, AnthropicLLM
+from app.coach.plans import plan_data
 from app.coach.tools import ALL_TOOLS
 from app.config import Settings, get_settings
-from app.db.models import CoachConversation, CoachMemory
+from app.db.models import CoachConversation, CoachMemory, CoachPlan
 from app.db.session import get_db, provide_session_factory
 from app.db.types import utc_now
 from app.repositories import coach as coach_repo
+from app.services.weeks import current_week
 
 router = APIRouter(prefix="/coach", tags=["coach"])
 
@@ -35,6 +45,7 @@ MAX_MEMORY_CHARS = 300
 
 class CoachName(StrEnum):
     TRAINING = "training"  # musculation et cardio
+    LONGEVITY = "longevity"  # santé sur le long terme
 
 
 def get_llm(settings: Settings = Depends(get_settings)) -> LLM | None:
@@ -93,12 +104,32 @@ class ConversationOut(BaseModel):
     updated_at: datetime
 
 
+class PlanSessionOut(BaseModel):
+    day: date
+    kind: str  # run, ride, strength, class, walk, mobility, rest, other
+    title: str
+    duration_min: int
+    intensity: str
+    details: str
+    why: str
+
+
+class PlanOut(BaseModel):
+    id: int
+    coach: str
+    week_start: date  # Monday
+    summary: str
+    sessions: list[PlanSessionOut]
+    status: str  # proposed, accepted, rejected, replaced
+
+
 class ShownMessage(BaseModel):
-    """A message as the screen shows it: text, and the tools the coach used."""
+    """A message as the screen shows it: text, the tools the coach used, its plans."""
 
     role: str  # "user" or "assistant"
     text: str
     tools: list[str]  # French labels, e.g. "lit ton sommeil"
+    plans: list[PlanOut] = []
 
 
 class ConversationDetailOut(ConversationOut):
@@ -114,14 +145,18 @@ def _conversation_out(conversation: CoachConversation) -> ConversationOut:
     )
 
 
-def _shown(conversation: CoachConversation) -> list[ShownMessage]:
+def _shown(db: Session, conversation: CoachConversation) -> list[ShownMessage]:
     """Merge the model's messages into what a chat shows.
 
     Tool results (stored with role "user") are not shown; the tools called
     during an answer are attached to the coach's next text.
     """
+    plans = coach_repo.plans_by_id(
+        db, [i for m in conversation.messages if m.role == "user" for i in _plan_ids(m.content)]
+    )
     shown: list[ShownMessage] = []
     pending_tools: list[str] = []
+    pending_plans: list[PlanOut] = []
     for message in conversation.messages:
         text = "".join(b.get("text", "") for b in message.content if b.get("type") == "text")
         if message.role == "assistant":
@@ -129,11 +164,36 @@ def _shown(conversation: CoachConversation) -> list[ShownMessage]:
                 if block.get("type") == "tool_use" and block["name"] in ALL_TOOLS:
                     pending_tools.append(ALL_TOOLS[block["name"]].label)
             if text:
-                shown.append(ShownMessage(role="assistant", text=text, tools=pending_tools))
-                pending_tools = []
-        elif text:
-            shown.append(ShownMessage(role="user", text=text, tools=[]))
+                shown.append(
+                    ShownMessage(
+                        role="assistant", text=text, tools=pending_tools, plans=pending_plans
+                    )
+                )
+                pending_tools, pending_plans = [], []
+        else:
+            pending_plans += [
+                PlanOut.model_validate(plan_data(plans[i]))
+                for i in _plan_ids(message.content)
+                if i in plans
+            ]
+            if text:
+                shown.append(ShownMessage(role="user", text=text, tools=[]))
     return shown
+
+
+def _plan_ids(blocks: list[dict[str, Any]]) -> list[int]:
+    """Ids of the plans proposed in these tool results (``{"plan_id": 3, ...}``)."""
+    ids = []
+    for block in blocks:
+        if block.get("type") != "tool_result" or block.get("is_error"):
+            continue
+        try:
+            plan_id = json.loads(block.get("content") or "{}").get("plan_id")
+        except (json.JSONDecodeError, AttributeError):
+            continue
+        if isinstance(plan_id, int):
+            ids.append(plan_id)
+    return ids
 
 
 def _get(db: Session, conversation_id: int) -> CoachConversation:
@@ -163,7 +223,7 @@ def create_conversation(coach: CoachName, db: Session = Depends(get_db)) -> Conv
 def read_conversation(conversation_id: int, db: Session = Depends(get_db)) -> ConversationDetailOut:
     conversation = _get(db, conversation_id)
     return ConversationDetailOut(
-        **_conversation_out(conversation).model_dump(), messages=_shown(conversation)
+        **_conversation_out(conversation).model_dump(), messages=_shown(db, conversation)
     )
 
 
@@ -187,6 +247,8 @@ def _sse(event: CoachEvent) -> str:
         name, data = "text", {"text": event.text}
     elif isinstance(event, ToolEvent):
         name, data = "tool", {"name": event.name, "label": event.label}
+    elif isinstance(event, PlanEvent):
+        name, data = "plan", event.plan
     elif isinstance(event, DoneEvent):
         name, data = "done", vars(event)
     else:
@@ -223,6 +285,45 @@ def ask(
         # No caching or buffering by a proxy: each event must arrive at once.
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+# --- Weekly plans ------------------------------------------------------------------------
+
+
+class CurrentPlansOut(BaseModel):
+    this_week: PlanOut | None  # the accepted plan of the current week
+    next_week: PlanOut | None
+
+
+class PlanDecision(BaseModel):
+    accepted: bool
+
+
+def _plan_out(plan: CoachPlan | None) -> PlanOut | None:
+    return PlanOut.model_validate(plan_data(plan)) if plan else None
+
+
+@router.get("/plans/current", response_model=CurrentPlansOut)
+def read_current_plans(
+    db: Session = Depends(get_db), settings: Settings = Depends(get_settings)
+) -> CurrentPlansOut:
+    """The accepted plans of this week and the next one (Accueil page)."""
+    monday = current_week(settings.app_timezone, utc_now()).monday
+    return CurrentPlansOut(
+        this_week=_plan_out(coach_repo.accepted_plan(db, monday)),
+        next_week=_plan_out(coach_repo.accepted_plan(db, monday + timedelta(days=7))),
+    )
+
+
+@router.patch("/plans/{plan_id}", response_model=PlanOut)
+def decide_plan(plan_id: int, payload: PlanDecision, db: Session = Depends(get_db)) -> PlanOut:
+    """Accept a proposed plan (it replaces the week's previous one) or reject it."""
+    plan = coach_repo.get_plan(db, plan_id)
+    if plan is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plan not found")
+    coach_repo.decide_plan(db, plan, payload.accepted)
+    db.commit()
+    return PlanOut.model_validate(plan_data(plan))
 
 
 # --- Memories ------------------------------------------------------------------------------
