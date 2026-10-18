@@ -53,6 +53,9 @@ class Activity(Base):
     has_heartrate: Mapped[bool] = mapped_column(default=False)
     is_manual: Mapped[bool] = mapped_column(default=False)
     is_trainer: Mapped[bool] = mapped_column(default=False)  # indoor (home trainer, treadmill)
+    # Manual correction of the automatic strength/cardio/other category (None = automatic).
+    # Syncs never touch this column, so a correction survives every re-sync.
+    category_override: Mapped[str | None] = mapped_column(String(16))
     created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now, onupdate=utc_now)
 
