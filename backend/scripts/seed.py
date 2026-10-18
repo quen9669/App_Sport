@@ -30,6 +30,8 @@ from app.db.models import (
     DailyHealth,
     RawPayload,
     SleepNight,
+    StrengthSession,
+    StrengthSet,
 )
 from app.db.models.enums import DataSource
 from app.db.session import get_session_factory
@@ -253,8 +255,68 @@ def seed_weight(db: Session, start: date, end: date, rng: random.Random) -> int:
     return count
 
 
+# A typical Monday/Thursday gym routine: (exercise, sets, reps, starting load in kg).
+STRENGTH_ROUTINE = [
+    ("Squat", 4, 8, 70.0),
+    ("Développé couché", 4, 8, 55.0),
+    ("Rowing barre", 3, 10, 45.0),
+    ("Développé militaire", 3, 10, 30.0),
+    ("Tractions", 3, 6, None),
+]
+
+
+def seed_strength(db: Session, rng: random.Random) -> int:
+    """Typed sets for every synthetic WeightTraining activity, linked to it.
+
+    Loads go up slowly over the year (progressive overload), like a real log.
+    """
+    activities = list(
+        db.scalars(
+            select(Activity)
+            .where(Activity.source == SOURCE, Activity.sport_type == "WeightTraining")
+            .order_by(Activity.start_time)
+        )
+    )
+    linked = set(db.scalars(select(StrengthSession.activity_id)))
+    count = 0
+    for index, activity in enumerate(activities):
+        if activity.id in linked:
+            continue
+        progress = index / max(len(activities), 1)
+        sets: list[StrengthSet] = []
+        for exercise, set_count, reps, load in STRENGTH_ROUTINE:
+            for number in range(1, set_count + 1):
+                weight = None if load is None else round(load * (1 + 0.2 * progress) / 2.5) * 2.5
+                sets.append(
+                    StrengthSet(
+                        position=len(sets),
+                        exercise=exercise,
+                        set_number=number,
+                        reps=reps - rng.randint(0, 2) if number == set_count else reps,
+                        weight_kg=weight,
+                        rpe=rng.randint(7, 9),
+                    )
+                )
+        db.add(
+            StrengthSession(
+                performed_at=activity.start_time,
+                duration_min=activity.elapsed_time_s // 60,
+                activity_id=activity.id,
+                sets=sets,
+            )
+        )
+        count += 1
+    db.commit()
+    return count
+
+
 def clear(db: Session) -> None:
     activity_ids = select(Activity.id).where(Activity.source == SOURCE)
+    # Typed sessions of the synthetic activities are synthetic too.
+    for session in db.scalars(
+        select(StrengthSession).where(StrengthSession.activity_id.in_(activity_ids))
+    ):
+        db.delete(session)
     db.execute(delete(ActivityStream).where(ActivityStream.activity_id.in_(activity_ids)))
     for model in (Activity, SleepNight, DailyHealth, RawPayload, BodyMetric):
         db.execute(delete(model).where(model.source == SOURCE))
@@ -280,9 +342,10 @@ def main() -> None:
         activities = seed_activities(db, start, end, rng)
         nights = seed_health(db, start, end, rng)
         weigh_ins = seed_weight(db, start, end, rng)
+        sessions = seed_strength(db, rng)
         print(
-            f"Synthetic data ready: {activities} activities, {nights} nights and "
-            f"{weigh_ins} weigh-ins ({start} to {end})."
+            f"Synthetic data ready: {activities} activities, {nights} nights, "
+            f"{weigh_ins} weigh-ins and {sessions} strength logs ({start} to {end})."
         )
 
 

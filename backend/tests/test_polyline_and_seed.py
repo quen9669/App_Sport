@@ -3,7 +3,7 @@
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.db.models import Activity, BodyMetric, SleepNight
+from app.db.models import Activity, BodyMetric, SleepNight, StrengthSession, StrengthSet
 from app.services import polyline
 from scripts import seed
 
@@ -49,3 +49,20 @@ def test_seed_weight_keeps_manual_weigh_ins(db: Session) -> None:
     seed.clear(db)
     remaining = list(db.scalars(select(BodyMetric)))
     assert [m.weight_kg for m in remaining] == [77.7]
+
+
+def test_seed_strength_links_sessions_and_clears_them(db: Session) -> None:
+    import random
+    from datetime import date
+
+    seed.seed_activities(db, date(2026, 9, 1), date(2026, 9, 30), random.Random(1))
+    created = seed.seed_strength(db, random.Random(1))
+    assert created > 0
+    assert seed.seed_strength(db, random.Random(1)) == 0  # idempotent
+    session = db.scalars(select(StrengthSession)).first()
+    assert session is not None and session.activity_id is not None
+    assert {s.exercise for s in session.sets} >= {"Squat", "Tractions"}
+
+    seed.clear(db)
+    assert db.scalar(select(func.count()).select_from(StrengthSession)) == 0
+    assert db.scalar(select(func.count()).select_from(StrengthSet)) == 0
