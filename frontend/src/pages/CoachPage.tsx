@@ -1,16 +1,20 @@
-// "Coach" page: chat with the training coach (musculation et cardio).
-// The answer arrives piece by piece (streaming); the tools the coach uses to
-// read FRANKS's data are shown as they run ("lit ton sommeil…"). Conversations
-// are kept by the backend; the month's cost and budget are always visible.
+// Coach pages: chat with the training coach ("/coach") or the longevity coach
+// ("/longevite"), same screen, different texts. The answer arrives piece by
+// piece (streaming); the tools the coach uses to read FRANKS's data are shown
+// as they run ("lit ton sommeil…"), and a proposed weekly plan appears as a
+// card to accept or modify. Conversations are kept by the backend; the
+// month's cost and budget (both coaches together) are always visible.
 import { useEffect, useRef, useState } from 'react'
 
 import {
   askCoach,
   type CoachConversation,
   type CoachName,
+  type CoachPlan,
   type CoachShownMessage,
   type CoachStatus,
   createConversation,
+  decidePlan,
   deleteConversation,
   fetchCoachStatus,
   fetchConversation,
@@ -18,21 +22,44 @@ import {
 } from '../api/client'
 import CoachMemories from '../components/CoachMemories'
 import CoachText from '../components/CoachText'
+import PlanCard from '../components/PlanCard'
 import { formatNumber } from '../utils/format'
 
-const COACH: CoachName = 'training'
+interface CoachTexts {
+  title: string
+  subtitle: string
+  suggestions: string[] // ready-made questions for an empty conversation
+}
 
-// Ready-made questions for an empty conversation.
-const SUGGESTIONS = [
-  'Comment se passe ma préparation du 10 km du 13 décembre ?',
-  'Mes séances de muscu progressent-elles ?',
-  'Ma récupération de cette semaine permet-elle une séance intense demain ?',
-  'Propose-moi la répartition de mes séances de la semaine prochaine.',
-]
+const COACHES: Record<CoachName, CoachTexts> = {
+  training: {
+    title: 'Coach muscu et cardio',
+    subtitle: 'Programmation, progression, récupération et plan de la semaine',
+    suggestions: [
+      'Comment se passe ma préparation du 10 km du 13 décembre ?',
+      'Mes séances de muscu progressent-elles ?',
+      'Ma récupération de cette semaine permet-elle une séance intense demain ?',
+      'Propose-moi un plan pour la semaine prochaine.',
+    ],
+  },
+  longevity: {
+    title: 'Coach longévité',
+    subtitle: 'Zone 2, VO2max, force, sommeil, activité quotidienne et arrêt du tabac',
+    suggestions: [
+      'Fais-moi un bilan de ma santé sur les trois derniers mois.',
+      'Est-ce que je fais assez d’endurance en zone 2 ?',
+      'Comment évolue ma VO2max ?',
+      'Où en est mon arrêt de la cigarette ?',
+    ],
+  },
+}
+
+const MODIFY_PREFIX = 'Modifie le plan : '
 
 const euros = (value: number) => `${formatNumber(value, 2)} €`
 
-export default function CoachPage() {
+export default function CoachPage({ coach }: { coach: CoachName }) {
+  const texts = COACHES[coach]
   const [status, setStatus] = useState<CoachStatus | null>(null)
   const [conversations, setConversations] = useState<CoachConversation[]>([])
   const [current, setCurrent] = useState<number | null>(null)
@@ -40,10 +67,11 @@ export default function CoachPage() {
   const [answering, setAnswering] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [answers, setAnswers] = useState(0) // refreshes the memory panel after each answer
+  const [question, setQuestion] = useState('')
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([fetchCoachStatus(), fetchConversations(COACH)])
+    Promise.all([fetchCoachStatus(), fetchConversations(coach)])
       .then(([coachStatus, list]) => {
         if (cancelled) return
         setStatus(coachStatus)
@@ -56,7 +84,7 @@ export default function CoachPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [coach])
 
   async function open(id: number) {
     setError(null)
@@ -86,7 +114,7 @@ export default function CoachPage() {
     let id = current
     try {
       if (id === null) {
-        const created = await createConversation(COACH)
+        const created = await createConversation(coach)
         id = created.id
         setCurrent(id)
         setConversations((list) => [{ ...created, title: question.slice(0, 80) }, ...list])
@@ -94,17 +122,21 @@ export default function CoachPage() {
       // The question at once, then an empty coach message that fills up.
       setMessages((list) => [
         ...list,
-        { role: 'user', text: question, tools: [] },
-        { role: 'assistant', text: '', tools: [] },
+        { role: 'user', text: question, tools: [], plans: [] },
+        { role: 'assistant', text: '', tools: [], plans: [] },
       ])
       await askCoach(id, question, (event) => {
-        if (event.type === 'text' || event.type === 'tool') {
+        if (event.type === 'text' || event.type === 'tool' || event.type === 'plan') {
           setMessages((list) => {
             const last = list.at(-1)!
-            const updated =
-              event.type === 'text'
-                ? { ...last, text: last.text + event.text }
-                : { ...last, tools: [...last.tools, event.label] }
+            let updated: CoachShownMessage
+            if (event.type === 'text') updated = { ...last, text: last.text + event.text }
+            else if (event.type === 'tool')
+              updated = { ...last, tools: [...last.tools, event.label] }
+            else {
+              const { type: _type, ...plan } = event
+              updated = { ...last, plans: [...last.plans, plan] }
+            }
             return [...list.slice(0, -1), updated]
           })
         } else if (event.type === 'done') {
@@ -138,9 +170,30 @@ export default function CoachPage() {
     }
   }
 
+  async function decide(plan: CoachPlan, accepted: boolean) {
+    try {
+      const updated = await decidePlan(plan.id, accepted)
+      // Accepting a plan replaces any other accepted plan of the same week.
+      setMessages((list) =>
+        list.map((message) => ({
+          ...message,
+          plans: message.plans.map((p) => {
+            if (p.id === updated.id) return updated
+            const sameWeek = p.week_start === updated.week_start && p.status === 'accepted'
+            return accepted && sameWeek ? { ...p, status: 'replaced' as const } : p
+          }),
+        })),
+      )
+    } catch {
+      setError('Impossible d’enregistrer ton choix sur le plan.')
+    }
+  }
+
   return (
     <>
-      <h1>Coach muscu et cardio</h1>
+      <h1>{texts.title}</h1>
+      <p className="subtitle">{texts.subtitle}</p>
+      <p className="hint">Conseils d’entraînement et d’hygiène de vie, pas un avis médical.</p>
       {status && <StatusLine status={status} />}
       <section className="card coach" aria-label="Conversation avec le coach">
         <div className="coach-bar">
@@ -169,10 +222,15 @@ export default function CoachPage() {
             </button>
           )}
         </div>
-        <Messages messages={messages} answering={answering} />
+        <Messages
+          messages={messages}
+          answering={answering}
+          onDecide={(plan, accepted) => void decide(plan, accepted)}
+          onModify={() => setQuestion(MODIFY_PREFIX)}
+        />
         {messages.length === 0 && !answering && (
           <div className="coach-suggestions">
-            {SUGGESTIONS.map((suggestion) => (
+            {texts.suggestions.map((suggestion) => (
               <button
                 key={suggestion}
                 type="button"
@@ -190,9 +248,14 @@ export default function CoachPage() {
             {error}
           </p>
         )}
-        <QuestionForm disabled={answering || !status?.configured} onAsk={ask} />
+        <QuestionForm
+          text={question}
+          onChange={setQuestion}
+          disabled={answering || !status?.configured}
+          onAsk={ask}
+        />
       </section>
-      <CoachMemories coach={COACH} refreshKey={answers} />
+      <CoachMemories coach={coach} refreshKey={answers} />
     </>
   )
 }
@@ -219,7 +282,17 @@ function StatusLine({ status }: { status: CoachStatus }) {
   )
 }
 
-function Messages({ messages, answering }: { messages: CoachShownMessage[]; answering: boolean }) {
+function Messages({
+  messages,
+  answering,
+  onDecide,
+  onModify,
+}: {
+  messages: CoachShownMessage[]
+  answering: boolean
+  onDecide: (plan: CoachPlan, accepted: boolean) => void
+  onModify: () => void
+}) {
   const end = useRef<HTMLDivElement>(null)
   useEffect(() => {
     // Follow the answer as it grows (jsdom has no scrollIntoView).
@@ -245,6 +318,15 @@ function Messages({ messages, answering }: { messages: CoachShownMessage[]; answ
           ) : (
             <p>{message.text}</p>
           )}
+          {message.plans.map((plan) => (
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              disabled={answering}
+              onDecide={(accepted) => onDecide(plan, accepted)}
+              onModify={onModify}
+            />
+          ))}
         </div>
       ))}
       <div ref={end} />
@@ -253,13 +335,21 @@ function Messages({ messages, answering }: { messages: CoachShownMessage[]; answ
 }
 
 function QuestionForm({
+  text,
+  onChange: setText,
   disabled,
   onAsk,
 }: {
+  text: string // kept by the page, so "Modifier" on a plan can start the message
+  onChange: (text: string) => void
   disabled: boolean
   onAsk: (question: string) => Promise<void>
 }) {
-  const [text, setText] = useState('')
+  const input = useRef<HTMLTextAreaElement>(null)
+  useEffect(() => {
+    // "Modifier" fills the start of the message: put the cursor at the end.
+    if (text === MODIFY_PREFIX) input.current?.focus()
+  }, [text])
   function send() {
     const question = text.trim()
     if (!question || disabled) return
@@ -279,6 +369,7 @@ function QuestionForm({
         Ta question
       </label>
       <textarea
+        ref={input}
         id="coach-question"
         rows={2}
         maxLength={4000}

@@ -1,4 +1,5 @@
-// Home page: the week's goal rings, the week's sessions and the quick weigh-in.
+// Home page: the week's goal rings, the week's sessions, the coach's accepted
+// plan and the quick weigh-in.
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -15,6 +16,7 @@ import {
 import ActivityTable from '../components/ActivityTable'
 import GoalRing from '../components/GoalRing'
 import QuickWeight from '../components/QuickWeight'
+import WeekPlanSection from '../components/WeekPlanSection'
 import { CATEGORY_LABELS, formatDayTime, formatShortDate } from '../utils/format'
 
 /** The three states of the backend check, shown with different messages. */
@@ -197,6 +199,8 @@ export default function HomePage() {
           </>
         )}
       </section>
+
+      <WeekPlanSection />
 
       <section className="card" aria-labelledby="weight-title">
         <h2 id="weight-title">Poids</h2>

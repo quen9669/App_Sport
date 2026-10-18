@@ -3,7 +3,7 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import type { CoachStatus } from '../api/client'
+import type { CoachPlan, CoachStatus } from '../api/client'
 import CoachText from '../components/CoachText'
 import { fakeBackend } from '../test/fakeBackend'
 import CoachPage from './CoachPage'
@@ -46,7 +46,7 @@ describe('CoachPage', () => {
         ),
     })
     const user = userEvent.setup()
-    render(<CoachPage />)
+    render(<CoachPage coach="training" />)
 
     expect(await screen.findByText(/Ce mois-ci : 0,12 € sur 10 €/)).toBeInTheDocument()
     await user.type(screen.getByLabelText('Ta question'), 'Comment je dors ?{Enter}')
@@ -70,8 +70,13 @@ describe('CoachPage', () => {
         ...conversation,
         title: 'Mon 10 km',
         messages: [
-          { role: 'user', text: 'Et mon 10 km ?', tools: [] },
-          { role: 'assistant', text: 'Prédiction 49:40.', tools: ['regarde tes prédictions'] },
+          { role: 'user', text: 'Et mon 10 km ?', tools: [], plans: [] },
+          {
+            role: 'assistant',
+            text: 'Prédiction 49:40.',
+            tools: ['regarde tes prédictions'],
+            plans: [],
+          },
         ],
       },
       'GET /api/coach/training/memories': [],
@@ -79,7 +84,7 @@ describe('CoachPage', () => {
         sse(['error', { message: 'Budget du mois atteint.' }]),
     })
     const user = userEvent.setup()
-    render(<CoachPage />)
+    render(<CoachPage coach="training" />)
 
     expect(await screen.findByText('Prédiction 49:40.')).toBeInTheDocument()
     expect(screen.getByRole('combobox')).toHaveValue('4')
@@ -94,7 +99,7 @@ describe('CoachPage', () => {
       'GET /api/coach/training/conversations': [],
       'GET /api/coach/training/memories': [],
     })
-    render(<CoachPage />)
+    render(<CoachPage coach="training" />)
     expect(await screen.findByText(/attend ta clé API Gemini/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Envoyer' })).toBeDisabled()
     expect(screen.getByRole('button', { name: /préparation du 10 km/ })).toBeDisabled()
@@ -112,7 +117,7 @@ describe('CoachPage', () => {
       },
     })
     const user = userEvent.setup()
-    render(<CoachPage />)
+    render(<CoachPage coach="training" />)
 
     const panel = await screen.findByRole('region', { name: 'Ce que le coach retient' })
     await user.click(await within(panel).findByRole('button', { name: 'Accepter' }))
@@ -122,6 +127,98 @@ describe('CoachPage', () => {
     await waitFor(() =>
       expect(fetchMock.mock.calls.some(([, init]) => init?.method === 'PATCH')).toBe(true),
     )
+  })
+})
+
+const plan: CoachPlan = {
+  id: 7,
+  coach: 'training',
+  week_start: '2026-10-19',
+  summary: 'Semaine d’endurance avec une séance de seuil.',
+  status: 'proposed',
+  sessions: [
+    {
+      day: '2026-10-20',
+      kind: 'run',
+      title: 'Seuil',
+      duration_min: 50,
+      intensity: '5:00 /km',
+      details: '3 x 10 min',
+      why: 'Allure de course',
+    },
+    {
+      day: '2026-10-21',
+      kind: 'rest',
+      title: 'Repos',
+      duration_min: 0,
+      intensity: '',
+      details: '',
+      why: 'Récupérer',
+    },
+  ],
+}
+
+describe('CoachPage plans', () => {
+  it('shows a proposed plan as a card that FRANKS accepts', async () => {
+    const fetchMock = fakeBackend({
+      'GET /api/coach/status': status,
+      'GET /api/coach/training/conversations': [],
+      'GET /api/coach/training/memories': [],
+      'POST /api/coach/training/conversations': { ...conversation, messages: [] },
+      'POST /api/coach/conversations/4/messages': () =>
+        sse(
+          ['tool', { name: 'propose_weekly_plan', label: 'prépare un plan de semaine' }],
+          ['plan', plan],
+          ['text', { text: 'Voici ta semaine.' }],
+          ['done', { cost_eur: 0.01, month_spent_eur: 0.13, month_limit_eur: 10 }],
+        ),
+      'PATCH /api/coach/plans/7': { ...plan, status: 'accepted' },
+    })
+    const user = userEvent.setup()
+    render(<CoachPage coach="training" />)
+    await screen.findByText(/Ce mois-ci/)
+    await user.type(screen.getByLabelText('Ta question'), 'Un plan ?{Enter}')
+
+    const card = await screen.findByRole('article', { name: 'Plan de la semaine du 19 oct.' })
+    expect(within(card).getByText('Seuil')).toBeInTheDocument()
+    expect(within(card).getByText(/5:00 \/km/)).toBeInTheDocument()
+    expect(within(card).getByText('Allure de course')).toBeInTheDocument()
+    await user.click(within(card).getByRole('button', { name: 'Accepter' }))
+    expect(await within(card).findByText(/il est sur l’Accueil/)).toBeInTheDocument()
+    const patch = fetchMock.mock.calls.find(([, init]) => init?.method === 'PATCH')
+    expect(JSON.parse(String(patch?.[1]?.body))).toEqual({ accepted: true })
+  })
+
+  it('« Modifier » starts a message to the coach', async () => {
+    fakeBackend({
+      'GET /api/coach/status': status,
+      'GET /api/coach/training/conversations': [conversation],
+      'GET /api/coach/conversations/4': {
+        ...conversation,
+        messages: [
+          { role: 'user', text: 'Un plan ?', tools: [], plans: [] },
+          { role: 'assistant', text: 'Voici.', tools: [], plans: [plan] },
+        ],
+      },
+      'GET /api/coach/training/memories': [],
+    })
+    const user = userEvent.setup()
+    render(<CoachPage coach="training" />)
+    await user.click(await screen.findByRole('button', { name: 'Modifier' }))
+    expect(screen.getByLabelText('Ta question')).toHaveValue('Modifie le plan : ')
+    expect(screen.getByLabelText('Ta question')).toHaveFocus()
+  })
+
+  it('the longevity coach has its own texts and conversations', async () => {
+    fakeBackend({
+      'GET /api/coach/status': status,
+      'GET /api/coach/longevity/conversations': [],
+      'GET /api/coach/longevity/memories': [],
+    })
+    render(<CoachPage coach="longevity" />)
+    expect(await screen.findByRole('heading', { name: 'Coach longévité' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /zone 2/ })).toBeInTheDocument()
+    expect(screen.getByText(/pas un avis médical/)).toBeInTheDocument()
   })
 })
 

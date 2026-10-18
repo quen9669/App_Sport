@@ -32,6 +32,7 @@ export default function App() {
         <NavLink to="/carte">Carte</NavLink>
         <NavLink to="/course">Course</NavLink>
         <NavLink to="/coach">Coach</NavLink>
+        <NavLink to="/longevite">Longévité</NavLink>
         <NavLink to="/profil">Profil</NavLink>
         <NavLink to="/sources">Sources</NavLink>
       </nav>
@@ -43,7 +44,9 @@ export default function App() {
           <Route path="/sante" element={<HealthPage />} />
           <Route path="/carte" element={<Lazy page={<MapPage />} />} />
           <Route path="/course" element={<RacePage />} />
-          <Route path="/coach" element={<CoachPage />} />
+          {/* A key per coach: switching page starts from a fresh screen. */}
+          <Route path="/coach" element={<CoachPage key="training" coach="training" />} />
+          <Route path="/longevite" element={<CoachPage key="longevity" coach="longevity" />} />
           <Route path="/activites/:id" element={<Lazy page={<ActivityPage />} />} />
           <Route path="/profil" element={<ProfilePage />} />
           <Route path="/sources" element={<SourcesPage />} />
