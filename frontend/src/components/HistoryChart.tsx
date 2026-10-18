@@ -47,7 +47,10 @@ export default function HistoryChart({
             contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
             cursor={{ fill: 'var(--border)', opacity: 0.4 }}
           />
-          <Legend />
+          {/* Legend text in the normal text color: the colored square carries the identity. */}
+          <Legend
+            formatter={(value: string) => <span style={{ color: 'var(--text)' }}>{value}</span>}
+          />
           {series.map((item, index) => (
             <Bar
               key={item.key}

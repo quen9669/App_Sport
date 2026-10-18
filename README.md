@@ -6,7 +6,7 @@ une carte de mes sorties, prédira mes temps de course et proposera deux coachs 
 
 > Cette application donne des conseils d'entraînement, pas un avis médical.
 
-**État actuel : phase 2a** (profil, poids, objectifs hebdomadaires et tableau de bord de la semaine). Voir [docs/roadmap.md](docs/roadmap.md).
+**État actuel : phase 2** (profil, poids, objectifs hebdomadaires, saisie des séances de musculation et historique des semaines). Voir [docs/roadmap.md](docs/roadmap.md).
 
 ## Installation (Windows avec WSL2)
 
@@ -46,7 +46,7 @@ make dev
 ```
 
 - Frontend : http://localhost:5173 (doit afficher « Backend OK » et ta semaine), puis les écrans
-  Objectifs, Profil et Sources dans la barre du haut
+  Muscu, Objectifs, Profil et Sources dans la barre du haut
 - API et sa documentation interactive : http://localhost:8000/docs
 
 `Ctrl+C` arrête les deux. Pas encore de compte configuré ? `make seed` remplit la base avec un an

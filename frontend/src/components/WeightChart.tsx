@@ -46,7 +46,10 @@ export default function WeightChart({ points }: { points: WeightPoint[] }) {
             formatter={(value) => `${formatNumber(Number(value))} kg`}
             contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
           />
-          <Legend />
+          {/* Legend text in the normal text color: the colored square carries the identity. */}
+          <Legend
+            formatter={(value: string) => <span style={{ color: 'var(--text)' }}>{value}</span>}
+          />
           <Line
             name="Pesée"
             dataKey="weight"

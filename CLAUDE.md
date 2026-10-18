@@ -94,3 +94,11 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - `body_metric` has one row per day (upsert on `measured_on`) and a `source` column so `make seed`
   weigh-ins can be removed without touching manual ones.
 - Frontend tests use `src/test/fakeBackend.ts` (fake `fetch` by "METHOD /path").
+- Typed strength sessions (`strength_session` / `strength_set`, `app/api/strength.py`) count for
+  strength and minute goals only when not already recorded on Strava: linked by `activity_id`, or
+  a strength activity within 3 h (`app/services/strength.py`). Never count both.
+- History and streak: `weeks_history()` loads a whole period in 3 queries; the current week never
+  breaks the streak. "Done" goals still count for past weeks, paused ones never do.
+- The gym draft lives in `localStorage` (`src/utils/strengthDraft.ts`) until "Terminer la séance".
+- Chart series colors are CSS variables `--series-1..4` (fixed order, validated for color
+  blindness, separate light/dark steps); legend and labels stay in text colors.

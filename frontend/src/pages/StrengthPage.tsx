@@ -285,11 +285,18 @@ export default function StrengthPage() {
                   {session.duration_min !== null && (
                     <span className="hint"> · {session.duration_min} min</span>
                   )}
-                  {summarize(session.sets).map((line) => (
-                    <div key={line} className="hint">
-                      {line}
-                    </div>
-                  ))}
+                  {/* Collapsed by default: the list stays short, details are one tap away. */}
+                  <details>
+                    <summary className="hint">
+                      {session.sets.length} séries ·{' '}
+                      {[...new Set(session.sets.map((set) => set.exercise))].join(', ')}
+                    </summary>
+                    {summarize(session.sets).map((line) => (
+                      <div key={line} className="hint">
+                        {line}
+                      </div>
+                    ))}
+                  </details>
                 </div>
                 <button
                   type="button"

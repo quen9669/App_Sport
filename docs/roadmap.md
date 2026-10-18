@@ -5,8 +5,8 @@
 | 0 | Cadrage et squelette : monorepo, outils, tests, CI | ✅ Terminé |
 | 1a | Modèle de données, connexion et synchro Strava | ✅ Terminé |
 | 1b | Garmin (bibliothèque + import de fichiers), synchro planifiée, données synthétiques, écran Sources | ✅ Terminé |
-| 2a | Profil, poids, classification des activités, objectifs et tableau de bord | 🟡 En revue |
-| 2b | Saisie des séances de musculation, historique des semaines | ⚪ À faire |
+| 2a | Profil, poids, classification des activités, objectifs et tableau de bord | ✅ Terminé |
+| 2b | Saisie des séances de musculation, historique des semaines | 🟡 En revue |
 | 3 | Carte interactive et tableaux de bord de santé | ⚪ À faire |
 | 4 | Prédicteur de course et allures | ⚪ À faire |
 | 5 | Coachs IA (musculation/cardio et longévité) | ⚪ À faire |
@@ -45,6 +45,14 @@
 - [x] Objectifs hebdomadaires (séances, minutes, km), semaine du lundi au dimanche à l'heure de
       Luxembourg, y compris aux changements d'heure
 - [x] « 3 muscu + 3 cardio » en un tap, anneaux de progression sur l'accueil (test E2E)
+
+## Phase 2b : critères d'acceptation
+
+- [x] Saisie des séances en salle : catalogue de 32 exercices en français ou saisie libre,
+      dernière charge proposée, « Répéter la série » en un tap, brouillon conservé si l'app se ferme
+- [x] Pas de double comptage avec une activité Strava de musculation (liée, ou à moins de 3 h)
+- [x] Historique des 12 dernières semaines (barres en % de la cible, avec tableau) et série de
+      semaines réussies
 
 ## Points à surveiller
 
