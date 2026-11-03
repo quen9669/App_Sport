@@ -224,7 +224,7 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 
 ## Longévité tab (owner's request)
 
-- Santé › Longévité (`/sante/longevite`, `LongevitySection`): `services/longevity.py` computes, read-only,
+- Santé › Bilan longévité (`/sante/longevite`, `LongevitySection`): `services/longevity.py` computes, read-only,
   one indicator per lever (intensity minutes and strength sessions: last 4 COMPLETE weeks; steps,
   sleep, resting HR: last 30 days; VO2max, weight, BMI: latest vs 3 months ago), each with a
   `status` against a public reference (WHO 150 min and 2 strength days, 7-9 h of sleep, 8,000
@@ -244,7 +244,7 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   them. Barlow fonts come from `@fontsource` (bundled, never a font CDN).
 - Menu in 3 folders (owner's request), all in `src/navigation.ts`: Entraînement (Ma semaine,
   Activités, Muscu, Course, Objectifs), Santé (Résumé, Sommeil, Récupération, Activité, Poids,
-  Tabac, Longévité), Coach (Muscu et cardio, Longévité, Mon plan); Réglages (Profil, Sources, Mes lieux)
+  Tabac, Bilan longévité), Coach (Muscu et cardio, Longévité, Mon plan); Réglages (Profil, Sources, Mes lieux)
   behind the gear. `AppShell` renders both a phone layout (dark top bar with the folder's tabs,
   bottom bar with the folders) and a PC sidebar (>= 60rem); CSS shows one. In unit tests both are in
   the DOM: scope queries by the nav's `aria-label`. E2E opens tabs through `e2e/nav.ts`.

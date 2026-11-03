@@ -37,7 +37,7 @@ export const FOLDERS: Folder[] = [
     { to: '/sante/activite', label: 'Activité' },
     { to: '/sante/poids', label: 'Poids' },
     { to: '/sante/tabac', label: 'Tabac' },
-    { to: '/sante/longevite', label: 'Longévité' },
+    { to: '/sante/longevite', label: 'Bilan longévité' },
   ]),
   folder('coach', 'Coach', { to: '/coach', label: 'Muscu et cardio' }, [
     { to: '/longevite', label: 'Longévité' },
