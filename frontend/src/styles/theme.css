@@ -1134,3 +1134,73 @@ textarea {
     max-width: 8rem;
   }
 }
+
+/* --- Longévité tab --- */
+/* One small card per lever: 1 per row on a phone, 2 or 3 on a PC. */
+.longevity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.75rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.longevity-item {
+  display: grid;
+  align-content: start;
+  gap: 0.3rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.longevity-item h3 {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.longevity-item p {
+  margin: 0;
+}
+
+.longevity-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.longevity-badges .badge {
+  margin-left: 0;
+}
+
+/* Verdict: colour plus the words ("Repère atteint"), never colour alone. */
+.badge.status--met,
+.badge.status--partly,
+.badge.status--below {
+  color: var(--text);
+  border-color: var(--status-color);
+  background: color-mix(in srgb, var(--status-color) 18%, transparent);
+}
+
+.status--met {
+  --status-color: var(--success);
+}
+
+.status--partly {
+  --status-color: var(--series-4);
+}
+
+.status--below {
+  --status-color: var(--danger);
+}
+
+.milestones {
+  padding-left: 0;
+  list-style: none;
+}
+
+.milestones li {
+  margin: 0.3rem 0;
+}

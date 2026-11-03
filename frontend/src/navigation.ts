@@ -37,6 +37,7 @@ export const FOLDERS: Folder[] = [
     { to: '/sante/activite', label: 'Activité' },
     { to: '/sante/poids', label: 'Poids' },
     { to: '/sante/tabac', label: 'Tabac' },
+    { to: '/sante/longevite', label: 'Longévité' },
   ]),
   folder('coach', 'Coach', { to: '/coach', label: 'Muscu et cardio' }, [
     { to: '/longevite', label: 'Longévité' },
@@ -79,6 +80,7 @@ export const HEALTH_SECTIONS = [
   'activite',
   'poids',
   'tabac',
+  'longevite',
 ] as const
 export type HealthSection = (typeof HEALTH_SECTIONS)[number]
 
