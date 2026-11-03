@@ -24,7 +24,7 @@ ALL_TOOLS: dict[str, Tool] = {
 # The training coach plans the week; the longevity coach looks at the long term
 # (no race paces, no weekly plan, but the smoke-free days).
 _TRAINING_ONLY = {"get_race_predictions", "get_pace_zones", "propose_weekly_plan"}
-_LONGEVITY_ONLY = {"get_smoke_free"}
+_LONGEVITY_ONLY = {"get_smoke_free", "get_longevity_overview"}
 COACH_TOOLS: dict[str, list[str]] = {
     "training": [name for name in ALL_TOOLS if name not in _LONGEVITY_ONLY],
     "longevity": [name for name in ALL_TOOLS if name not in _TRAINING_ONLY],

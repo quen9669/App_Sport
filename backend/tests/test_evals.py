@@ -82,7 +82,7 @@ def test_a_scenario_runs_end_to_end(settings: Settings) -> None:
         ]
     )
     result = run.evaluate(BY_NAME["smoke_free"], llm, settings)
-    assert result.version == "longevity-v1+common-v1"
+    assert result.version == "longevity-v2+common-v1"
     assert all(check.passed for check in result.checks), result.checks
     assert result.outcome.tools == ["get_smoke_free"]
     assert json.loads(result.outcome.tool_results[0])["current_streak_days"] == 17
@@ -114,10 +114,10 @@ def test_injection_and_plan_scenarios(settings: Settings) -> None:
 def test_report_compares_two_prompt_versions(
     settings: Settings, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    variant = tmp_path / "longevity-v2.md"
-    variant.write_text("<!-- version: longevity-v2 -->\nSois bref.", encoding="utf-8")
+    variant = tmp_path / "longevity-v3.md"
+    variant.write_text("<!-- version: longevity-v3 -->\nSois bref.", encoding="utf-8")
     coach, prompt = run.variant(variant)
-    assert (coach, prompt.version) == ("longevity", "longevity-v2")
+    assert (coach, prompt.version) == ("longevity", "longevity-v3")
 
     llm = FakeLLM(
         [tool_turn(("get_smoke_free", {})), text_turn("17 jours."), text_turn(VERDICT)] * 2
@@ -129,8 +129,8 @@ def test_report_compares_two_prompt_versions(
     # The variant's prompt really replaced the coach's file in the second run.
     assert "Sois bref." in llm.calls[3]["system"][0]["text"]
     report = next((tmp_path / "reports").glob("eval-*.md")).read_text(encoding="utf-8")
-    assert "| longevity-v1+common-v1 | 1 | 3/3 | 5,0 | 4,0 | 5,0 |" in report
-    assert "| longevity-v2+common-v1 | 1 | 3/3 |" in report
+    assert "| longevity-v2+common-v1 | 1 | 3/3 | 5,0 | 4,0 | 5,0 |" in report
+    assert "| longevity-v3+common-v1 | 1 | 3/3 |" in report
     assert "> 17 jours." in report
 
 
