@@ -222,6 +222,20 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   `Engine.prompt`. `tests/test_evals.py` covers it all with FakeLLM. A new prompt behaviour
   deserves a scenario.
 
+## Longévité tab (owner's request)
+
+- Santé › Longévité (`/sante/longevite`, `LongevitySection`): `services/longevity.py` computes, read-only,
+  one indicator per lever (intensity minutes and strength sessions: last 4 COMPLETE weeks; steps,
+  sleep, resting HR: last 30 days; VO2max, weight, BMI: latest vs 3 months ago), each with a
+  `status` against a public reference (WHO 150 min and 2 strength days, 7-9 h of sleep, 8,000
+  steps, BMI 18.5-25; none for VO2max, resting HR, weight) and an `evidence` level. Fewer than 7
+  days of data = no value. Strength never counts a typed session twice (`counts_on_its_own`).
+- Smoke-free: counters, WHO milestones (frontend `utils/longevity.ts`, a COMPLETE stop; the vape
+  keeps nicotine) and resting HR / HRV / sleep / steps in the 30 days before the quit date vs the
+  last 30 days (never before the quit date). Shown as a change, not a cause.
+- Route `GET /api/longevity`; the longevity coach gets the same data as `get_longevity_overview`
+  (prompt `longevity-v2`). French texts only in `utils/longevity.ts`, codes in the API.
+
 ## Interface (design pass before phase 6)
 
 - Owner's choice: clean, Garmin Connect look in the red of his "QF" logo (`src/assets/logo.png`,
@@ -230,7 +244,7 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   them. Barlow fonts come from `@fontsource` (bundled, never a font CDN).
 - Menu in 3 folders (owner's request), all in `src/navigation.ts`: Entraînement (Ma semaine,
   Activités, Muscu, Course, Objectifs), Santé (Résumé, Sommeil, Récupération, Activité, Poids,
-  Tabac), Coach (Muscu et cardio, Longévité, Mon plan); Réglages (Profil, Sources, Mes lieux)
+  Tabac, Longévité), Coach (Muscu et cardio, Longévité, Mon plan); Réglages (Profil, Sources, Mes lieux)
   behind the gear. `AppShell` renders both a phone layout (dark top bar with the folder's tabs,
   bottom bar with the folders) and a PC sidebar (>= 60rem); CSS shows one. In unit tests both are in
   the DOM: scope queries by the nav's `aria-label`. E2E opens tabs through `e2e/nav.ts`.
