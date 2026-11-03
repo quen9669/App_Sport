@@ -156,6 +156,10 @@ Hébergement choisi par FRANKS : son PC et Tailscale (guide `docs/learning/06-te
 - [x] Séances de course du plan détaillées en étapes (échauffement, fractions, récupération,
       retour au calme) avec allures cibles calculées par l'app, modifiables, et envoyées une par
       une sur la montre Garmin depuis Mon plan
+- [x] Onglet Santé › Bilan longévité : un bilan par levier (minutes d'intensité, muscu, VO2max, pas,
+      sommeil, FC au repos, poids, IMC) comparé aux repères publics avec le niveau de preuve,
+      repères OMS après l'arrêt de la cigarette et comparaison avant / depuis l'arrêt des données
+      Garmin ; le coach longévité lit le même bilan
 
 ## Points à surveiller
 

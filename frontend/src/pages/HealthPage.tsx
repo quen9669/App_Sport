@@ -1,7 +1,8 @@
 // "Santé" folder: one page per tab (see navigation.ts). The summary shows one
 // tile per measure, each opening its tab; the tabs hold the cards and charts:
 // sleep, recovery (resting HR, HRV, training load), activity (intensity
-// minutes, steps, floors), weight and the smoke-free counters.
+// minutes, steps, floors), weight, the smoke-free counters and the long-term
+// overview (Longévité).
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -16,6 +17,7 @@ import {
   type StepsAndFloors,
   type TrainingLoad,
 } from '../api/client'
+import LongevitySection from '../components/LongevitySection'
 import SmokeFreeSection from '../components/SmokeFreeSection'
 import type { HealthSection } from '../navigation'
 import { formatDuration, formatNumber, formatShortDate } from '../utils/format'
@@ -41,6 +43,7 @@ const SUBTITLES: Record<HealthSection, string> = {
   activite: 'Minutes d’intensité, pas et étages',
   poids: 'Tes pesées Garmin et celles saisies dans l’app',
   tabac: 'Tes jours sans cigarette',
+  longevite: 'Les leviers de ta santé sur le long terme',
 }
 
 const PERIODS = [7, 30, 90] as const
@@ -86,7 +89,8 @@ export default function HealthPage({ section = 'resume' }: { section?: HealthSec
 
   // Each tab only asks the backend for what it shows.
   const needs = {
-    metrics: section !== 'tabac',
+    // These two tabs load their own data.
+    metrics: section !== 'tabac' && section !== 'longevite',
     load: section === 'resume' || section === 'recuperation',
     intensity: section === 'resume' || section === 'activite',
     steps: section === 'resume' || section === 'activite',
@@ -151,8 +155,8 @@ export default function HealthPage({ section = 'resume' }: { section?: HealthSec
         </p>
       )}
 
-      {/* The summary always covers 7 days; the smoke-free card has no period. */}
-      {section !== 'resume' && section !== 'tabac' && (
+      {/* The summary always covers 7 days; the smoke-free and longevity tabs have their own. */}
+      {section !== 'resume' && section !== 'tabac' && section !== 'longevite' && (
         <div className="segmented" role="group" aria-label="Période">
           {PERIODS.map((value) => (
             <button
@@ -192,6 +196,7 @@ export default function HealthPage({ section = 'resume' }: { section?: HealthSec
       )}
       {section === 'poids' && <WeightSection days={days} />}
       {section === 'tabac' && <SmokeFreeSection />}
+      {section === 'longevite' && <LongevitySection />}
     </>
   )
 }

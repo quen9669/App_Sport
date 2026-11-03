@@ -81,3 +81,18 @@ test('Santé page: write a day with a cigarette, then remove it', async ({ page 
   await entry.getByRole('button', { name: /Supprimer/ }).click()
   await expect(entry).toHaveCount(0)
 })
+
+test('Bilan longévité: levers with their verdict, and before / since quitting', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await openTab(page, 'Santé', 'Bilan longévité')
+  const levers = page.getByRole('region', { name: 'Tes leviers' })
+  // The seed has 21 days of watch data: enough for the 30-day averages (7 days minimum).
+  const steps = levers.getByRole('listitem', { name: 'Pas par jour' })
+  await expect(steps.getByText(/pas\/jour$/).first()).toBeVisible()
+  await expect(steps.getByText('Preuve probable')).toBeVisible()
+  const quit = page.getByRole('region', { name: 'Depuis l’arrêt de la cigarette' })
+  await expect(quit.getByRole('row', { name: /FC au repos/ })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'En parler au coach longévité' })).toBeVisible()
+})

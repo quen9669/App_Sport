@@ -37,7 +37,7 @@ def test_each_coach_has_its_own_tools_and_prompt() -> None:
     assert "get_smoke_free" in longevity and "get_smoke_free" not in training
     assert {"get_daily_activity", "get_vo2max_trend", "get_sleep"} <= longevity
     prompt = prompts.system_prompt("longevity")
-    assert prompt.version == "longevity-v1+common-v1"
+    assert prompt.version == "longevity-v2+common-v1"
     assert "bien établi" in prompt.text and "complément" in prompt.text
 
 

@@ -1,4 +1,5 @@
-"""Tools for the longevity coach: daily activity, VO2max, heart-rate zones, smoke-free days.
+"""Tools for the longevity coach: daily activity, VO2max, heart-rate zones, smoke-free days,
+and the overview of the Longévité screen.
 
 Like the other tools, they reuse the app's own numbers (the Santé page) and
 send summaries, never raw streams or positions.
@@ -19,6 +20,7 @@ from app.repositories import profile as profile_repo
 from app.repositories import smoking as smoking_repo
 from app.services.classification import Category, effective_category
 from app.services.health_dashboard import health_days, weekly_intensity, weekly_steps
+from app.services.longevity import overview
 from app.services.smoking import DEFAULT_QUIT_DATE, CigaretteDay, summarize
 from app.services.training_load import heart_rate_params
 from app.services.weeks import Week, current_week
@@ -148,6 +150,43 @@ def get_smoke_free(ctx: ToolContext, _: NoInput) -> dict[str, Any]:
     }
 
 
+def get_longevity_overview(ctx: ToolContext, _: NoInput) -> dict[str, Any]:
+    """The numbers of the Longévité screen, so the coach and FRANKS see the same thing."""
+    result = overview(ctx.db, ctx.timezone, ctx.now)
+    smoke = result.smoke_free
+    return {
+        "today": result.today.isoformat(),
+        "indicators": [
+            {
+                "key": i.key,
+                "value": i.value,
+                "previous_period": i.previous,
+                "unit": i.unit,
+                "status": i.status.value if i.status else None,
+                "evidence": i.evidence.value,
+                "samples": i.samples,
+            }
+            for i in result.indicators
+        ],
+        "smoke_free": {
+            "quit_date": smoke.quit_date.isoformat(),
+            "days_since_quit": smoke.days_since_quit,
+            "current_streak_days": smoke.current_streak,
+            "cigarettes_since_quit": smoke.cigarettes,
+            "before_period": f"{smoke.before_start.isoformat()} to {smoke.before_end.isoformat()}",
+            "since_period": f"{smoke.after_start.isoformat()} to {result.today.isoformat()}",
+            "comparisons": [vars(c) for c in smoke.comparisons],
+        },
+        "note": "Windows: intensity and strength = average of the last 4 complete weeks "
+        "(previous_period = the 4 weeks before); steps, sleep, resting HR = last 30 days "
+        "(previous = the 30 before); VO2max, weight = latest vs about 3 months ago. "
+        "status compares with public references (WHO 150 min and 2 strength days per week, "
+        "7-9 h of sleep, BMI 18.5-25); None = no reference or not enough data. "
+        "The before/since quit comparison shows a change, not its cause (training, season, "
+        "stress and vaping also play a part).",
+    }
+
+
 TOOLS = [
     Tool(
         "get_daily_activity",
@@ -178,5 +217,15 @@ TOOLS = [
         "regarde tes jours sans cigarette",
         NoInput,
         get_smoke_free,
+    ),
+    Tool(
+        "get_longevity_overview",
+        "Overview of the Longévité screen: long-term markers (intensity minutes, strength "
+        "sessions, VO2max, steps, sleep, resting HR, weight, BMI) with their status against "
+        "public references and evidence level, plus resting HR, HRV, sleep and steps in the "
+        "30 days before the quit date versus the last 30 days.",
+        "regarde ton bilan longévité",
+        NoInput,
+        get_longevity_overview,
     ),
 ]

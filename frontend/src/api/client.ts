@@ -630,6 +630,50 @@ export const deleteCigaretteDay = (day: string) =>
 export const saveQuitDate = (quitDate: string) =>
   sendJson<Smoking>('PUT', '/api/smoking/quit-date', { quit_date: quitDate })
 
+// --- Longévité (mirrors backend/app/api/longevity.py) ---
+
+export type LongevityStatus = 'met' | 'partly' | 'below'
+export type LongevityEvidence = 'established' | 'likely' | 'uncertain'
+
+/** One long-term marker: its value, the same one a period earlier, and a verdict. */
+export interface LongevityIndicator {
+  key: string // "intensity_minutes", "strength_sessions", "vo2max"...
+  value: number | null // null: not enough data yet
+  previous: number | null // 4 weeks, 30 days or 3 months earlier (see the key)
+  unit: string
+  status: LongevityStatus | null // null: no public reference, or no value
+  evidence: LongevityEvidence
+  samples: number // days, nights or weeks behind the value
+}
+
+/** One measure in the 30 days before the quit date and in the last 30 days. */
+export interface QuitComparison {
+  key: string // "resting_hr", "hrv_ms", "sleep_h", "steps"
+  unit: string
+  before: number | null
+  after: number | null
+  before_days: number
+  after_days: number
+}
+
+export interface Longevity {
+  today: string
+  indicators: LongevityIndicator[]
+  smoke_free: {
+    quit_date: string
+    days_since_quit: number
+    smoke_free_days: number
+    current_streak: number
+    cigarettes: number
+    before_start: string
+    before_end: string
+    after_start: string
+    comparisons: QuitComparison[]
+  }
+}
+
+export const fetchLongevity = () => request<Longevity>('GET', '/api/longevity')
+
 // --- Race predictor ---
 
 /** One run used (or considered) by the form estimate. */
