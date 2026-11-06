@@ -1,0 +1,1928 @@
+{
+  ".claude/settings.json": {
+    "mtime": 1793976174.6948378,
+    "seen": 1793976181.5482202,
+    "ast_hash": "0a0ef578e59e2bb38c69f1dcb49a0e1a",
+    "semantic_hash": ""
+  },
+  ".github/dependabot.yml": {
+    "mtime": 1793976109.7374568,
+    "seen": 1793976181.5482292,
+    "ast_hash": "7ea6ececcd031a07eed36e50cf4e813b",
+    "semantic_hash": ""
+  },
+  ".github/workflows/ci.yml": {
+    "mtime": 1793976109.7382936,
+    "seen": 1793976181.5482326,
+    "ast_hash": "7484710b685c5fcc54a5b2a41394bdbd",
+    "semantic_hash": ""
+  },
+  "backend/alembic/env.py": {
+    "mtime": 1793976109.7385864,
+    "seen": 1793976181.5482342,
+    "ast_hash": "b2fbede90bb0dbea10d08f3e69a2e650",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_0811-180f3a71acd6_initial_schema_for_ingestion.py": {
+    "mtime": 1793976109.738658,
+    "seen": 1793976181.5482361,
+    "ast_hash": "d5b65087292c17e44777eda4ea3165f8",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_0842-b1cd14864cef_profile_body_metrics_goals_and_category_.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.548237,
+    "ast_hash": "420a1dc7925f0f8e82a5adfaa6c10bc9",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_1019-207e4cace852_strength_sessions_and_sets.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.5482385,
+    "ast_hash": "2c379760187d8dfab35db67cf2f6041b",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_1100-5bf6d8c96b49_activity_dedupe_and_hide_columns.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.54824,
+    "ast_hash": "8298b28eea97b9291d66fa8c8541dfb8",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_1320-5974acb22aa2_daily_intensity_minutes.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.548241,
+    "ast_hash": "01c97456453b34d22cf4d32e21806772",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_1337-8b334a381cde_places_for_activities_without_gps.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.548242,
+    "ast_hash": "26bbeb0e43abd03d24e01c9ad8d83ce1",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_1353-c32f1c56a3a9_smoke_free_tracking.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.5482435,
+    "ast_hash": "f1a73e61e1ee1df02bf32acc1ef5b417",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_1422-3137e628324e_activity_start_location_and_place_city.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.5482447,
+    "ast_hash": "6de5d4aab5ce6adbc3e4ffc887f60d49",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_1446-377f6c977436_race_target_and_exclusion.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.548246,
+    "ast_hash": "9e01fe552509694b1cbec8a3bcb7962e",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_1522-4ae8dc6985f1_coach_conversations_memory_and_calls.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.5482473,
+    "ast_hash": "00bb4fe0fc0aea8eac295d6a9b4bc53c",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_1610-7c7fe564fda1_daily_floors.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.548248,
+    "ast_hash": "03f68a5207762423d7366d43eb1f91af",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_1621-a7f0075fa79a_coach_weekly_plans.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.5482492,
+    "ast_hash": "160685d44d42a93ea5ec11764b6b1143",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/2026_10_18_1754-8703e63f2538_login_sessions.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.5482504,
+    "ast_hash": "321e9b006ca228166bb288f249d565fd",
+    "semantic_hash": ""
+  },
+  "backend/app/__init__.py": {
+    "mtime": 1793976109.7387736,
+    "seen": 1793976181.5482514,
+    "ast_hash": "9b3ccea34266ab69ea2ca25a7097531a",
+    "semantic_hash": ""
+  },
+  "backend/app/api/__init__.py": {
+    "mtime": 1793976109.7390625,
+    "seen": 1793976181.5482526,
+    "ast_hash": "4f859e9ce21862a4c76d69238a34c224",
+    "semantic_hash": ""
+  },
+  "backend/app/api/activities.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482538,
+    "ast_hash": "8db293a5856080d5ebfddf1580f6a73b",
+    "semantic_hash": ""
+  },
+  "backend/app/api/auth.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482547,
+    "ast_hash": "f454de4ba0b0f20692b2ff0f6eadefc8",
+    "semantic_hash": ""
+  },
+  "backend/app/api/coach.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482557,
+    "ast_hash": "d640f2a1e7d561c5851a9e9fce7539a1",
+    "semantic_hash": ""
+  },
+  "backend/app/api/dashboards.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482576,
+    "ast_hash": "65dd94a0cd39d758fb8cbad25e8efc75",
+    "semantic_hash": ""
+  },
+  "backend/app/api/goals.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482585,
+    "ast_hash": "13c4740b5e6e1edcac265c412e412cc6",
+    "semantic_hash": ""
+  },
+  "backend/app/api/health.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482595,
+    "ast_hash": "e044984ad9de3b41a2f8f5d141a2c84b",
+    "semantic_hash": ""
+  },
+  "backend/app/api/health_data.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482607,
+    "ast_hash": "93d6a7643952185dc3980ef825bbf5a1",
+    "semantic_hash": ""
+  },
+  "backend/app/api/longevity.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.548262,
+    "ast_hash": "128c68683f818bbd3ec06ced8a208983",
+    "semantic_hash": ""
+  },
+  "backend/app/api/maps.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.548263,
+    "ast_hash": "1284eea10f9a89cd272cacc4c2e04896",
+    "semantic_hash": ""
+  },
+  "backend/app/api/places.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482643,
+    "ast_hash": "eef243f2c2fc93d21a38e8ee595f842f",
+    "semantic_hash": ""
+  },
+  "backend/app/api/plan_workouts.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482655,
+    "ast_hash": "2a27afcad2ed9b4a75ac5d389a70e1ea",
+    "semantic_hash": ""
+  },
+  "backend/app/api/profile.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482664,
+    "ast_hash": "662a8e0e9b7b517961341843d0592957",
+    "semantic_hash": ""
+  },
+  "backend/app/api/race.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482676,
+    "ast_hash": "7b2ae9bf967b4003b40713efd81ff60f",
+    "semantic_hash": ""
+  },
+  "backend/app/api/rows.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.548269,
+    "ast_hash": "eaca457c1ac174f36c5c2c40d3d047b9",
+    "semantic_hash": ""
+  },
+  "backend/app/api/smoking.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.548276,
+    "ast_hash": "046a9dd050348644c40607f357eb66ff",
+    "semantic_hash": ""
+  },
+  "backend/app/api/strava.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.548278,
+    "ast_hash": "784c92846158b0d2c5d03a3bc41ae7be",
+    "semantic_hash": ""
+  },
+  "backend/app/api/strength.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482795,
+    "ast_hash": "3a31fd97293ae744e2f4cb5fcf4bb67b",
+    "semantic_hash": ""
+  },
+  "backend/app/api/sync.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482814,
+    "ast_hash": "8b76c2857700bdd10a62811a09b2851b",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/__init__.py": {
+    "mtime": 1793976109.739079,
+    "seen": 1793976181.5482824,
+    "ast_hash": "00cc9bc38743e97b2699757d44eee3ca",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/costs.py": {
+    "mtime": 1793976109.7396817,
+    "seen": 1793976181.5482833,
+    "ast_hash": "aa4201d17742879f109589dc377b9d93",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/engine.py": {
+    "mtime": 1793976109.7396817,
+    "seen": 1793976181.5482845,
+    "ast_hash": "82c9e47394466684fefb64028a7db56b",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/gemini.py": {
+    "mtime": 1793976109.7396817,
+    "seen": 1793976181.5482857,
+    "ast_hash": "ace74b0a1a1e87a1681a2fdcf9dffe6c",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/history.py": {
+    "mtime": 1793976109.7396817,
+    "seen": 1793976181.5482867,
+    "ast_hash": "a188d6d4ada5981c66424b4df90f2f9f",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/llm.py": {
+    "mtime": 1793976109.7396817,
+    "seen": 1793976181.5482876,
+    "ast_hash": "42742487f68c99fd0dbb0aa01973d190",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/plans.py": {
+    "mtime": 1793976109.7396817,
+    "seen": 1793976181.54829,
+    "ast_hash": "09025bfd130c6bb180988a404140980e",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/prompts/__init__.py": {
+    "mtime": 1793976109.7396817,
+    "seen": 1793976181.548291,
+    "ast_hash": "89a8bfe1a7a76712ce0bbb095e403752",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/tools/__init__.py": {
+    "mtime": 1793976109.7399073,
+    "seen": 1793976181.5482924,
+    "ast_hash": "e9c615fa56fbab4738520cb0140a7afb",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/tools/activities.py": {
+    "mtime": 1793976109.740023,
+    "seen": 1793976181.548293,
+    "ast_hash": "15451fe2354ad0a14d9a26b143d78cbb",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/tools/base.py": {
+    "mtime": 1793976109.740023,
+    "seen": 1793976181.548294,
+    "ast_hash": "a39fe51a29d23681b64ea7c3618929ef",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/tools/health.py": {
+    "mtime": 1793976109.740023,
+    "seen": 1793976181.5482953,
+    "ast_hash": "4e58821247a3886c29b20d602c04f009",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/tools/longevity.py": {
+    "mtime": 1793976109.740023,
+    "seen": 1793976181.5482965,
+    "ast_hash": "9e92dd0207db5a931d3bd9ffa81fe56e",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/tools/memory.py": {
+    "mtime": 1793976109.740023,
+    "seen": 1793976181.5482974,
+    "ast_hash": "23ef2aa4647a94bcc82857f2ddb37b5d",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/tools/plan.py": {
+    "mtime": 1793976109.740023,
+    "seen": 1793976181.5482984,
+    "ast_hash": "c5f896f49a5d02e5bb696b74d6024653",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/tools/profile.py": {
+    "mtime": 1793976109.740023,
+    "seen": 1793976181.5482998,
+    "ast_hash": "68ad58dd4ed9ad48f08db40d49946c6f",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/tools/race.py": {
+    "mtime": 1793976109.740023,
+    "seen": 1793976181.5483007,
+    "ast_hash": "47c49afeb7647e55e3bdadd5ea623418",
+    "semantic_hash": ""
+  },
+  "backend/app/config.py": {
+    "mtime": 1793976109.740023,
+    "seen": 1793976181.548302,
+    "ast_hash": "f56bd6819328b24d408c66a9d1182e2f",
+    "semantic_hash": ""
+  },
+  "backend/app/db/__init__.py": {
+    "mtime": 1793976109.740023,
+    "seen": 1793976181.5483027,
+    "ast_hash": "003f099a9314135bd951d71cb8fd49fd",
+    "semantic_hash": ""
+  },
+  "backend/app/db/base.py": {
+    "mtime": 1793976109.740362,
+    "seen": 1793976181.5483036,
+    "ast_hash": "a2288c9689c0abab0a18a00654534b19",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/__init__.py": {
+    "mtime": 1793976109.740362,
+    "seen": 1793976181.5483046,
+    "ast_hash": "a5d616f9e4c65a1f935cb59167903e0d",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/activity.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.548306,
+    "ast_hash": "9eb8b2e9751fb50ad1a3122af58a354c",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/auth.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.5483067,
+    "ast_hash": "49aaf620eb9d58651193acc1bfb07fef",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/coach.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.5483077,
+    "ast_hash": "0906bc7034543502b37d7760b7865f21",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/credential.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.5483088,
+    "ast_hash": "512324fd827c5065aebe823b179bccb9",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/enums.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.5483096,
+    "ast_hash": "e29cb9aa0b3347a14614328f7ba5be59",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/goal.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.5483105,
+    "ast_hash": "b1840d260845e9830fe901348c535590",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/health.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.5483115,
+    "ast_hash": "9b5a80c7a49dd08e9247a00e00b156dd",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/place.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.548313,
+    "ast_hash": "db379f3e8d51204d1933f892a33327bb",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/profile.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.548314,
+    "ast_hash": "14f31a9e605008637abee72b123459ff",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/race.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.5483148,
+    "ast_hash": "3ff492469527bc827466c50e0c7b7c2a",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/raw.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.548316,
+    "ast_hash": "66dac3b5a5775110f168d3bc1b789d46",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/smoking.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.548317,
+    "ast_hash": "0933dcb7790247564a95ff3f9235f1f0",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/strength.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.5483181,
+    "ast_hash": "de24fc856e8bedce73c3045f2267df81",
+    "semantic_hash": ""
+  },
+  "backend/app/db/models/sync.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.5483193,
+    "ast_hash": "02240700dbdb5b4c1afc9b17fa4e9546",
+    "semantic_hash": ""
+  },
+  "backend/app/db/session.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.54832,
+    "ast_hash": "b6da3b6d460af757ea6a1a2bc3e06241",
+    "semantic_hash": ""
+  },
+  "backend/app/db/types.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.548321,
+    "ast_hash": "d8fc9c38306c86d66fb06b7f89f3f4bb",
+    "semantic_hash": ""
+  },
+  "backend/app/dependencies.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.5483222,
+    "ast_hash": "271cc33c884d13baf0d8e4593bf0ed2d",
+    "semantic_hash": ""
+  },
+  "backend/app/frontend.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.5483234,
+    "ast_hash": "9208d31606893b864ecee865fff5a9e2",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/__init__.py": {
+    "mtime": 1793976109.7404106,
+    "seen": 1793976181.5483243,
+    "ast_hash": "b0e79a252e1499fa53b987dcd70f24fd",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/health/__init__.py": {
+    "mtime": 1793976109.74192,
+    "seen": 1793976181.5483253,
+    "ast_hash": "3ff744a2a579f5d93cf77af7fa90b135",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/health/file_import.py": {
+    "mtime": 1793976109.7419457,
+    "seen": 1793976181.5483267,
+    "ast_hash": "e9af2bbbeb3b3569d3ceb44fa9ebb754",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/health/garmin_activities.py": {
+    "mtime": 1793976109.7419457,
+    "seen": 1793976181.5483277,
+    "ast_hash": "4a3a26617f35e1141d05350dee42b9c9",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/health/garmin_connect.py": {
+    "mtime": 1793976109.7419457,
+    "seen": 1793976181.5483286,
+    "ast_hash": "100279438ce396cf374e8dbc328a09b5",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/health/garmin_workouts.py": {
+    "mtime": 1793976109.7419457,
+    "seen": 1793976181.5483298,
+    "ast_hash": "115db7401c5278146eef613f40920187",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/health/provider.py": {
+    "mtime": 1793976109.7419457,
+    "seen": 1793976181.548331,
+    "ast_hash": "c372fe06432d0892e7e4419480d79ad8",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/health/validation.py": {
+    "mtime": 1793976109.7419457,
+    "seen": 1793976181.548332,
+    "ast_hash": "b7c40b6a7229d32c73d0696b4e65ee6e",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/strava/__init__.py": {
+    "mtime": 1793976109.7419457,
+    "seen": 1793976181.5483332,
+    "ast_hash": "0ff731918574eb8d56c33d83bb1c326b",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/strava/client.py": {
+    "mtime": 1793976109.7421966,
+    "seen": 1793976181.5483341,
+    "ast_hash": "603bb532d3b5920f33d6c21248b6d1a9",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/strava/mappers.py": {
+    "mtime": 1793976109.7421966,
+    "seen": 1793976181.5483363,
+    "ast_hash": "a588a315de49c6625299d1a53ebba723",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/strava/oauth.py": {
+    "mtime": 1793976109.7421966,
+    "seen": 1793976181.5483375,
+    "ast_hash": "2d24f834bbeec296b38d349a625afbff",
+    "semantic_hash": ""
+  },
+  "backend/app/integrations/strava/rate_limit.py": {
+    "mtime": 1793976109.7421966,
+    "seen": 1793976181.5483387,
+    "ast_hash": "2a313fca21455fbaad8b79c1a7b88747",
+    "semantic_hash": ""
+  },
+  "backend/app/logging_config.py": {
+    "mtime": 1793976109.7421966,
+    "seen": 1793976181.5483396,
+    "ast_hash": "a0b534668b3194d935723d6095eff05c",
+    "semantic_hash": ""
+  },
+  "backend/app/main.py": {
+    "mtime": 1793976109.7421966,
+    "seen": 1793976181.5483408,
+    "ast_hash": "9cc2d07c8f69bbc16d3f1d20b18e8f0c",
+    "semantic_hash": ""
+  },
+  "backend/app/repositories/__init__.py": {
+    "mtime": 1793976109.7421966,
+    "seen": 1793976181.5483418,
+    "ast_hash": "3c1c6c8c8322bf14f4bb2d49c9f22db1",
+    "semantic_hash": ""
+  },
+  "backend/app/repositories/activities.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.5483427,
+    "ast_hash": "c35c7e64c654483513b958e3368444fd",
+    "semantic_hash": ""
+  },
+  "backend/app/repositories/coach.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.548344,
+    "ast_hash": "1fd05bad0eadeb411254aa74004132c5",
+    "semantic_hash": ""
+  },
+  "backend/app/repositories/credentials.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.5483446,
+    "ast_hash": "69747098d4f220ebc3f55c2d465d3a33",
+    "semantic_hash": ""
+  },
+  "backend/app/repositories/goals.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.5483456,
+    "ast_hash": "b6d4d9fcae32c7a455a2d8d58d4bef6f",
+    "semantic_hash": ""
+  },
+  "backend/app/repositories/health.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.5483465,
+    "ast_hash": "3588772750537431629be7920e5c5d93",
+    "semantic_hash": ""
+  },
+  "backend/app/repositories/profile.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.5483477,
+    "ast_hash": "b960022ce8c029321d49e8e5c721d618",
+    "semantic_hash": ""
+  },
+  "backend/app/repositories/race.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.5483484,
+    "ast_hash": "2ea5468fd7dc554b45d76e00d6231bca",
+    "semantic_hash": ""
+  },
+  "backend/app/repositories/smoking.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.5483494,
+    "ast_hash": "d8499384a8e36d0bcebf5ad1163a1d4f",
+    "semantic_hash": ""
+  },
+  "backend/app/repositories/strength.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.54835,
+    "ast_hash": "c6e5f2db12b903c556ea0f2cdd600ac1",
+    "semantic_hash": ""
+  },
+  "backend/app/repositories/sync.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.5483513,
+    "ast_hash": "47b937ad891d88faf1f4867efe96c8c7",
+    "semantic_hash": ""
+  },
+  "backend/app/scheduler.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.5483522,
+    "ast_hash": "72f830f35a78ad756905627ba49d79fa",
+    "semantic_hash": ""
+  },
+  "backend/app/security.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.5483532,
+    "ast_hash": "d5a41b829e43490f409eb642be356f86",
+    "semantic_hash": ""
+  },
+  "backend/app/services/__init__.py": {
+    "mtime": 1793976109.742389,
+    "seen": 1793976181.5483544,
+    "ast_hash": "14fb1881aee7fafb9814bdfd42a04e73",
+    "semantic_hash": ""
+  },
+  "backend/app/services/activity_location.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483556,
+    "ast_hash": "7ec8dbabe08a6aabce99f9b502af8e74",
+    "semantic_hash": ""
+  },
+  "backend/app/services/activity_map.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483565,
+    "ast_hash": "d1586d55deb5ef8c9c4d8febc12ea4f7",
+    "semantic_hash": ""
+  },
+  "backend/app/services/auth.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483577,
+    "ast_hash": "c240b934394533920ef739b60d260b58",
+    "semantic_hash": ""
+  },
+  "backend/app/services/backup.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483587,
+    "ast_hash": "176548f5e6ae014efb92ea2d25c34a7d",
+    "semantic_hash": ""
+  },
+  "backend/app/services/classification.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483594,
+    "ast_hash": "40f014c4dae7287a844d5191356acc9d",
+    "semantic_hash": ""
+  },
+  "backend/app/services/countries.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483603,
+    "ast_hash": "5087c11b9de81319a762aa54b0d57ac5",
+    "semantic_hash": ""
+  },
+  "backend/app/services/crypto.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483615,
+    "ast_hash": "a99b7eecd2e59bc2156fc0a3e929ce0c",
+    "semantic_hash": ""
+  },
+  "backend/app/services/dedupe.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483623,
+    "ast_hash": "28baded9bc278e02d96d1f827eaa2a97",
+    "semantic_hash": ""
+  },
+  "backend/app/services/exercises.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483632,
+    "ast_hash": "e9f4ec3096a3db25a4c0593444a8860b",
+    "semantic_hash": ""
+  },
+  "backend/app/services/garmin_activity_sync.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.548364,
+    "ast_hash": "4b7031a027a34a1e3399821524493873",
+    "semantic_hash": ""
+  },
+  "backend/app/services/garmin_push.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.548365,
+    "ast_hash": "3045fd0f3967b8a006746a4f0e312e1c",
+    "semantic_hash": ""
+  },
+  "backend/app/services/geo.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.548366,
+    "ast_hash": "871592c0bca8914dfe5dcb7c433fe366",
+    "semantic_hash": ""
+  },
+  "backend/app/services/goals.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.548367,
+    "ast_hash": "0dff560dbd1f6f43ee48d6109c5f2d4f",
+    "semantic_hash": ""
+  },
+  "backend/app/services/health_dashboard.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483682,
+    "ast_hash": "3f3aa24c0334bea0aa06a0e5261897d8",
+    "semantic_hash": ""
+  },
+  "backend/app/services/health_sync.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483692,
+    "ast_hash": "88dd975f7f858f23b62debb7fed7b45c",
+    "semantic_hash": ""
+  },
+  "backend/app/services/jobs.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483701,
+    "ast_hash": "d3cc883e61f41a2b186c30b854b0424c",
+    "semantic_hash": ""
+  },
+  "backend/app/services/longevity.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.5483713,
+    "ast_hash": "afcfc9c717bf21fd52e4e85e81e9f609",
+    "semantic_hash": ""
+  },
+  "backend/app/services/places.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.548372,
+    "ast_hash": "3c78aa369750d816908c2970ff4171a3",
+    "semantic_hash": ""
+  },
+  "backend/app/services/polyline.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.548373,
+    "ast_hash": "7456a4ea53c07b16a2868278ac2bd1df",
+    "semantic_hash": ""
+  },
+  "backend/app/services/race/__init__.py": {
+    "mtime": 1793976109.7426631,
+    "seen": 1793976181.548374,
+    "ast_hash": "a7e9a10d3cd004b661af398cf4370d19",
+    "semantic_hash": ""
+  },
+  "backend/app/services/race/daniels.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.5483751,
+    "ast_hash": "a33452ebe1454fd44d5495ead51eb699",
+    "semantic_hash": ""
+  },
+  "backend/app/services/race/efforts.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.5483758,
+    "ast_hash": "e5b0816a76522e9bad8d4e428d6f514e",
+    "semantic_hash": ""
+  },
+  "backend/app/services/race/plan.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.5483768,
+    "ast_hash": "3917ab3340513743523a84661975d018",
+    "semantic_hash": ""
+  },
+  "backend/app/services/race/predictor.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.5483778,
+    "ast_hash": "806ca7fe5c2b4fda5710dde57d4f095a",
+    "semantic_hash": ""
+  },
+  "backend/app/services/race/riegel.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.548379,
+    "ast_hash": "5c5499ff033509d4639c3a819bd7a5a1",
+    "semantic_hash": ""
+  },
+  "backend/app/services/smoking.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.54838,
+    "ast_hash": "a49fad5886f145a4c6856f12f6190ba1",
+    "semantic_hash": ""
+  },
+  "backend/app/services/strava_auth.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.5483809,
+    "ast_hash": "1a2fe47cfb43cb758ad9d994a90b96e2",
+    "semantic_hash": ""
+  },
+  "backend/app/services/strava_sync.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.548382,
+    "ast_hash": "db887fae1be511756455f10a39f507c4",
+    "semantic_hash": ""
+  },
+  "backend/app/services/stream_codec.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.548383,
+    "ast_hash": "0d139f35cd2696501837b8e750926ad8",
+    "semantic_hash": ""
+  },
+  "backend/app/services/strength.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.5483837,
+    "ast_hash": "b53fdffede5bf15f6e2244df3c60219b",
+    "semantic_hash": ""
+  },
+  "backend/app/services/training_load.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.5483847,
+    "ast_hash": "5e3db113b9cecdf4da2957df61a899b7",
+    "semantic_hash": ""
+  },
+  "backend/app/services/weeks.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.5483859,
+    "ast_hash": "69c0d8da6392e48424eece879e855a93",
+    "semantic_hash": ""
+  },
+  "backend/app/services/workouts.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.5483866,
+    "ast_hash": "0ef52611a52b91cfc440a303013e51fd",
+    "semantic_hash": ""
+  },
+  "backend/evals/__init__.py": {
+    "mtime": 1793976109.74328,
+    "seen": 1793976181.5483875,
+    "ast_hash": "a94868dbdb43465dc36f857a94a32566",
+    "semantic_hash": ""
+  },
+  "backend/evals/checks.py": {
+    "mtime": 1793976109.7437322,
+    "seen": 1793976181.5483887,
+    "ast_hash": "9507e120a239320a41815f95da0eff9f",
+    "semantic_hash": ""
+  },
+  "backend/evals/judge.py": {
+    "mtime": 1793976109.7437322,
+    "seen": 1793976181.5483897,
+    "ast_hash": "686447c15eccd6a7b7579fb1519a1c5c",
+    "semantic_hash": ""
+  },
+  "backend/evals/report.py": {
+    "mtime": 1793976109.7437322,
+    "seen": 1793976181.5483906,
+    "ast_hash": "2af9c93ff7ff9a6465591f28ee82c613",
+    "semantic_hash": ""
+  },
+  "backend/evals/run.py": {
+    "mtime": 1793976109.7437322,
+    "seen": 1793976181.5483916,
+    "ast_hash": "e17852472a3a2abbd155df1952e417bd",
+    "semantic_hash": ""
+  },
+  "backend/evals/scenarios.py": {
+    "mtime": 1793976109.7437322,
+    "seen": 1793976181.5483928,
+    "ast_hash": "2fe56470469972ab7cf4c13d746f54d6",
+    "semantic_hash": ""
+  },
+  "backend/pyproject.toml": {
+    "mtime": 1793976109.7437322,
+    "seen": 1793976181.5483935,
+    "ast_hash": "0eae5e69a89690eab145f89efbce4226",
+    "semantic_hash": ""
+  },
+  "backend/scripts/__init__.py": {
+    "mtime": 1793976109.7437322,
+    "seen": 1793976181.5483944,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "backend/scripts/backup.py": {
+    "mtime": 1793976109.743945,
+    "seen": 1793976181.5483956,
+    "ast_hash": "c0fd600e2ed86c6d7f9526351fe439eb",
+    "semantic_hash": ""
+  },
+  "backend/scripts/seed.py": {
+    "mtime": 1793976109.743945,
+    "seen": 1793976181.5483968,
+    "ast_hash": "b4a06c48c1473983325d1fc2bba6c015",
+    "semantic_hash": ""
+  },
+  "backend/scripts/set_password.py": {
+    "mtime": 1793976109.743945,
+    "seen": 1793976181.5483978,
+    "ast_hash": "398c4c62785a3e290e69203866ca9b97",
+    "semantic_hash": ""
+  },
+  "backend/tests/__init__.py": {
+    "mtime": 1793976109.743945,
+    "seen": 1793976181.5483987,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "backend/tests/conftest.py": {
+    "mtime": 1793976109.7440596,
+    "seen": 1793976181.5484,
+    "ast_hash": "93fd3ad7e182681266d17b2e05a76570",
+    "semantic_hash": ""
+  },
+  "backend/tests/fixtures/__init__.py": {
+    "mtime": 1793976109.7440596,
+    "seen": 1793976181.5484009,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "backend/tests/fixtures/fake_llm.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484018,
+    "ast_hash": "b3cfe470b469c2e777df89be07bb468f",
+    "semantic_hash": ""
+  },
+  "backend/tests/fixtures/garmin.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548403,
+    "ast_hash": "e50a4452b2fb34d1bd39febc7a32abf8",
+    "semantic_hash": ""
+  },
+  "backend/tests/fixtures/strava.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548404,
+    "ast_hash": "7b80c70e7559186b6001725f559478f7",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_api_goals.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548405,
+    "ast_hash": "01a31ea6e8423e2f70ca6add0fc068ae",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_api_health_data.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484056,
+    "ast_hash": "b87abd3a1432bd7e104409097dfe7d8a",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_api_profile.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484068,
+    "ast_hash": "619f4d89ce6d851c1f8ada46bbedd990",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_api_strava.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484078,
+    "ast_hash": "3c89f85c12401a9179da67194397bf3e",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_api_strength.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484085,
+    "ast_hash": "7a7da242ae6bc9186cd64c348c25f52e",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_auth.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484097,
+    "ast_hash": "26ef8b9350b11d247a81e2e475afcdb0",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_backup.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548412,
+    "ast_hash": "0d948086a6c9db5636f36113c2615e6d",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_coach.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484133,
+    "ast_hash": "16c6d0080ec6e53e87851d82c7d963a3",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_coach_gemini.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548416,
+    "ast_hash": "768d14db93d9989957ecb8970e9385c2",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_coach_longevity_plan.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548417,
+    "ast_hash": "7e1732dfd75f1096551b43bc836e1dcf",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_crypto.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548418,
+    "ast_hash": "d2e06ad0e4aecb43ed162430f8cd66d9",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_dashboards.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548419,
+    "ast_hash": "2eea55e7eb3d02af6f62873474698d07",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_evals.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484202,
+    "ast_hash": "a467603901370a0b2d39d8f0a4e72cf2",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_garmin_activities.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548421,
+    "ast_hash": "b7c81ba8b258617bfbd9e7c6883aacea",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_health.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484219,
+    "ast_hash": "c6d48f2554cd7f842ffb12872f0e833a",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_health_providers.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484228,
+    "ast_hash": "92bfe43e3b21d7f93d5475a8ba751460",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_health_sync.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484254,
+    "ast_hash": "9820b134e743a4911b2c5117f3e987b3",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_location.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484269,
+    "ast_hash": "86d14fcf9466a8e0cdedb1603ee1c043",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_logging_config.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484276,
+    "ast_hash": "60397d8fbb953a6b86734a3ea7985499",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_longevity.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484285,
+    "ast_hash": "d6664142632fb8675ce8e42661e20539",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_map.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484297,
+    "ast_hash": "44971a92611eaac32d7cc1ffea976ab1",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_migrations.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548431,
+    "ast_hash": "173207db79e1558bbf1981f87e69d259",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_plan_workouts.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484319,
+    "ast_hash": "a73fa1433975de6b4018fc5783acca8a",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_polyline_and_seed.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484326,
+    "ast_hash": "c25f090d39cbb1bb34c02ca7ad96f9e2",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_race.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484338,
+    "ast_hash": "2cc8f746fe8005d9bef06b9366dfe8b4",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_scheduler.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548435,
+    "ast_hash": "a6a31370b0534525d4e75ab97b7820f4",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_security_headers.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484397,
+    "ast_hash": "a38f73e7efa0fd362e44f97f13f3d36d",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_smoking.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548441,
+    "ast_hash": "9ede63a0a103f8113c446f5927cc0f17",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_strava_client.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548442,
+    "ast_hash": "c172aea43fa8e942b703aff3a61ba94e",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_strava_oauth.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548443,
+    "ast_hash": "2b9f5a97a6077a2af6b01fcae1dd04df",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_strava_rate_limit.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484443,
+    "ast_hash": "09b4dc550d40309dddd1b4b44391cd96",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_strava_sync.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548445,
+    "ast_hash": "b929338f8016185615c16bc56402c462",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_stream_codec.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.548446,
+    "ast_hash": "620c05127944b05da62a4f806634f060",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_weeks_and_classification.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484512,
+    "ast_hash": "e74aa4beba79305da0867df781aae9a6",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_weights.py": {
+    "mtime": 1793976109.744105,
+    "seen": 1793976181.5484526,
+    "ast_hash": "4f732933b0cc5b57a043220f9dc242ae",
+    "semantic_hash": ""
+  },
+  "frontend/.oxlintrc.json": {
+    "mtime": 1793976109.7468152,
+    "seen": 1793976181.5484536,
+    "ast_hash": "029f4905006c1fffd96bc863e2d98d3e",
+    "semantic_hash": ""
+  },
+  "frontend/.prettierrc.json": {
+    "mtime": 1793976109.747112,
+    "seen": 1793976181.5484543,
+    "ast_hash": "75e4513fd50c39fde2000e2e82e6c5f5",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/coach.spec.ts": {
+    "mtime": 1793976109.747112,
+    "seen": 1793976181.5484557,
+    "ast_hash": "126e0b4223386dcbd912ba32f24ac5b4",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/goals.spec.ts": {
+    "mtime": 1793976109.7472003,
+    "seen": 1793976181.5484574,
+    "ast_hash": "5060e7f9cc265ef24d3fd760054968f9",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/health.spec.ts": {
+    "mtime": 1793976109.7472003,
+    "seen": 1793976181.5484586,
+    "ast_hash": "b8f3607d169fb1edd730ba936de75e77",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/map.spec.ts": {
+    "mtime": 1793976109.7472003,
+    "seen": 1793976181.548461,
+    "ast_hash": "1ec3c9799fd0ca7c776087a62505ad34",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/nav.ts": {
+    "mtime": 1793976109.7472003,
+    "seen": 1793976181.5484622,
+    "ast_hash": "20a4f28d0a23e396385dbdc6d2db53cb",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/race.spec.ts": {
+    "mtime": 1793976109.7472003,
+    "seen": 1793976181.548463,
+    "ast_hash": "2e6ad1d98a66820eea29810d2517cc33",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/smoke.spec.ts": {
+    "mtime": 1793976109.7472003,
+    "seen": 1793976181.5484638,
+    "ast_hash": "da7a8a268eaae582a527a61a2167911d",
+    "semantic_hash": ""
+  },
+  "frontend/e2e/strength.spec.ts": {
+    "mtime": 1793976109.7472003,
+    "seen": 1793976181.548465,
+    "ast_hash": "001a35b9fc6af902b2c6077153753518",
+    "semantic_hash": ""
+  },
+  "frontend/package.json": {
+    "mtime": 1793976109.7472003,
+    "seen": 1793976181.548466,
+    "ast_hash": "9cf1d4eeac6421e0dbae3ff65d40979a",
+    "semantic_hash": ""
+  },
+  "frontend/playwright.config.ts": {
+    "mtime": 1793976109.7472003,
+    "seen": 1793976181.548467,
+    "ast_hash": "c3b2ff03b463d6a5f25152949d66ab00",
+    "semantic_hash": ""
+  },
+  "frontend/src/App.test.tsx": {
+    "mtime": 1793976109.7480774,
+    "seen": 1793976181.548468,
+    "ast_hash": "9530bcc14fabdd9b1bc5d14f5f022fa4",
+    "semantic_hash": ""
+  },
+  "frontend/src/App.tsx": {
+    "mtime": 1793976109.7487867,
+    "seen": 1793976181.5484693,
+    "ast_hash": "4fa97186252a609d10d6420a4168728b",
+    "semantic_hash": ""
+  },
+  "frontend/src/api/client.test.ts": {
+    "mtime": 1793976109.7487867,
+    "seen": 1793976181.5484703,
+    "ast_hash": "4637b34d74633f695300387df9f084c4",
+    "semantic_hash": ""
+  },
+  "frontend/src/api/client.ts": {
+    "mtime": 1793976109.748847,
+    "seen": 1793976181.548471,
+    "ast_hash": "0b0528b707cc598a3671cea062fc6864",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ActivityMap.tsx": {
+    "mtime": 1793976109.748847,
+    "seen": 1793976181.5484722,
+    "ast_hash": "3ced591bbc4847266298270dc18ecca1",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ActivityTable.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484731,
+    "ast_hash": "fc2ab3b0ea23645a0dc3594baaf0ea21",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/AppBanners.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484738,
+    "ast_hash": "049982c1c494b2d69fde669fc565ec37",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/AppShell.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484748,
+    "ast_hash": "77c49c04d48bac3cd783a1eeaaf1ac25",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/AuthGate.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484757,
+    "ast_hash": "ebafcb8aada98ab502cdb8384e276805",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/CoachMemories.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484796,
+    "ast_hash": "cbcd382719a6b69efda205bf19b9e6d8",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/CoachText.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.548481,
+    "ast_hash": "a58443333bbc3158a662f784eee3a840",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/DetailCharts.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.548482,
+    "ast_hash": "b486873404162099279d59fbfbee74b7",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/DeviceSection.test.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484831,
+    "ast_hash": "e2b85d9044a72629ba4a0bd30a4a6232",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/DeviceSection.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.548484,
+    "ast_hash": "48921008f4914066a0c69fbbd1004a51",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/GoalRing.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.548485,
+    "ast_hash": "5560fb1189c6357ed37f805c7a7a4b2f",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/HistoryChart.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484862,
+    "ast_hash": "e4ca60deed1a739fb9366de6dfc0dad0",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/LongevitySection.test.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.548487,
+    "ast_hash": "c2a8cec209daaca6677605cc2a55dfcf",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/LongevitySection.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.548488,
+    "ast_hash": "e2ed73cc12a0d82cc0b8fa48b7038c18",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/OfflineBanner.test.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484889,
+    "ast_hash": "2d90730439133767666017649057e88c",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/PlacesPanel.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.54849,
+    "ast_hash": "056169bdfd2bc2ac7acaa9a50148c4f7",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/PlanCard.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.548491,
+    "ast_hash": "6608f85fb8e18f34efae303dd0fc385f",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/QuickWeight.test.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484924,
+    "ast_hash": "05e4bf4093e029f43ae11d4541b3358b",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/QuickWeight.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484943,
+    "ast_hash": "eb50a1e3eba572bc1dd2d5b43f104c92",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/RoutesMap.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484955,
+    "ast_hash": "bc3c88c29f9ead4983f37f275045e231",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/RunGarminActions.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484967,
+    "ast_hash": "eae08b4daa048b4313acd7f12acdc53e",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/SmokeFreeSection.test.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5484989,
+    "ast_hash": "86a25820a21baa16a64e45b39d827468",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/SmokeFreeSection.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5485003,
+    "ast_hash": "b29127fa68670ca3a353446f4de4037f",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/TodayPlan.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5485013,
+    "ast_hash": "c98acdd961e52557058de5ba4ad1cdf0",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/TrendChart.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5485022,
+    "ast_hash": "9befaf2ea59ad2d033eb59cce45eefc7",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/WeekPlanSection.test.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5485034,
+    "ast_hash": "08454700303392302a58bc2bb5fe1f47",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/WeekPlanSection.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5485044,
+    "ast_hash": "51639e59636eafd35a55d710fb625ccc",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/WeeklyBarChart.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5485055,
+    "ast_hash": "e76888d8e33080419fef80e2283e1545",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/WeightChart.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5485067,
+    "ast_hash": "7f9005945482f6af08c42819328c6a3f",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/WorkoutEditor.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5485077,
+    "ast_hash": "d66cbf072f6c384505a3ada6bb5ed047",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/icons.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5485086,
+    "ast_hash": "0962988d755f324b5bb811d594420477",
+    "semantic_hash": ""
+  },
+  "frontend/src/main.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5485096,
+    "ast_hash": "697ddbbf3f909b73ca12a9017a7da5ca",
+    "semantic_hash": ""
+  },
+  "frontend/src/navigation.ts": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5485108,
+    "ast_hash": "66bc2d4f8c83954b19ef96c599e11591",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/ActivityPage.test.tsx": {
+    "mtime": 1793976109.749296,
+    "seen": 1793976181.5485117,
+    "ast_hash": "a1108b39d9e93e58a24e60a6edd2b7c1",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/ActivityPage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.5485127,
+    "ast_hash": "dd40e59d8292f01d1e816235ff49fe4d",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/CoachPage.test.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548514,
+    "ast_hash": "b0f3640628ba7b4d339194033bfb2f7b",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/CoachPage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548515,
+    "ast_hash": "6738d9cd17406b9effab1f1239a8d6ef",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/GoalsPage.test.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.5485158,
+    "ast_hash": "a3edb20f29978c6403c23e2b5db68c01",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/GoalsPage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.5485168,
+    "ast_hash": "d55fba7d3d5a2cfa88e8f63189fb2009",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/HealthPage.test.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548518,
+    "ast_hash": "1f858616f31b26230d994803ca882599",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/HealthPage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548519,
+    "ast_hash": "38b53c9c526ab5571425039981b198ee",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/HomePage.test.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.5485198,
+    "ast_hash": "b28cc32854bf99add8a00563e121d73e",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/HomePage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548521,
+    "ast_hash": "e35530d3f5fe0fc5c6e439abe03bdbad",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/LoginPage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548522,
+    "ast_hash": "caadfe88994f5a56443b15f23de8e0f4",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/MapPage.test.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548523,
+    "ast_hash": "0e5a0c631cd88f908b9ad39845cd4381",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/MapPage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.5485241,
+    "ast_hash": "714eaa701cdd911d6e56aba5a32e0310",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/PlacesPage.test.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548525,
+    "ast_hash": "97ebf8eb7e163af05dcfe959aad6207a",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/PlacesPage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548526,
+    "ast_hash": "ead11010671f905680a904359c702545",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/PlanPage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548527,
+    "ast_hash": "350c2e21c188962101050a339690d5dd",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/ProfilePage.test.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548528,
+    "ast_hash": "9a23dfe3ec3b214cc5c817f678884d85",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/ProfilePage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548529,
+    "ast_hash": "94f0d580bb3d06dbde5726336d6c23de",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/RacePage.test.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.5485299,
+    "ast_hash": "877b5d610c5af13f25bd8e558768dcde",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/RacePage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548531,
+    "ast_hash": "5f01e5cc632a306771c7f3dc1c7e908b",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/SourcesPage.test.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548532,
+    "ast_hash": "0c42192ff8a2ae6317709f56da55e6e5",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/SourcesPage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548533,
+    "ast_hash": "13eea8338bc83bd01e612050a9ea026a",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/StrengthPage.test.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.5485342,
+    "ast_hash": "22dba070480cd7b49cdd019d28737898",
+    "semantic_hash": ""
+  },
+  "frontend/src/pages/StrengthPage.tsx": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.5485353,
+    "ast_hash": "79ea3441b23f3eb64bd95a37aa95b556",
+    "semantic_hash": ""
+  },
+  "frontend/src/pwa/install.ts": {
+    "mtime": 1793976109.750156,
+    "seen": 1793976181.548536,
+    "ast_hash": "3de9233c1b5db525ad34b05138033992",
+    "semantic_hash": ""
+  },
+  "frontend/src/pwa/offlineData.ts": {
+    "mtime": 1793976109.7510023,
+    "seen": 1793976181.548537,
+    "ast_hash": "a0b168f89111e7b1078fed56c685af57",
+    "semantic_hash": ""
+  },
+  "frontend/src/test/fakeBackend.ts": {
+    "mtime": 1793976109.7510023,
+    "seen": 1793976181.5485382,
+    "ast_hash": "5e840efea32674b8d5751b0585e367ca",
+    "semantic_hash": ""
+  },
+  "frontend/src/test/setup.ts": {
+    "mtime": 1793976109.7511265,
+    "seen": 1793976181.5485392,
+    "ast_hash": "127e020f10f7da7b47a590b4f1476a5c",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/activity.test.ts": {
+    "mtime": 1793976109.7511265,
+    "seen": 1793976181.5485399,
+    "ast_hash": "c0eb05acd8966716da668462f82ba652",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/activity.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485408,
+    "ast_hash": "9170f1ef3e9b7b155f3b7b48c16152fa",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/bounds.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.548542,
+    "ast_hash": "c7ea63e8ae8e6a32de0372de50ce1aa3",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/format.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485427,
+    "ast_hash": "a5d9af03e6e78c0abb7fee02d9d64025",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/health.test.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485437,
+    "ast_hash": "37a8d6637c7810def632ec66055e66b1",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/health.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.548545,
+    "ast_hash": "5c9a4404c8f17ba3c3136c82d1d1cc1e",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/history.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.548546,
+    "ast_hash": "b6c132f7b6902c71aea01983967adc20",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/longevity.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485468,
+    "ast_hash": "6a8e8f653772b645a8e53e82eab34ee5",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/profileForm.test.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485477,
+    "ast_hash": "b3b9b34f9d534fdcfd8dd39fe3d479f7",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/profileForm.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.548549,
+    "ast_hash": "23bcaa5125e308bd357381ffb1b35d5a",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/race.test.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.54855,
+    "ast_hash": "45840882c71caf5ce59c35f453465f08",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/race.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485508,
+    "ast_hash": "cfa21d3be3f203f96503b1bc5923b1b3",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/strengthDraft.test.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485518,
+    "ast_hash": "d1593c236b259e041dbbe68db5321ab6",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/strengthDraft.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485528,
+    "ast_hash": "008ae5f153f3d394605a95e9723ec635",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/tiles.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485537,
+    "ast_hash": "f4c6d92b6a1e6314ce25f460a8cbc7bf",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/week.test.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485547,
+    "ast_hash": "f02ef34b43ccda783bb8d0d040a18baa",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/week.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485556,
+    "ast_hash": "0010d9110573cb9aea8553875b38f10d",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/weight.test.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485566,
+    "ast_hash": "03f7c2080de3c31e6d4ad3147f6ff46f",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/weight.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485575,
+    "ast_hash": "66a1fea354e89557d7401793a5a842b9",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/workout.test.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.548559,
+    "ast_hash": "91ed96b610bb49f43cbbbebc2b24ea75",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/workout.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.54856,
+    "ast_hash": "b61e94a912a4bb8a63423819bcca4449",
+    "semantic_hash": ""
+  },
+  "frontend/src/vite-env.d.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485609,
+    "ast_hash": "12b0a14775e7c24e3868c507929dd88a",
+    "semantic_hash": ""
+  },
+  "frontend/tsconfig.app.json": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485618,
+    "ast_hash": "2da3eabb463a0492b9e7a631755472ab",
+    "semantic_hash": ""
+  },
+  "frontend/tsconfig.json": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485632,
+    "ast_hash": "cebcd0aef9a53b9c724ac53266f03437",
+    "semantic_hash": ""
+  },
+  "frontend/tsconfig.node.json": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485642,
+    "ast_hash": "d744b943991e5c06ff558aa0d0b0334a",
+    "semantic_hash": ""
+  },
+  "frontend/vite.config.ts": {
+    "mtime": 1793976109.751174,
+    "seen": 1793976181.5485651,
+    "ast_hash": "970f0d28774b4aa289b3f424850ef03b",
+    "semantic_hash": ""
+  },
+  "scripts/windows/autostart.sh": {
+    "mtime": 1793976109.75174,
+    "seen": 1793976181.5485663,
+    "ast_hash": "776c0ac4d96d9281912997586b4fd7e4",
+    "semantic_hash": ""
+  },
+  "scripts/windows/start-app.sh": {
+    "mtime": 1793976109.7517743,
+    "seen": 1793976181.5485673,
+    "ast_hash": "c952e8097936b61cc7b7f2ed9704eb30",
+    "semantic_hash": ""
+  },
+  ".github/pull_request_template.md": {
+    "mtime": 1793976109.7382936,
+    "seen": 1793976181.5485682,
+    "ast_hash": "6583734fe791e49f6380006d30d5c7d5",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1793976174.6798716,
+    "seen": 1793976181.5485692,
+    "ast_hash": "c11356b7d89403bd7592fd28a4245bc1",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1793976109.7382936,
+    "seen": 1793976181.5485702,
+    "ast_hash": "d8d2da2ad65d01c2f5e81d515cce8ce0",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/prompts/common.md": {
+    "mtime": 1793976109.7399073,
+    "seen": 1793976181.548571,
+    "ast_hash": "86091158014e14977769d66606e680ca",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/prompts/longevity.md": {
+    "mtime": 1793976109.7399073,
+    "seen": 1793976181.5485718,
+    "ast_hash": "e93bf750eaa4da22e41c3db2b448528d",
+    "semantic_hash": ""
+  },
+  "backend/app/coach/prompts/training.md": {
+    "mtime": 1793976109.7399073,
+    "seen": 1793976181.548573,
+    "ast_hash": "53c25427495de1c64d77f68f001c84c9",
+    "semantic_hash": ""
+  },
+  "docs/adr/0001-stack.md": {
+    "mtime": 1793976109.7466488,
+    "seen": 1793976181.548574,
+    "ast_hash": "b8eeebff8a8fea28575b64be86ed4be1",
+    "semantic_hash": ""
+  },
+  "docs/architecture.md": {
+    "mtime": 1793976109.7466488,
+    "seen": 1793976181.548575,
+    "ast_hash": "30e9633366d03dcfa16f48a499ef0f2e",
+    "semantic_hash": ""
+  },
+  "docs/data-model.md": {
+    "mtime": 1793976109.7466488,
+    "seen": 1793976181.548576,
+    "ast_hash": "d3cdbd620094330d8c8db56780681b34",
+    "semantic_hash": ""
+  },
+  "docs/learning/00-github.md": {
+    "mtime": 1793976109.7466488,
+    "seen": 1793976181.548577,
+    "ast_hash": "33283d151a9291b79a67a856e344fc24",
+    "semantic_hash": ""
+  },
+  "docs/learning/00-outils.md": {
+    "mtime": 1793976109.7468152,
+    "seen": 1793976181.548578,
+    "ast_hash": "c3528573bc9bf1fe00d5cfbbf3c397d4",
+    "semantic_hash": ""
+  },
+  "docs/learning/01-strava-setup.md": {
+    "mtime": 1793976109.7468152,
+    "seen": 1793976181.5485792,
+    "ast_hash": "35c4038b347ed3e7140d4dd5127e0d8b",
+    "semantic_hash": ""
+  },
+  "docs/learning/02-garmin-setup.md": {
+    "mtime": 1793976109.7468152,
+    "seen": 1793976181.5485804,
+    "ast_hash": "23301bd30601fb28f0d49d4b72cf6265",
+    "semantic_hash": ""
+  },
+  "docs/learning/03-coach-api-key.md": {
+    "mtime": 1793976109.7468152,
+    "seen": 1793976181.5485814,
+    "ast_hash": "c8b0e762f10b8ae3454f26a12d134f2a",
+    "semantic_hash": ""
+  },
+  "docs/learning/04-evaluer-les-coachs.md": {
+    "mtime": 1793976109.7468152,
+    "seen": 1793976181.5485823,
+    "ast_hash": "98d456c73b3bd6d39a036f7e92abfe95",
+    "semantic_hash": ""
+  },
+  "docs/learning/05-securite-et-installation.md": {
+    "mtime": 1793976109.7468152,
+    "seen": 1793976181.5485835,
+    "ast_hash": "38375373069bed4f66b228c166f31898",
+    "semantic_hash": ""
+  },
+  "docs/learning/06-telephone-tailscale.md": {
+    "mtime": 1793976109.7468152,
+    "seen": 1793976181.5485845,
+    "ast_hash": "a0ed142cf4a66adbb1029a32d731a436",
+    "semantic_hash": ""
+  },
+  "docs/roadmap.md": {
+    "mtime": 1793976109.7468152,
+    "seen": 1793976181.5485854,
+    "ast_hash": "8b70acb9bbc003ea2152ad1671c149d4",
+    "semantic_hash": ""
+  },
+  "frontend/index.html": {
+    "mtime": 1793976109.7472003,
+    "seen": 1793976181.5485866,
+    "ast_hash": "c3f49c20dc0eac8a01a8cfec0dde1aae",
+    "semantic_hash": ""
+  },
+  "frontend/public/favicon.png": {
+    "mtime": 1793976109.7472003,
+    "seen": 1793976181.5485876,
+    "ast_hash": "1b80edd90784da9d8b727da84f7fd023",
+    "semantic_hash": ""
+  },
+  "frontend/public/icons/apple-touch-icon.png": {
+    "mtime": 1793976109.7479732,
+    "seen": 1793976181.5485888,
+    "ast_hash": "eb3ec841d72897a4050c7c89743c58c6",
+    "semantic_hash": ""
+  },
+  "frontend/public/icons/icon-192.png": {
+    "mtime": 1793976109.7480774,
+    "seen": 1793976181.5485897,
+    "ast_hash": "80f286209c9dfcd82120da60f7d9bfc9",
+    "semantic_hash": ""
+  },
+  "frontend/public/icons/icon-512.png": {
+    "mtime": 1793976109.7480774,
+    "seen": 1793976181.548591,
+    "ast_hash": "3e01fdef351139fadf8d75285a5b3c06",
+    "semantic_hash": ""
+  },
+  "frontend/public/icons/icon-maskable-512.png": {
+    "mtime": 1793976109.7480774,
+    "seen": 1793976181.5485919,
+    "ast_hash": "10e6dd48490ae07f88f91f12dfe68c75",
+    "semantic_hash": ""
+  },
+  "frontend/src/assets/logo.png": {
+    "mtime": 1793976109.748847,
+    "seen": 1793976181.5485928,
+    "ast_hash": "34095342fdbbb4f06734326e4fb03b27",
+    "semantic_hash": ""
+  },
+  "frontend/package-lock.json": {
+    "mtime": 1793976109.7472003,
+    "seen": 1793976181.548594,
+    "ast_hash": "dbb6966dff8d292fe9329df0f1ebdfc5",
+    "semantic_hash": ""
+  }
+}
