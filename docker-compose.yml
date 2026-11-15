@@ -27,6 +27,8 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       COACH_PROVIDER: ${COACH_PROVIDER:-}
       COACH_MONTHLY_BUDGET_EUR: ${COACH_MONTHLY_BUDGET_EUR:-10}
+      # Address of the Grafana dashboard (button on Réglages > Monitoring); empty = no button.
+      GRAFANA_URL: ${GRAFANA_URL:-}
       APP_TIMEZONE: Europe/Luxembourg
     volumes:
       - app-sport-data:/data

@@ -88,6 +88,9 @@ class Settings(BaseSettings):
     # Nightly copies of the SQLite database; the most recent `backup_keep` are kept.
     backup_dir: str = "./data/backups"
     backup_keep: int = Field(default=14, ge=1, le=365)
+    # Address of the "App Sport" Grafana dashboard, for the button of the Monitoring
+    # page. Empty = no button. Grafana is only reachable inside the tailnet.
+    grafana_url: str = ""
 
     # --- AI coaches (phase 5) ---
     # Keys stay in .env (never in the code, never logged). Both empty = coaches disabled.

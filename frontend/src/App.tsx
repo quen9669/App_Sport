@@ -10,6 +10,7 @@ import GoalsPage from './pages/GoalsPage'
 import { isHealthSection } from './navigation'
 import HealthPage from './pages/HealthPage'
 import HomePage from './pages/HomePage'
+import MonitoringPage from './pages/MonitoringPage'
 import PlacesPage from './pages/PlacesPage'
 import PlanPage from './pages/PlanPage'
 import ProfilePage from './pages/ProfilePage'
@@ -54,6 +55,7 @@ export default function App() {
           <Route path="/profil" element={<ProfilePage />} />
           <Route path="/sources" element={<SourcesPage />} />
           <Route path="/lieux" element={<PlacesPage />} />
+          <Route path="/monitoring" element={<MonitoringPage />} />
         </Routes>
         <p className="disclaimer">
           Cette application donne des conseils d’entraînement, pas un avis médical.

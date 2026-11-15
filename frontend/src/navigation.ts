@@ -49,6 +49,7 @@ export const FOLDERS: Folder[] = [
 export const SETTINGS = folder('settings', 'Réglages', { to: '/profil', label: 'Profil' }, [
   { to: '/sources', label: 'Sources' },
   { to: '/lieux', label: 'Mes lieux' },
+  { to: '/monitoring', label: 'Monitoring' },
 ])
 
 const ALL = [...FOLDERS, SETTINGS]
