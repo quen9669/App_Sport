@@ -66,8 +66,13 @@ services:
     build: ./deploy/backup
     restart: unless-stopped
     environment:
+      # Google Drive access. It can be the same Google account and OAuth client as
+      # JobRadar's backup (owner's choice): only these values are copied, App Sport
+      # still writes to its own folder with its own encryption keys.
       RCLONE_CONFIG_GDRIVE_TYPE: drive
-      RCLONE_CONFIG_GDRIVE_SCOPE: drive.file
+      RCLONE_CONFIG_GDRIVE_SCOPE: ${RCLONE_GDRIVE_SCOPE:-drive.file}
+      RCLONE_CONFIG_GDRIVE_CLIENT_ID: ${RCLONE_GDRIVE_CLIENT_ID:-}
+      RCLONE_CONFIG_GDRIVE_CLIENT_SECRET: ${RCLONE_GDRIVE_CLIENT_SECRET:-}
       RCLONE_CONFIG_GDRIVE_TOKEN: ${RCLONE_GDRIVE_TOKEN:?}
       RCLONE_CONFIG_SPORT_TYPE: crypt
       RCLONE_CONFIG_SPORT_REMOTE: "gdrive:App Sport"

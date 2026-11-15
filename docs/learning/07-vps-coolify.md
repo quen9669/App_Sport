@@ -65,7 +65,8 @@ Jamais dans le dépôt. Copie aussi dans `C:\Users\franc\.jobradar-secrets\app-s
 | `STRAVA_REDIRECT_URI` | `https://app-sport.<tailnet>.ts.net/api/strava/callback` |
 | `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `GARMIN_EMAIL`, `GARMIN_PASSWORD`, `GEMINI_API_KEY` | comme sur le PC |
 | `TS_AUTHKEY` | la clé Tailscale (étape 1) |
-| `RCLONE_GDRIVE_TOKEN` | le jeton de l'étape 3 |
+| `RCLONE_GDRIVE_TOKEN` | le jeton de l'étape 3, ou celui de la sauvegarde JobRadar (ton choix) |
+| `RCLONE_GDRIVE_CLIENT_ID`, `RCLONE_GDRIVE_CLIENT_SECRET`, `RCLONE_GDRIVE_SCOPE` | seulement si tu reprends l'accès Drive de JobRadar : les mêmes valeurs que sa configuration rclone (le jeton est lié à ce client Google) |
 | `RCLONE_CRYPT_PASSWORD`, `RCLONE_CRYPT_SALT` | deux mots de passe aléatoires passés par `rclone obscure`. **Garde-les hors du VPS** : sans eux, les copies Drive sont illisibles |
 
 ## Migrer les données du PC
