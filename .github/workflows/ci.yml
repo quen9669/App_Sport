@@ -123,3 +123,30 @@ jobs:
           name: playwright-report
           path: frontend/playwright-report
           retention-days: 7
+
+  docker:
+    name: Docker image (VPS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # The same image Coolify builds on the VPS: if it breaks here, it would break there.
+      - name: Build the app image
+        run: docker build -t app-sport:ci .
+      - name: Start it and check /api/health
+        run: |
+          docker run -d --name app --read-only --tmpfs /tmp --cap-drop ALL -v app-data:/data \
+            -e APP_PASSWORD_HASH='$argon2id$v=19$m=65536,t=3,p=4$Y2lzYWx0c2FsdA$Zm9vYmFyZm9vYmFyZm9vYmFyZm9vYmFyZm9vYmFyMTI' \
+            -e TOKEN_ENCRYPTION_KEY=$(python3 -c "import base64,os;print(base64.urlsafe_b64encode(os.urandom(32)).decode())") \
+            -p 127.0.0.1:8000:8000 app-sport:ci
+          for i in $(seq 1 30); do curl -fs http://127.0.0.1:8000/api/health && exit 0; sleep 2; done
+          docker logs app; exit 1
+      - name: Check the compose file
+        run: docker compose config -q
+        env:
+          TOKEN_ENCRYPTION_KEY: x
+          APP_PASSWORD_HASH: x
+          FRONTEND_URL: x
+          TS_AUTHKEY: x
+          RCLONE_GDRIVE_TOKEN: x
+          RCLONE_CRYPT_PASSWORD: x
+          RCLONE_CRYPT_SALT: x

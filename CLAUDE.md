@@ -287,6 +287,18 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - `FRONTEND_URL` and `STRAVA_REDIRECT_URI` point at the ts.net address; production is same-origin,
   so `CORS_ORIGINS` is not needed there.
 
+## Hosting on the VPS (Coolify, owner's request 2026-11-15)
+
+- The app moves to FRANKS's own VPS (Coolify 4.7.5, also hosts `jobradar` and `supervision`,
+  which must NEVER be touched). Own Coolify project `app-sport`, `docker-compose.yml` at the root:
+  `sport-app` (`Dockerfile`, non-root, read-only, 512 MB), `sport-tailscale` (userspace Tailscale
+  sidecar serving https://app-sport.<tailnet>.ts.net, `deploy/tailscale/serve.json` baked in: no
+  bind mounts in Coolify) and `sport-backup` (rclone crypt to Google Drive, `deploy/backup/`).
+  NO published port, so the VPS firewall and `docker-private-ports` stay unchanged.
+- Data stays SQLite (owner's choice) in the named volume `app-sport-data` (`/data`: database,
+  nightly copies, Garmin tokens). Secrets only in Coolify variables. Guide:
+  `docs/learning/07-vps-coolify.md`.
+
 ## Runs sent to the Garmin watch (owner's request, running only)
 
 - A `run` session of the weekly plan carries `workout` (`services/workouts.py`, `RunWorkout`:

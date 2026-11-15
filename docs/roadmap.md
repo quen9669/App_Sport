@@ -14,6 +14,7 @@
 | 5b | Coach longévité, plan de semaine proposé, banc d'évaluation | ✅ Terminé |
 | 6a | Connexion par mot de passe, durcissement, sauvegardes, PWA hors ligne | ✅ Terminé |
 | 6b | Mise en ligne (PC + Tailscale) et installation sur le téléphone | ✅ Terminé |
+| 6c | Hébergement sur le VPS (Coolify, projet à part, SQLite) | 🚧 En cours |
 
 ## Phase 0 : critères d'acceptation
 

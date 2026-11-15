@@ -1,0 +1,94 @@
+# App Sport on the VPS, as one Coolify project ("app-sport").
+#
+# Three containers on a Docker network of their own, one volume, and NO port
+# published on the VPS: you reach the app only through Tailscale, at
+# https://app-sport.<your-tailnet>.ts.net. Nothing here touches other projects.
+# Guide: docs/learning/07-vps-coolify.md
+#
+# Secrets (${...}) are typed in Coolify's "Environment Variables", never here.
+
+services:
+  # The app: API + interface on port 8000, inside the project network only.
+  sport-app:
+    build: .
+    restart: unless-stopped
+    environment:
+      # Same values as the PC's .env. TOKEN_ENCRYPTION_KEY MUST be the PC's one:
+      # the Strava tokens stored in the database are encrypted with it.
+      TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY:?}
+      APP_PASSWORD_HASH: ${APP_PASSWORD_HASH:?}
+      FRONTEND_URL: ${FRONTEND_URL:?}
+      STRAVA_REDIRECT_URI: ${STRAVA_REDIRECT_URI:-}
+      STRAVA_CLIENT_ID: ${STRAVA_CLIENT_ID:-}
+      STRAVA_CLIENT_SECRET: ${STRAVA_CLIENT_SECRET:-}
+      GARMIN_EMAIL: ${GARMIN_EMAIL:-}
+      GARMIN_PASSWORD: ${GARMIN_PASSWORD:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      COACH_PROVIDER: ${COACH_PROVIDER:-}
+      COACH_MONTHLY_BUDGET_EUR: ${COACH_MONTHLY_BUDGET_EUR:-10}
+      APP_TIMEZONE: Europe/Luxembourg
+    volumes:
+      - app-sport-data:/data
+    # Hardening: read-only system, no Linux privileges, a memory ceiling.
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+
+  # Door to the tailnet: a Tailscale device of its own, HTTPS, no published port.
+  # Userspace networking: no /dev/net/tun, no NET_ADMIN, nothing on the host.
+  sport-tailscale:
+    build: ./deploy/tailscale
+    restart: unless-stopped
+    hostname: app-sport
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY:?}
+      TS_HOSTNAME: app-sport
+      TS_USERSPACE: "true"
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_SERVE_CONFIG: /config/serve.json
+      # Log in with the key only the first time; afterwards the saved state is used.
+      TS_AUTH_ONCE: "true"
+      # No logs sent to Tailscale's servers (the project allows no telemetry).
+      TS_TAILSCALED_EXTRA_ARGS: --no-logs-no-support
+    volumes:
+      - app-sport-tailscale:/var/lib/tailscale
+    depends_on: [sport-app]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 128m
+
+  # Encrypted copy of the nightly backups to Google Drive (folder "App Sport").
+  sport-backup:
+    build: ./deploy/backup
+    restart: unless-stopped
+    environment:
+      # Google Drive access. It can be the same Google account and OAuth client as
+      # JobRadar's backup (owner's choice): only these values are copied, App Sport
+      # still writes to its own folder with its own encryption keys.
+      RCLONE_CONFIG_GDRIVE_TYPE: drive
+      RCLONE_CONFIG_GDRIVE_SCOPE: ${RCLONE_GDRIVE_SCOPE:-drive.file}
+      RCLONE_CONFIG_GDRIVE_CLIENT_ID: ${RCLONE_GDRIVE_CLIENT_ID:-}
+      RCLONE_CONFIG_GDRIVE_CLIENT_SECRET: ${RCLONE_GDRIVE_CLIENT_SECRET:-}
+      RCLONE_CONFIG_GDRIVE_TOKEN: ${RCLONE_GDRIVE_TOKEN:?}
+      RCLONE_CONFIG_SPORT_TYPE: crypt
+      RCLONE_CONFIG_SPORT_REMOTE: "gdrive:App Sport"
+      RCLONE_CONFIG_SPORT_PASSWORD: ${RCLONE_CRYPT_PASSWORD:?}
+      RCLONE_CONFIG_SPORT_PASSWORD2: ${RCLONE_CRYPT_SALT:?}
+    volumes:
+      # Read-only: the backup container can never change the database.
+      - app-sport-data:/data:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /config/rclone
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 128m
+
+volumes:
+  app-sport-data:
+  app-sport-tailscale:

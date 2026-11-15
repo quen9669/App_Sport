@@ -1,0 +1,26 @@
+# Files Docker never copies into the image. Secrets and health data first:
+# the image is built on the VPS and must not carry them.
+.env
+.env.*
+**/*.db
+**/*.sqlite*
+**/data/
+**/.app_sport/
+exports/
+# Rebuilt inside the image, or useless there.
+**/node_modules/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+frontend/dist/
+frontend/dev-dist/
+frontend/e2e/
+frontend/playwright-report/
+frontend/test-results/
+backend/evals/reports/
+graphify-out/
+.git/
+.github/
+docs/
