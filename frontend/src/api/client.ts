@@ -674,6 +674,51 @@ export interface Longevity {
 
 export const fetchLongevity = () => request<Longevity>('GET', '/api/longevity')
 
+// --- Monitoring (mirrors backend/app/api/monitoring.py) ---
+
+/** ok: nothing to do · warning: worth a look · error: broken · unknown: no data yet. */
+export type MonitoringStatus = 'ok' | 'warning' | 'error' | 'unknown'
+
+export interface SourceHealth {
+  source: string // "garmin" or "strava"
+  status: MonitoringStatus
+  last_success_at: string | null
+  last_run_at: string | null
+  last_run_status: string | null
+  last_error: string | null
+  failures_7d: number
+}
+
+export interface Monitoring {
+  status: MonitoringStatus // the worst of the checks
+  checked_at: string
+  started_at: string // when the app last started
+  sources: SourceHealth[]
+  backup: {
+    status: MonitoringStatus
+    last_copy_at: string | null
+    copies: number
+    last_copy_bytes: number | null
+  }
+  memory: {
+    status: MonitoringStatus
+    used_bytes: number | null // null outside Docker
+    limit_bytes: number | null
+  }
+  coach: {
+    status: MonitoringStatus
+    enabled: boolean
+    month: string
+    spent_eur: number
+    limit_eur: number
+  }
+  database_bytes: number | null
+  activities_7d: number
+  grafana_url: string | null // null: no "Ouvrir dans Grafana" button
+}
+
+export const fetchMonitoring = () => request<Monitoring>('GET', '/api/monitoring')
+
 // --- Race predictor ---
 
 /** One run used (or considered) by the form estimate. */

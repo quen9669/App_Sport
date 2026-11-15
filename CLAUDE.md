@@ -299,6 +299,20 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   nightly copies, Garmin tokens). Secrets only in Coolify variables. Guide:
   `docs/learning/07-vps-coolify.md`.
 
+## Monitoring (owner's request 2026-11-15)
+
+- Réglages › Monitoring (`/monitoring`, `MonitoringPage`): `services/monitoring.py` computes, read-only,
+  the app's own health from its database and files: last good sync per source (`success` or
+  `partial`; warning after 6 h, error after 12 h), failed runs over 7 days, newest nightly copy
+  (error after 30 h), database size, coach budget, container memory from cgroup v2
+  (`/sys/fs/cgroup/memory.current|max`, `unknown` outside Docker). Statuses ok / warning / error /
+  unknown; the worst wins, `unknown` never alarms. Technical numbers only, never health data.
+  Route `GET /api/monitoring`; French words in `utils/monitoring.ts`.
+- Grafana stays the outside watcher (this page is down when the app is): dashboard
+  `deploy/grafana/app-sport.json` (uid `app-sport`, folder "App Sport"), cAdvisor + node-exporter
+  only, so `supervision` and the JobRadar repo are untouched; imported by hand, see
+  `deploy/grafana/README.md`. `GRAFANA_URL` (Coolify variable) shows the "Ouvrir dans Grafana" button.
+
 ## Runs sent to the Garmin watch (owner's request, running only)
 
 - A `run` session of the weekly plan carries `workout` (`services/workouts.py`, `RunWorkout`:
