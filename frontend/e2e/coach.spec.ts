@@ -10,7 +10,7 @@ test('Coach page: waits for the API key, memories can be added', async ({ page }
   await page.goto('/')
   await openTab(page, 'Coach', 'Muscu et cardio')
   await expect(page.getByRole('heading', { name: 'Coach muscu et cardio' })).toBeVisible()
-  await expect(page.getByText(/attend ta clé API Gemini/)).toBeVisible()
+  await expect(page.getByText(/attend la clé OmniRoute/)).toBeVisible()
   await expect(page.getByRole('button', { name: 'Envoyer' })).toBeDisabled()
 
   const panel = page.getByRole('region', { name: 'Ce que le coach retient' })
