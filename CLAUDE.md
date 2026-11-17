@@ -207,8 +207,8 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - The model only sees data through tools, never GPS positions; tool results are data, not
   instructions. Memories are proposed by the coach and sent to the model only once accepted.
 - Settings: `OMNIROUTE_API_KEY` (from the vault; empty = coach disabled, screen explains it),
-  `OMNIROUTE_BASE_URL`, prices per million tokens. The model is imposed in OmniRoute: by default
-  no `model` is sent (`COACH_MODEL` / `COACH_LIGHT_MODEL` only override it).
+  `OMNIROUTE_BASE_URL`, prices per million tokens. OmniRoute refuses a request without a model,
+  so the app sends `auto` by default (`COACH_MODEL` / `COACH_LIGHT_MODEL` in the vault override it).
 - Routes in `api/coach.py`; the answer is SSE (`text` / `tool` / `done` / `error`) with its own DB
   session. Tests use `tests/fixtures/fake_llm.py`. Page `CoachPage` (`/coach`), answers rendered by
   `CoachText` (mini-Markdown built from React elements, never raw HTML).

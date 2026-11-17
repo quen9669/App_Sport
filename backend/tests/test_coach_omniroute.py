@@ -182,9 +182,9 @@ def test_the_coach_needs_only_the_omniroute_key() -> None:
     assert get_llm(Settings(omniroute_api_key="")) is None
     assert isinstance(get_llm(Settings(omniroute_api_key="k")), OmniRouteLLM)
     settings = Settings(omniroute_api_key="k")
-    # The model is imposed in OmniRoute: none is named by default.
-    assert (settings.main_model, settings.light_model) == ("", "")
-    assert settings.prices("") == (3.0, 15.0)
+    # OmniRoute requires a model name: "auto" lets it route (it refuses none).
+    assert (settings.main_model, settings.light_model) == ("auto", "auto")
+    assert settings.prices("auto") == (3.0, 15.0)
 
 
 @respx.mock
