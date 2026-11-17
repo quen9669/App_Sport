@@ -47,7 +47,6 @@ keep functions short, and explain important choices in PR descriptions.
 | `make set-password` | Choose the app password (Argon2 fingerprint written to `.env`) |
 | `make prod` | Build the interface and run one production server on 127.0.0.1:8000 |
 | `make autostart` / `make autostart-off` / `make prod-restart` | Windows: start `make prod` at each log-on / stop that / restart it (phase 6b) |
-| `make backup` / `make restore f=...` | Copy the database now / list or restore a copy |
 
 Single backend test: `cd backend && uv run pytest tests/test_health.py -k ok`.
 Single frontend test: `cd frontend && npx vitest run src/App.test.tsx`.
@@ -274,8 +273,8 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   inline styles allowed for Leaflet/Recharts), nosniff, frame denial, HSTS in production. A new
   external resource needs a CSP change, never a CDN script. `/docs` is off in production.
 - `make prod`: `FRONTEND_DIST` makes `frontend.py` serve the build (SPA fallback, `/api/*` stays
-  404, no path escape, `index.html`/`sw.js` not cached). Nightly backups: `services/backup.py`
-  (SQLite backup API) scheduled at 03:30 in `scheduler.py`.
+  404, no path escape, `index.html`/`sw.js` not cached). No backup of the app's own
+  (référentiel R-11, SPT-09): the server's nightly archive copies the `app-sport-data` volume.
 - PWA (`vite.config.ts`): `registerType: 'prompt'` (`AppBanners` "Recharger"), app files, logo and
   latin fonts precached, API GETs `NetworkFirst` in `api-cache` (never `/api/auth|coach|strava`).
   Offline: `OfflineBanner` shows the last answer time; non-GET requests fail with
@@ -302,18 +301,19 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   which must NEVER be touched). Own Coolify project `app-sport`, `docker-compose.yml` at the root:
   `sport-app` (`Dockerfile`, non-root, read-only, 512 MB), `sport-tailscale` (userspace Tailscale
   sidecar serving https://app-sport.<tailnet>.ts.net, `deploy/tailscale/serve.json` baked in: no
-  bind mounts in Coolify) and `sport-backup` (rclone crypt to Google Drive, `deploy/backup/`).
+  bind mounts in Coolify) (no backup container: SPT-09). `sport-app` also joins the external networks `llm-net`
+  (OmniRoute) and `obs-net` (supervision probes `http://sport-app:8000/health`).
   NO published port, so the VPS firewall and `docker-private-ports` stay unchanged.
 - Data stays SQLite (owner's choice) in the named volume `app-sport-data` (`/data`: database,
-  nightly copies, Garmin tokens). Secrets only in Coolify variables. Guide:
+  Garmin tokens). Secrets come from the OpenBao vault (`apps/app-sport/<NAME>`), declared in the
+  compose as `NAME: ${NAME}`; the vault sync fills Coolify. Guide:
   `docs/learning/07-vps-coolify.md`.
 
 ## Monitoring (owner's request 2026-11-15)
 
 - Réglages › Monitoring (`/monitoring`, `MonitoringPage`): `services/monitoring.py` computes, read-only,
   the app's own health from its database and files: last good sync per source (`success` or
-  `partial`; warning after 6 h, error after 12 h), failed runs over 7 days, newest nightly copy
-  (error after 30 h), database size, coach (month's estimate; warning if the last call failed), container memory from cgroup v2
+  `partial`; warning after 6 h, error after 12 h), failed runs over 7 days, database size, coach (month's estimate; warning if the last call failed), container memory from cgroup v2
   (`/sys/fs/cgroup/memory.current|max`, `unknown` outside Docker). Statuses ok / warning / error /
   unknown; the worst wins, `unknown` never alarms. Technical numbers only, never health data.
   Route `GET /api/monitoring`; French words in `utils/monitoring.ts`.
@@ -321,6 +321,16 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   `deploy/grafana/app-sport.json` (uid `app-sport`, folder "App Sport"), cAdvisor + node-exporter
   only, so `supervision` and the JobRadar repo are untouched; imported by hand, see
   `deploy/grafana/README.md`. `GRAFANA_URL` (Coolify variable) shows the "Ouvrir dans Grafana" button.
+
+## Common contract (référentiel R-16, R-26, SPT-06)
+
+- `api/contract.py`, at the root and signed out: `GET /health` (common format, `etat`
+  en_service / degrade mapped from the Monitoring statuses; arrete and 503 only when the
+  database cannot be read) and
+  `GET /vitrine.json` (aggregates only: sessions count, weeks-in-a-row streak). `EXP-04`, line `ml`
+  and the step are constants there, kept in step with `expedition.yaml`.
+- The app never alerts by itself: `jobs.ping_healthchecks` pings `HEALTHCHECKS_URL` (vault) after
+  each scheduled sync, on `/fail` if one could not run.
 
 ## Runs sent to the Garmin watch (owner's request, running only)
 

@@ -1,5 +1,11 @@
 # L'app sur ton VPS (Coolify), sans toucher au reste
 
+> **Mis à jour (référentiel, 2026-11-17)** : le conteneur `sport-backup`, les copies de nuit et
+> `make backup` / `make restore` sont retirés (SPT-09). Le volume `app-sport-data` est sauvegardé
+> par l'archive commune de la nuit du serveur (7 jours sur Drive). Les secrets viennent du coffre
+> OpenBao (SPT-10), la clé IA est `OMNIROUTE_API_KEY` (SPT-01). Le reste du guide est l'historique
+> de la migration.
+
 L'app quitte ton PC pour ton VPS. Elle y vit dans **son propre projet Coolify, `app-sport`**,
 avec son propre réseau Docker. Les projets `jobradar` et `supervision`, le pare-feu,
 `docker-private-ports` et le Tailscale du VPS ne sont pas modifiés.

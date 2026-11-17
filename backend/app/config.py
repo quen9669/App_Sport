@@ -72,12 +72,14 @@ class Settings(BaseSettings):
     # Built interface (`npm run build`) served by FastAPI itself: one server, one port.
     # Empty = not served (development uses the Vite server on port 5173).
     frontend_dist: str = ""
-    # Nightly copies of the SQLite database; the most recent `backup_keep` are kept.
-    backup_dir: str = "./data/backups"
-    backup_keep: int = Field(default=14, ge=1, le=365)
+    # No backup of its own (référentiel R-11, SPT-09): the server's nightly archive
+    # copies the whole `app-sport-data` volume, 7 days on Google Drive.
     # Address of the "App Sport" Grafana dashboard, for the button of the Monitoring
     # page. Empty = no button. Grafana is only reachable inside the tailnet.
     grafana_url: str = ""
+    # Healthchecks check pinged after each scheduled sync (référentiel R-26). The URL
+    # is a secret of its own: it comes from the vault (apps/app-sport/HEALTHCHECKS_URL).
+    healthchecks_url: str = ""
 
     # --- AI coaches (phase 5) ---
     # Only through OmniRoute (référentiel R-05). The key comes from the OpenBao

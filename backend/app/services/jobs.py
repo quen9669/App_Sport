@@ -6,7 +6,6 @@ already finished) and builds the clients it needs from the settings.
 
 import logging
 from collections.abc import Callable
-from pathlib import Path
 
 import httpx
 from sqlalchemy.orm import Session, sessionmaker
@@ -14,7 +13,6 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.config import Settings, get_settings
 from app.db.models import SyncLog
 from app.db.models.enums import DataSource, SyncKind
-from app.db.types import utc_now
 from app.dependencies import HTTP_TIMEOUT_S, build_strava_oauth
 from app.integrations.health.garmin_connect import (
     GarminApi,
@@ -23,7 +21,6 @@ from app.integrations.health.garmin_connect import (
 )
 from app.integrations.strava.client import StravaClient
 from app.repositories import credentials as credentials_repo
-from app.services.backup import backup_database
 from app.services.crypto import TokenCipher
 from app.services.garmin_activity_sync import GarminActivitySyncService
 from app.services.health_sync import run_provider_sync
@@ -96,27 +93,36 @@ def run_scheduled_syncs(session_factory: sessionmaker[Session]) -> None:
     next source from running.
     """
     settings = get_settings()
+    failed = False
     with session_factory() as db:
         strava_connected = credentials_repo.get_credential(db, DataSource.STRAVA) is not None
     if strava_connected:
         try:
             run_strava_sync(session_factory, SyncKind.SCHEDULED)
         except Exception:  # e.g. a manual sync already running
+            failed = True
             logger.exception("Scheduled Strava sync could not run")
     if is_garmin_configured(settings):
         try:
             run_garmin_sync(session_factory, SyncKind.SCHEDULED)
         except Exception:
+            failed = True
             logger.exception("Scheduled Garmin sync could not run")
+    ping_healthchecks(settings.healthchecks_url, failed)
 
 
-def run_nightly_backup() -> None:
-    """Scheduled every night: a copy of the database, the last BACKUP_KEEP kept."""
-    settings = get_settings()
+def ping_healthchecks(url: str, failed: bool, client: httpx.Client | None = None) -> None:
+    """Tell Healthchecks the scheduled run happened (référentiel R-26, SPT-06).
+
+    The app never sends alerts itself: if the pings stop, or arrive on ``/fail``,
+    Healthchecks warns FRANKS through the "Franks Ops" Telegram bot. The URL
+    comes from the vault; empty = no ping (development, tests).
+    """
+    if not url:
+        return
     try:
-        backup_database(
-            settings.database_url, Path(settings.backup_dir), settings.backup_keep, utc_now()
-        )
-    except Exception:
-        # A failed backup must never stop the app; the log says what happened.
-        logger.exception("Nightly backup failed")
+        http = client or httpx.Client(timeout=HTTP_TIMEOUT_S)
+        http.get(url.rstrip("/") + ("/fail" if failed else ""))
+    except httpx.HTTPError:
+        # A missed ping is what Healthchecks watches for: nothing more to do here.
+        logger.warning("Healthchecks ping failed")

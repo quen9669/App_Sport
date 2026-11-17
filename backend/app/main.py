@@ -16,6 +16,7 @@ from app.api import (
     activities,
     auth,
     coach,
+    contract,
     dashboards,
     goals,
     health,
@@ -121,6 +122,8 @@ def create_app() -> FastAPI:
 
     # Every route lives under /api so the frontend and the API never clash.
     app.include_router(health.router, prefix="/api")
+    # The common contract (/health, /vitrine.json) sits at the root, signed out.
+    app.include_router(contract.router)
     app.include_router(auth.router, prefix="/api")
     app.include_router(strava.router, prefix="/api")
     for router in PROTECTED_ROUTERS:

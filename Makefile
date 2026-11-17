@@ -11,7 +11,7 @@ FRONTEND := frontend
 
 .PHONY: help install dev dev-backend dev-frontend test test-backend test-frontend \
 	test-e2e e2e-install lint format typecheck check clean db-upgrade db-revision seed seed-clear eval \
-	set-password prod build backup restore autostart autostart-off prod-restart
+	set-password prod build autostart autostart-off prod-restart
 
 help: ## Show this list of commands
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | \
@@ -68,12 +68,6 @@ autostart-off: ## Windows only: stop starting the app at log-in
 
 prod-restart: ## Windows only: restart the app started by autostart (after an update)
 	bash scripts/windows/autostart.sh restart
-
-backup: ## Copy the database now (also done every night at 03:30)
-	cd $(BACKEND) && uv run python -m scripts.backup
-
-restore: ## List backups, or put one back with the app stopped: make restore f=app_sport-....db
-	cd $(BACKEND) && uv run python -m scripts.backup --restore $(f)
 
 dev-frontend: ## Start only the frontend dev server
 	cd $(FRONTEND) && npm run dev -- --port 5173

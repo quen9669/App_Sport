@@ -72,7 +72,7 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 5,
+        "w": 7,
         "x": 0,
         "y": 1
       },
@@ -150,8 +150,8 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 5,
-        "x": 5,
+        "w": 7,
+        "x": 7,
         "y": 1
       },
       "targets": [
@@ -218,84 +218,6 @@
       }
     },
     {
-      "id": 4,
-      "type": "stat",
-      "title": "Sauvegarde Drive",
-      "description": "Conteneur sport-backup (rclone chiffré vers Google Drive).",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 5,
-        "x": 10,
-        "y": 1
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "(time() - max(container_last_seen{name=~\"^sport-backup-.*\"})) < bool 120",
-          "instant": true
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "noValue": "Arrêté",
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "Arrêté",
-                  "color": "red"
-                },
-                "1": {
-                  "text": "En marche",
-                  "color": "green"
-                }
-              }
-            }
-          ],
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "textMode": "value",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "justifyMode": "center",
-        "orientation": "auto"
-      }
-    },
-    {
       "id": 5,
       "type": "stat",
       "title": "Redémarrages (24 h)",
@@ -306,8 +228,8 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 4,
-        "x": 15,
+        "w": 5,
+        "x": 14,
         "y": 1
       },
       "targets": [
@@ -317,7 +239,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "sum(changes(container_start_time_seconds{name=~\"^sport-(app|tailscale|backup)-.*\"}[24h])) or vector(0)",
+          "expr": "sum(changes(container_start_time_seconds{name=~\"^sport-(app|tailscale)-.*\"}[24h])) or vector(0)",
           "instant": true
         }
       ],
@@ -556,7 +478,7 @@
     {
       "id": 10,
       "type": "timeseries",
-      "title": "Mémoire Tailscale et sauvegarde",
+      "title": "Mémoire Tailscale",
       "description": "Limite de 128 Mo pour chacun.",
       "datasource": {
         "type": "prometheus",
@@ -577,15 +499,6 @@
           },
           "expr": "sum(container_memory_working_set_bytes{name=~\"^sport-tailscale-.*\"})",
           "legendFormat": "Tailscale"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "sum(container_memory_working_set_bytes{name=~\"^sport-backup-.*\"})",
-          "legendFormat": "sauvegarde"
         }
       ],
       "fieldConfig": {

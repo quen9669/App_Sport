@@ -35,12 +35,6 @@ function monitoring(overrides: Partial<Monitoring> = {}): Monitoring {
         failures_7d: 2,
       },
     ],
-    backup: {
-      status: 'ok',
-      last_copy_at: '2026-11-15T03:30:00Z',
-      copies: 14,
-      last_copy_bytes: 90 * 1024 * 1024,
-    },
     memory: { status: 'ok', used_bytes: 214 * 1024 * 1024, limit_bytes: 512 * 1024 * 1024 },
     coach: { status: 'ok', enabled: true, month: '2026-11', spent_eur: 3.4 },
     database_bytes: 86 * 1024 * 1024,
@@ -63,7 +57,7 @@ describe('MonitoringPage', () => {
     expect(screen.getByText(/Échecs sur 7 jours : 2/)).toBeInTheDocument()
     expect(screen.getByText('3,40 € dépensés ce mois-ci (estimation)')).toBeInTheDocument()
     expect(screen.getByText('Mémoire : 214 Mo sur 512 Mo')).toBeInTheDocument()
-    expect(screen.getByText(/14 copies gardées · 90 Mo chacune/)).toBeInTheDocument()
+    expect(screen.getByText(/archive commune de la nuit/)).toBeInTheDocument()
   })
 
   it('opens Grafana in a new tab, and hides the button without an address', async () => {

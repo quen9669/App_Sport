@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Literal
 
 from sqlalchemy import func, select
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session
 
 from app.coach.costs import month_spent
@@ -28,7 +29,6 @@ from app.db.models import CoachCall
 from app.db.models.activity import Activity
 from app.db.models.enums import DataSource, SyncStatus
 from app.db.models.sync import SyncLog
-from app.services.backup import PREFIX, list_backups, sqlite_path
 
 Status = Literal["ok", "warning", "error", "unknown"]
 
@@ -37,8 +37,6 @@ Status = Literal["ok", "warning", "error", "unknown"]
 # the next run) counts as a success: the data did arrive.
 SYNC_WARNING_HOURS = 6
 SYNC_ERROR_HOURS = 12
-# The copy is made every night at 03:30: one missed night is an error.
-BACKUP_ERROR_HOURS = 30
 # Docker stops the app when it reaches its memory limit.
 MEMORY_WARNING_SHARE = 0.85
 # How far back the failed runs are counted.
@@ -66,14 +64,6 @@ class SourceHealth:
 
 
 @dataclass(frozen=True)
-class BackupHealth:
-    status: Status
-    last_copy_at: datetime | None
-    copies: int
-    last_copy_bytes: int | None
-
-
-@dataclass(frozen=True)
 class MemoryHealth:
     status: Status
     used_bytes: int | None
@@ -94,7 +84,6 @@ class Monitoring:
     checked_at: datetime
     started_at: datetime
     sources: list[SourceHealth]
-    backup: BackupHealth
     memory: MemoryHealth
     coach: CoachHealth
     database_bytes: int | None
@@ -144,28 +133,6 @@ def source_health(db: Session, source: str, now: datetime) -> SourceHealth:
     )
 
 
-def _copy_time(path: Path) -> datetime | None:
-    """The UTC time written in a copy's name (app_sport-20261018-033000.db)."""
-    stamp = path.stem.removeprefix(PREFIX)
-    for pattern in ("%Y%m%d-%H%M%S", "%Y%m%d-%H%M"):
-        try:
-            return datetime.strptime(stamp, pattern).replace(tzinfo=UTC)
-        except ValueError:
-            continue
-    return None
-
-
-def backup_health(backup_dir: Path, now: datetime) -> BackupHealth:
-    """The nightly copies kept next to the database (the Drive upload is separate)."""
-    copies = list_backups(backup_dir)
-    if not copies:
-        return BackupHealth("unknown", None, 0, None)
-    last_at = _copy_time(copies[0])
-    age = _hours_since(last_at, now)
-    status: Status = "ok" if age is not None and age <= BACKUP_ERROR_HOURS else "error"
-    return BackupHealth(status, last_at, len(copies), copies[0].stat().st_size)
-
-
 def _read_int(path: Path) -> int | None:
     """A number from a cgroup file; None when missing or "max" (no limit)."""
     try:
@@ -202,6 +169,14 @@ def coach_health(db: Session, now: datetime, settings: Settings) -> CoachHealth:
     )
 
 
+def sqlite_path(database_url: str) -> Path | None:
+    """The database file, or None for a non-SQLite or in-memory database."""
+    url = make_url(database_url)
+    if url.get_backend_name() != "sqlite" or not url.database or url.database == ":memory:":
+        return None
+    return Path(url.database)
+
+
 def database_bytes(database_url: str) -> int | None:
     path = sqlite_path(database_url)
     return path.stat().st_size if path is not None and path.is_file() else None
@@ -229,16 +204,14 @@ def monitoring(
     """Everything the Monitoring page shows, computed in a few small queries."""
     now = now or datetime.now(UTC)
     sources = [source_health(db, source, now) for source in MONITORED_SOURCES]
-    backup = backup_health(Path(settings.backup_dir), now)
     memory = memory_health(cgroup_dir)
     coach = coach_health(db, now, settings)
-    statuses = [s.status for s in sources] + [backup.status, memory.status, coach.status]
+    statuses = [s.status for s in sources] + [memory.status, coach.status]
     return Monitoring(
         status=overall(statuses),
         checked_at=now,
         started_at=PROCESS_STARTED_AT,
         sources=sources,
-        backup=backup,
         memory=memory,
         coach=coach,
         database_bytes=database_bytes(settings.database_url),

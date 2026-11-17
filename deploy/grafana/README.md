@@ -30,5 +30,5 @@ files: if Grafana is ever reinstalled, import it again.
 ## Containers it looks for
 
 cAdvisor names containers after the Coolify services: `sport-app-…`,
-`sport-tailscale-…`, `sport-backup-…`. Renaming a service in
+`sport-tailscale-…`. Renaming a service in
 `docker-compose.yml` means updating the `name=~"^sport-…"` filters here.

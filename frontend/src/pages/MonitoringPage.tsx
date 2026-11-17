@@ -119,20 +119,10 @@ function MonitoringView({ data, onRefresh }: { data: Monitoring; onRefresh: () =
       </section>
 
       <section className="card" aria-labelledby="backup-title">
-        <h2 id="backup-title">
-          Sauvegarde de la nuit <StatusBadge status={data.backup.status} />
-        </h2>
-        <p>
-          {data.backup.last_copy_at
-            ? `Dernière copie : ${formatDateTime(data.backup.last_copy_at)} (${formatAgo(data.backup.last_copy_at, now)})`
-            : 'Aucune copie pour le moment.'}
-        </p>
+        <h2 id="backup-title">Sauvegarde</h2>
         <p className="hint">
-          {data.backup.copies} copie{data.backup.copies > 1 ? 's' : ''} gardée
-          {data.backup.copies > 1 ? 's' : ''}
-          {data.backup.last_copy_bytes !== null &&
-            ` · ${formatBytes(data.backup.last_copy_bytes)} chacune`}
-          . L&apos;envoi chiffré vers Google Drive est fait à part : il se suit dans Grafana.
+          Faite par le serveur : l&apos;archive commune de la nuit copie tout le volume de
+          l&apos;app, gardée 7 jours sur Google Drive.
         </p>
       </section>
 
