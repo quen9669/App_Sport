@@ -15,6 +15,10 @@ concurrency:
 permissions:
   contents: read
 
+# Read-only GitHub token for the shared library @quen9669/lignes (frontend/.npmrc).
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
 jobs:
   backend:
     name: Backend (lint, types, tests)
@@ -131,7 +135,7 @@ jobs:
       - uses: actions/checkout@v7
       # The same image Coolify builds on the VPS: if it breaks here, it would break there.
       - name: Build the app image
-        run: docker build -t app-sport:ci .
+        run: docker build --build-arg NPM_TOKEN -t app-sport:ci .
       - name: Start it and check /api/health
         run: |
           docker run -d --name app --read-only --tmpfs /tmp --cap-drop ALL -v app-data:/data \

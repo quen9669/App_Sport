@@ -8,8 +8,11 @@
 FROM node:22.23.0-slim AS frontend
 WORKDIR /src/frontend
 # Dependencies first: Docker reuses this layer while package*.json do not change.
-COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci --no-audit --no-fund
+COPY frontend/package.json frontend/package-lock.json frontend/.npmrc ./
+# The shared library @quen9669/lignes comes from GitHub Packages (read:packages token).
+# Only this stage sees it: the final image keeps nothing of this stage but dist/.
+ARG NPM_TOKEN
+RUN NPM_TOKEN="$NPM_TOKEN" npm ci --no-audit --no-fund
 COPY frontend/ ./
 # Empty API address: the interface calls the API on its own address (same origin).
 RUN VITE_API_BASE_URL= npm run build

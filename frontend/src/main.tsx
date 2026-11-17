@@ -6,12 +6,10 @@ import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill'
 // "?url": Vite copies the font into the build and gives its local address.
 import flagFont from 'country-flag-emoji-polyfill/dist/TwemojiCountryFlags.woff2?url'
 
-// Fonts bundled with the app (no font CDN): Barlow for text, its semi-condensed cut for numbers.
-import '@fontsource/barlow/400.css'
-import '@fontsource/barlow/600.css'
-import '@fontsource/barlow/700.css'
-import '@fontsource/barlow-semi-condensed/600.css'
-import '@fontsource/barlow-semi-condensed/700.css'
+// The shared charter (référentiel R-17, R-18, SPT-03): self-hosted fonts (no font
+// CDN), then the colour and spacing tokens. theme.css only maps them to the app.
+import '@quen9669/lignes/polices.css'
+import '@quen9669/lignes/tokens.css'
 
 import App from './App'
 import { captureInstallPrompt } from './pwa/install'

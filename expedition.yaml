@@ -14,6 +14,9 @@ maj: 2026-11-17
 # Un écart passe ici quand le commit qui le corrige cite son ID : fix(SPT-03): …
 ecarts:
   corriges:
+    - id: SPT-03
+      date: 2026-11-17
+      preuve: "bibliothèque @quen9669/lignes 0.2.0 (jetons, polices) ; logo et icônes PWA à reprendre"
     - id: SPT-07
       date: 2026-11-17
       preuve: "PR #38"
@@ -43,7 +46,8 @@ fait:
 
 # La ou les prochaines étapes, du point de vue de l'app.
 prochaines:
-  - "Charte Lignes : jetons, polices, pictogrammes par sport (SPT-03, SPT-04), dès que NPM_TOKEN est dans le coffre"
+  - "Pictogramme et libellé par sport, graphiques selon la charte (SPT-04)"
+  - "Logo et icônes PWA depuis la bibliothèque, une fois <Logo app=\"app-sport\"> corrigé dans Lignes (reste de SPT-03)"
   - "Gouvernance visible avec les composants de la bibliothèque (SPT-11)"
 
 # Chiffres clés, repris dans /vitrine.json et dans le mail.
