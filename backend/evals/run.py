@@ -10,9 +10,9 @@ change it (and its version line), then:
     make eval ARGS="--compare path/to/training-v3.md"
 
 The scenarios of that coach run twice, once per version, side by side in the
-report (evals/reports/, not committed). The calls cost real money but are not
-counted in the coach's monthly budget (they are logged in the throwaway
-database): ``--max-eur`` stops the run once that much has been spent.
+report (evals/reports/, not committed). The calls cost real money, through OmniRoute
+like the app (they are logged in the throwaway database): ``--max-eur`` stops
+the run once that much has been spent.
 """
 
 import argparse
@@ -114,7 +114,7 @@ def main(argv: list[str] | None = None) -> int:
     settings = get_settings()
     llm = get_llm(settings)
     if llm is None:
-        print("Aucune clé API dans .env (GEMINI_API_KEY ou ANTHROPIC_API_KEY) : rien à évaluer.")
+        print("Pas de clé OmniRoute (OMNIROUTE_API_KEY) : rien à évaluer.")
         return 1
     scenarios = [BY_NAME[name] for name in args.scenario] if args.scenario else SCENARIOS
     runs: list[tuple[Scenario, prompts.Prompt | None]] = [(s, None) for s in scenarios]

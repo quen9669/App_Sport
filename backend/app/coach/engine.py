@@ -8,7 +8,9 @@ One answer to FRANKS may take several model calls:
 3. back to 1, until the model answers in plain text (or ``MAX_ROUNDS``).
 
 Everything is streamed to the screen as it happens (``CoachEvent``), every
-model call is logged with its cost, and the monthly budget is checked first.
+model call is logged with its estimated cost. The budget is OmniRoute's job
+(référentiel R-07): when it refuses, the model raises ``LLMError`` and the
+screen shows the coach as "◆ Dégradé".
 """
 
 import json
@@ -23,7 +25,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy.orm import Session
 
 from app.coach import history, prompts
-from app.coach.costs import log_call, month_budget
+from app.coach.costs import log_call, month_spent
 from app.coach.llm import LLM, Final, LLMError, TextDelta, Usage
 from app.coach.plans import PLAN_TOOL, plan_data
 from app.coach.tools import ALL_TOOLS, ToolContext, run_tool, tools_for
@@ -62,8 +64,7 @@ class PlanEvent:
 @dataclass(frozen=True)
 class DoneEvent:
     cost_eur: float  # this answer, all model calls included
-    month_spent_eur: float
-    month_limit_eur: float
+    month_spent_eur: float  # information only, never a limit
 
 
 @dataclass(frozen=True)
@@ -158,14 +159,6 @@ class Engine:
     # --- The loop ---
 
     def answer(self, conversation: CoachConversation, text: str) -> Iterator[CoachEvent]:
-        budget = month_budget(self.db, self.now, self.settings)
-        if budget.exhausted:
-            yield ErrorEvent(
-                f"Budget du mois atteint ({budget.spent_eur:.2f} € sur {budget.limit_eur:.0f} €) : "
-                "le coach est en pause jusqu'au mois prochain. Tu peux relever "
-                "COACH_MONTHLY_BUDGET_EUR dans .env."
-            )
-            return
         if not conversation.messages:
             history.summarize_previous(self.db, self.llm, self.settings, conversation)
             conversation.title = text.strip()[:TITLE_LENGTH]
@@ -215,8 +208,8 @@ class Engine:
 
         history.compact(self.db, self.llm, self.settings, conversation)
         self.db.commit()
-        after = month_budget(self.db, self.now, self.settings)
-        yield DoneEvent(round(cost, 4), round(after.spent_eur, 4), after.limit_eur)
+        _, spent = month_spent(self.db, self.now)
+        yield DoneEvent(round(cost, 4), round(spent, 4))
 
     def _log(
         self,

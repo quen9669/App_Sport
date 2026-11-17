@@ -709,8 +709,7 @@ export interface Monitoring {
     status: MonitoringStatus
     enabled: boolean
     month: string
-    spent_eur: number
-    limit_eur: number
+    spent_eur: number // estimate; the quota lives in OmniRoute (SPT-02)
   }
   database_bytes: number | null
   activities_7d: number
@@ -825,14 +824,13 @@ export const setRunExcluded = (activityId: number, excluded: boolean) =>
 export type CoachName = 'training' | 'longevity'
 
 export interface CoachStatus {
-  configured: boolean // an API key is set in .env
+  configured: boolean // the app's OmniRoute key is set
   model: string
+  // The month's estimated spending, for information: the quota lives in
+  // OmniRoute, never in the app (référentiel R-07, SPT-02).
   budget: {
     month: string
     spent_eur: number
-    limit_eur: number
-    warning: boolean // 80 % of the budget reached
-    exhausted: boolean
   }
 }
 
@@ -931,7 +929,7 @@ export type CoachEvent =
   | { type: 'text'; text: string }
   | { type: 'tool'; name: string; label: string }
   | ({ type: 'plan' } & CoachPlan)
-  | { type: 'done'; cost_eur: number; month_spent_eur: number; month_limit_eur: number }
+  | { type: 'done'; cost_eur: number; month_spent_eur: number }
   | { type: 'error'; message: string }
 
 export const fetchCoachStatus = () => request<CoachStatus>('GET', '/api/coach/status')

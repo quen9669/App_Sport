@@ -1,4 +1,4 @@
-"""AI coach: tools, agent loop, costs and budget, history, memories, routes.
+"""AI coach: tools, agent loop, costs, history, memories, routes.
 
 The model is always the scripted FakeLLM (tests/fixtures/fake_llm.py).
 """
@@ -13,7 +13,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app.coach import history, prompts
-from app.coach.costs import cost_eur, month_budget
+from app.coach.costs import cost_eur, month_spent
 from app.coach.engine import DoneEvent, Engine, ErrorEvent, TextEvent, ToolEvent
 from app.coach.llm import LLMError, Usage
 from app.coach.tools import ALL_TOOLS, ToolContext, run_tool, tools_for
@@ -185,11 +185,11 @@ def test_prompts_are_versioned_files() -> None:
 
 def test_cost_estimate(settings: Settings) -> None:
     usage = Usage(input_tokens=1_000_000, output_tokens=100_000, cache_read_tokens=1_000_000)
-    # Gemini 3.8 Flash by default: 1.5 $ input + 0.15 $ cache reads + 0.75 $ output = 2.4 $.
-    assert cost_eur(usage, settings.main_model, settings) == pytest.approx(2.4 * 0.92)
+    # Default main model: 3 $ input + 0.3 $ cache reads + 1.5 $ output = 4.8 $.
+    assert cost_eur(usage, settings.main_model, settings) == pytest.approx(4.8 * 0.92)
     assert cost_eur(
         Usage(output_tokens=1_000_000), settings.light_model, settings
-    ) == pytest.approx(2.5 * 0.92)
+    ) == pytest.approx(5.0 * 0.92)
 
 
 # --- The agent loop ----------------------------------------------------------------------
@@ -264,22 +264,23 @@ def test_unknown_tool_and_failing_tool(
 
 
 def test_model_error_is_shown_and_logged(db: Session, settings: Settings) -> None:
-    llm = FakeLLM([LLMError("Clé API Anthropic refusée.")])
+    llm = FakeLLM([LLMError("◆ Coach dégradé : quota OmniRoute atteint.")])
     events = run(Engine(db, settings, llm, NOW), new_conversation(db), "Bonjour")
-    assert events == [ErrorEvent("Clé API Anthropic refusée.")]
+    assert events == [ErrorEvent("◆ Coach dégradé : quota OmniRoute atteint.")]
     assert db.query(CoachCall).one().error == "LLMError"
 
 
-def test_budget_exhausted_pauses_the_coach(db: Session, settings: Settings) -> None:
-    db.add(CoachCall(coach="training", model="m", cost_eur=10.0, created_at=NOW))
+def test_no_budget_in_the_app(db: Session, settings: Settings) -> None:
+    """SPT-02: whatever was spent, the app never stops the coach (OmniRoute does)."""
+    db.add(CoachCall(coach="training", model="m", cost_eur=1000.0, created_at=NOW))
     db.commit()
-    assert month_budget(db, NOW, settings).exhausted
-    llm = FakeLLM()
+    assert month_spent(db, NOW) == ("2026-10", 1000.0)
+    llm = FakeLLM([text_turn("Salut !")])
     events = run(Engine(db, settings, llm, NOW), new_conversation(db), "Bonjour")
-    assert isinstance(events[0], ErrorEvent) and "Budget du mois" in events[0].message
-    assert llm.calls == []
+    assert not any(isinstance(e, ErrorEvent) for e in events)
+    assert len(llm.calls) == 1
     # Last month's spending does not count.
-    assert not month_budget(db, NOW + timedelta(days=20), settings).exhausted
+    assert month_spent(db, NOW + timedelta(days=60))[1] == 0
 
 
 def test_too_many_rounds_stop(db: Session, settings: Settings) -> None:
@@ -335,7 +336,7 @@ def sse(body: str) -> list[tuple[str, dict[str, Any]]]:
 def test_status_without_key(client: TestClient) -> None:
     body = client.get("/api/coach/status").json()
     assert body["configured"] is False
-    assert body["budget"]["limit_eur"] == 10
+    assert "limit_eur" not in body["budget"]
     assert body["budget"]["spent_eur"] == 0
 
 
@@ -408,134 +409,3 @@ def test_memories(client: TestClient, fake: FakeLLM) -> None:
     assert len(client.get("/api/coach/training/memories").json()) == 1
     assert client.patch("/api/coach/memories/999", json={"accepted": True}).status_code == 404
     assert client.post("/api/coach/training/memories", json={"text": ""}).status_code == 422
-
-
-# --- The real SDK wrapper, against a simulated HTTP API ------------------------------------
-
-STREAM = [
-    (
-        "message_start",
-        {
-            "type": "message_start",
-            "message": {
-                "id": "msg_1",
-                "type": "message",
-                "role": "assistant",
-                "model": "m",
-                "content": [],
-                "stop_reason": None,
-                "stop_sequence": None,
-                "usage": {
-                    "input_tokens": 10,
-                    "output_tokens": 1,
-                    "cache_read_input_tokens": 900,
-                    "cache_creation_input_tokens": 0,
-                },
-            },
-        },
-    ),
-    (
-        "content_block_start",
-        {"type": "content_block_start", "index": 0, "content_block": {"type": "text", "text": ""}},
-    ),
-    (
-        "content_block_delta",
-        {
-            "type": "content_block_delta",
-            "index": 0,
-            "delta": {"type": "text_delta", "text": "Je regarde"},
-        },
-    ),
-    ("content_block_stop", {"type": "content_block_stop", "index": 0}),
-    (
-        "content_block_start",
-        {
-            "type": "content_block_start",
-            "index": 1,
-            "content_block": {
-                "type": "tool_use",
-                "id": "toolu_1",
-                "name": "get_sleep",
-                "input": {},
-            },
-        },
-    ),
-    (
-        "content_block_delta",
-        {
-            "type": "content_block_delta",
-            "index": 1,
-            "delta": {"type": "input_json_delta", "partial_json": '{"days": 7}'},
-        },
-    ),
-    ("content_block_stop", {"type": "content_block_stop", "index": 1}),
-    (
-        "message_delta",
-        {
-            "type": "message_delta",
-            "delta": {"stop_reason": "tool_use", "stop_sequence": None},
-            "usage": {"output_tokens": 30},
-        },
-    ),
-    ("message_stop", {"type": "message_stop"}),
-]
-
-
-def fake_http(response: Any) -> Any:
-    """An HTTP client for the SDK that answers locally (no network at all)."""
-    import httpx2
-
-    requests: list[Any] = []
-
-    def handler(request: Any) -> Any:
-        requests.append(request)
-        return response
-
-    client = httpx2.Client(transport=httpx2.MockTransport(handler))
-    client.requests = requests  # type: ignore[attr-defined]
-    return client
-
-
-def test_anthropic_wrapper_maps_the_stream() -> None:
-    import httpx2
-
-    from app.coach.llm import AnthropicLLM, Final, TextDelta, ToolStart
-
-    body = "".join(f"event: {name}\ndata: {json.dumps(data)}\n\n" for name, data in STREAM)
-    http = fake_http(httpx2.Response(200, text=body, headers={"content-type": "text/event-stream"}))
-    events = list(
-        AnthropicLLM("sk-test", http).stream(
-            model="m",
-            system=[],
-            tools=[],
-            messages=[{"role": "user", "content": "x"}],
-            max_tokens=5,
-        )
-    )
-    assert events[:2] == [TextDelta("Je regarde"), ToolStart("get_sleep")]
-    final = events[-1]
-    assert isinstance(final, Final) and final.stop_reason == "tool_use"
-    assert final.content[1] == {
-        "type": "tool_use",
-        "id": "toolu_1",
-        "name": "get_sleep",
-        "input": {"days": 7},
-    }
-    assert (final.usage.input_tokens, final.usage.output_tokens) == (10, 30)
-    assert final.usage.cache_read_tokens == 900
-    assert http.requests[-1].headers["x-api-key"] == "sk-test"
-
-
-def test_anthropic_wrapper_turns_errors_into_french_messages() -> None:
-    import httpx2
-
-    from app.coach.llm import AnthropicLLM
-
-    error = {"type": "error", "error": {"type": "authentication_error", "message": "bad key"}}
-    http = fake_http(httpx2.Response(401, json=error))
-    with pytest.raises(LLMError, match="Clé API Anthropic refusée"):
-        list(
-            AnthropicLLM("bad", http).stream(
-                model="m", system=[], tools=[], messages=[], max_tokens=5
-            )
-        )

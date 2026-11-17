@@ -3,7 +3,8 @@
 // piece (streaming); the tools the coach uses to read FRANKS's data are shown
 // as they run ("lit ton sommeil…"), and a proposed weekly plan appears as a
 // card to accept or modify. Conversations are kept by the backend; the
-// month's cost and budget (both coaches together) are always visible.
+// month's estimated cost (both coaches together) is always visible. The quota
+// itself lives in OmniRoute: when it refuses, the error says "◆ Coach dégradé".
 import { useEffect, useRef, useState } from 'react'
 
 import {
@@ -144,11 +145,7 @@ export default function CoachPage({ coach }: { coach: CoachName }) {
             old
               ? {
                   ...old,
-                  budget: {
-                    ...old.budget,
-                    spent_eur: event.month_spent_eur,
-                    warning: event.month_spent_eur >= 0.8 * event.month_limit_eur,
-                  },
+                  budget: { ...old.budget, spent_eur: event.month_spent_eur },
                 }
               : old,
           )
@@ -264,20 +261,14 @@ function StatusLine({ status }: { status: CoachStatus }) {
   if (!status.configured) {
     return (
       <p className="notice" role="status">
-        Le coach attend ta clé API Gemini : ajoute <code>GEMINI_API_KEY</code> dans le fichier{' '}
-        <code>.env</code> (voir le guide), puis relance l’app.
+        Le coach attend la clé OmniRoute de l’app (<code>OMNIROUTE_API_KEY</code>, rangée dans le
+        coffre).
       </p>
     )
   }
-  const { spent_eur, limit_eur, warning, exhausted } = status.budget
   return (
-    <p className={warning ? 'notice' : 'hint'} role="status">
-      Ce mois-ci : {euros(spent_eur)} sur {euros(limit_eur)} de budget
-      {exhausted
-        ? ' : budget atteint, le coach est en pause jusqu’au mois prochain.'
-        : warning
-          ? ' : plus de 80 % du budget utilisé.'
-          : '.'}
+    <p className="hint" role="status">
+      Ce mois-ci : {euros(status.budget.spent_eur)} (estimation). Le quota se règle dans OmniRoute.
     </p>
   )
 }

@@ -19,7 +19,7 @@
 | 6a | Connexion par mot de passe, durcissement, sauvegardes, PWA hors ligne | ✅ Terminé |
 | 6b | Mise en ligne (PC + Tailscale) et installation sur le téléphone | ✅ Terminé |
 | 6c | Hébergement sur le VPS (Coolify, projet à part, SQLite), alignement sur le socle commun | 🚧 En cours |
-| 7a | Écarts P1 : coach via OmniRoute (SPT-01), plus de budget dans le code (SPT-02) | ⏳ À faire, urgent |
+| 7a | Écarts P1 : coach via OmniRoute (SPT-01), plus de budget dans le code (SPT-02) | 🚧 Code prêt, test à travers OmniRoute à faire |
 | 7b | Écarts P2 : sauvegarde commune (SPT-09), coffre (SPT-10), charte Lignes (SPT-03, SPT-04), gouvernance visible (SPT-11) | ⏳ À faire |
 | 7c | Scène 3D d'accueil « la semaine » (SPT-05), après la bibliothèque (LIB-03) | ⏳ À faire |
 | 7d | Écarts P3 : `/health` commun, `/vitrine.json`, `obs-net` (SPT-06), badge Longévité (SPT-08) | ⏳ À faire |
@@ -188,7 +188,7 @@ Hébergement sur le VPS (Coolify 4.7.5, projet `app-sport`, voir `docs/learning/
 
 ## Phase 7a : écarts P1 (urgent)
 
-- [ ] **SPT-01** (R-05, R-06) : le coach passe uniquement par OmniRoute. Les anciennes clés
+- [x] **SPT-01** (R-05, R-06) : le coach passe uniquement par OmniRoute. Les anciennes clés
       Anthropic et Gemini ont été révoquées le 2026-11-17, le coach est peut-être en panne.
       `OMNIROUTE_API_KEY: ${OMNIROUTE_API_KEY}` déclarée dans le compose (valeur déjà dans le coffre,
       `apps/app-sport/OMNIROUTE_API_KEY`), `OMNIROUTE_BASE_URL=http://omniroute:20128/v1`,
@@ -197,11 +197,14 @@ Hébergement sur le VPS (Coolify 4.7.5, projet `app-sport`, voir `docs/learning/
       OmniRoute ; `GEMINI_API_KEY` et `ANTHROPIC_API_KEY` retirées de `.env.example` et de Coolify.
       Le modèle ne conserve pas les prompts (R-08, données de santé). Le banc d'évaluation
       (`make eval`) passe aussi par OmniRoute.
-- [ ] **SPT-02** (R-07) : le plafond de 10 €/mois codé dans l'app est supprimé (alerte 80 %, arrêt
+- [x] **SPT-02** (R-07) : le plafond de 10 €/mois codé dans l'app est supprimé (alerte 80 %, arrêt
       à 100 %, `COACH_MONTHLY_BUDGET_EUR`, carte budget du Monitoring). La clé OmniRoute est payante
       avec un quota fixé par FRANKS dans OmniRoute. Si OmniRoute refuse (quota atteint, clé
       bloquée), le coach passe en ◆ Dégradé avec un message clair, et le reste de l'app
       fonctionne. Le coût par appel peut rester journalisé, sans plafond.
+- [ ] Vérifié sur le VPS à travers OmniRoute : outils, streaming SSE, cache de prompt, noms des
+      modèles (`COACH_MODEL`) ; `GEMINI_API_KEY`, `ANTHROPIC_API_KEY` et `COACH_MONTHLY_BUDGET_EUR`
+      supprimées de Coolify (et du coffre si elles y sont).
 
 ## Phase 7b : écarts P2
 

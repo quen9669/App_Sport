@@ -1,11 +1,10 @@
-"""What the coaches cost: token prices, the log of every call and the monthly budget.
+"""What the coaches cost: token prices and the log of every call.
 
 Prices come from the settings (see app/config.py), so a price change or a new
 model only needs a line in ``.env``. Costs are estimates: the provider's
-invoice (Google or Anthropic) is the reference.
+quota and dashboard in OmniRoute are the reference.
 """
 
-from dataclasses import dataclass
 from datetime import datetime
 
 from sqlalchemy import func, select
@@ -15,12 +14,9 @@ from app.coach.llm import Usage
 from app.config import Settings
 from app.db.models import CoachCall
 
-# Cached input costs 10 % of the input price to read (both providers) and 125 %
-# to write (Anthropic only: Gemini's automatic cache has no write cost).
+# Cached input costs 10 % of the input price to read and 125 % to write.
 CACHE_READ_FACTOR = 0.1
 CACHE_WRITE_FACTOR = 1.25
-# The coach shows a warning when the month's spending reaches this share of the budget.
-WARNING_SHARE = 0.8
 
 
 def cost_eur(usage: Usage, model: str, settings: Settings) -> float:
@@ -67,23 +63,12 @@ def log_call(
     return call
 
 
-@dataclass(frozen=True)
-class Budget:
-    month: str  # "2026-10"
-    spent_eur: float
-    limit_eur: float
+def month_spent(db: Session, now: datetime) -> tuple[str, float]:
+    """("2026-11", estimated euros) of the current calendar month (UTC), both coaches.
 
-    @property
-    def exhausted(self) -> bool:
-        return self.spent_eur >= self.limit_eur
-
-    @property
-    def warning(self) -> bool:
-        return self.spent_eur >= self.limit_eur * WARNING_SHARE
-
-
-def month_budget(db: Session, now: datetime, settings: Settings) -> Budget:
-    """Spending of the current calendar month (UTC), both coaches together."""
+    Shown for information only: the budget is enforced by OmniRoute, never by the
+    app (référentiel R-07, écart SPT-02).
+    """
     start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     spent = db.scalar(select(func.sum(CoachCall.cost_eur)).where(CoachCall.created_at >= start))
-    return Budget(f"{now:%Y-%m}", float(spent or 0.0), settings.coach_monthly_budget_eur)
+    return f"{now:%Y-%m}", float(spent or 0.0)

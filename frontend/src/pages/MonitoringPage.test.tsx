@@ -42,7 +42,7 @@ function monitoring(overrides: Partial<Monitoring> = {}): Monitoring {
       last_copy_bytes: 90 * 1024 * 1024,
     },
     memory: { status: 'ok', used_bytes: 214 * 1024 * 1024, limit_bytes: 512 * 1024 * 1024 },
-    coach: { status: 'ok', enabled: true, month: '2026-11', spent_eur: 3.4, limit_eur: 10 },
+    coach: { status: 'ok', enabled: true, month: '2026-11', spent_eur: 3.4 },
     database_bytes: 86 * 1024 * 1024,
     activities_7d: 9,
     grafana_url: 'http://grafana.test/d/app-sport',
@@ -61,7 +61,7 @@ describe('MonitoringPage', () => {
     expect(screen.getByText('il y a 1 h 52')).toBeInTheDocument() // Garmin
     expect(screen.getByText(/Strava a refusé la connexion/)).toBeInTheDocument()
     expect(screen.getByText(/Échecs sur 7 jours : 2/)).toBeInTheDocument()
-    expect(screen.getByText('3,40 € dépensés sur 10,00 € ce mois-ci')).toBeInTheDocument()
+    expect(screen.getByText('3,40 € dépensés ce mois-ci (estimation)')).toBeInTheDocument()
     expect(screen.getByText('Mémoire : 214 Mo sur 512 Mo')).toBeInTheDocument()
     expect(screen.getByText(/14 copies gardées · 90 Mo chacune/)).toBeInTheDocument()
   })

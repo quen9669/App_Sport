@@ -46,7 +46,6 @@ class CoachHealthOut(BaseModel):
     enabled: bool
     month: str
     spent_eur: float
-    limit_eur: float
 
 
 class MonitoringOut(BaseModel):

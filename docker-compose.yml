@@ -5,7 +5,8 @@
 # https://app-sport.<your-tailnet>.ts.net. Nothing here touches other projects.
 # Guide: docs/learning/07-vps-coolify.md
 #
-# Secrets (${...}) are typed in Coolify's "Environment Variables", never here.
+# Secrets (${...}) live in the OpenBao vault (apps/app-sport/<NAME>); the vault
+# sync pushes them into Coolify. Never typed here, never in a real .env.
 
 services:
   # The app: API + interface on port 8000, inside the project network only.
@@ -23,15 +24,18 @@ services:
       STRAVA_CLIENT_SECRET: ${STRAVA_CLIENT_SECRET:-}
       GARMIN_EMAIL: ${GARMIN_EMAIL:-}
       GARMIN_PASSWORD: ${GARMIN_PASSWORD:-}
-      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      COACH_PROVIDER: ${COACH_PROVIDER:-}
-      COACH_MONTHLY_BUDGET_EUR: ${COACH_MONTHLY_BUDGET_EUR:-10}
+      # AI coaches: only through OmniRoute (référentiel R-05, SPT-01), on llm-net.
+      # The monthly quota is set in OmniRoute, never in the app (R-07, SPT-02).
+      OMNIROUTE_API_KEY: ${OMNIROUTE_API_KEY}
+      OMNIROUTE_BASE_URL: http://omniroute:20128/v1
       # Address of the Grafana dashboard (button on Réglages > Monitoring); empty = no button.
       GRAFANA_URL: ${GRAFANA_URL:-}
       APP_TIMEZONE: Europe/Luxembourg
     volumes:
       - app-sport-data:/data
+    # default: the project's own network (the Tailscale sidecar reaches the app
+    # there); llm-net: the shared network where OmniRoute listens.
+    networks: [default, llm-net]
     # Hardening: read-only system, no Linux privileges, a memory ceiling.
     read_only: true
     tmpfs:
@@ -94,3 +98,8 @@ services:
 volumes:
   app-sport-data:
   app-sport-tailscale:
+
+networks:
+  # Created once on the server by the AI socle, shared by the apps that use AI.
+  llm-net:
+    external: true

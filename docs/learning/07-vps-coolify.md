@@ -63,7 +63,8 @@ Jamais dans le dépôt. Copie aussi dans `C:\Users\franc\.jobradar-secrets\app-s
 | `APP_PASSWORD_HASH` | la même que sur le PC (même mot de passe) |
 | `FRONTEND_URL` | `https://app-sport.<tailnet>.ts.net` |
 | `STRAVA_REDIRECT_URI` | `https://app-sport.<tailnet>.ts.net/api/strava/callback` |
-| `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `GARMIN_EMAIL`, `GARMIN_PASSWORD`, `GEMINI_API_KEY` | comme sur le PC |
+| `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `GARMIN_EMAIL`, `GARMIN_PASSWORD` | comme sur le PC |
+| `OMNIROUTE_API_KEY` | vient du coffre (`apps/app-sport/OMNIROUTE_API_KEY`), poussée par la synchro : ne pas la saisir à la main |
 | `TS_AUTHKEY` | la clé Tailscale (étape 1) |
 | `RCLONE_GDRIVE_TOKEN` | le jeton de l'étape 3, ou celui de la sauvegarde JobRadar (ton choix) |
 | `RCLONE_GDRIVE_CLIENT_ID`, `RCLONE_GDRIVE_CLIENT_SECRET`, `RCLONE_GDRIVE_SCOPE` | seulement si tu reprends l'accès Drive de JobRadar : les mêmes valeurs que sa configuration rclone (le jeton est lié à ce client Google) |

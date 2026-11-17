@@ -140,10 +140,12 @@ function MonitoringView({ data, onRefresh }: { data: Monitoring; onRefresh: () =
         <h2 id="coach-title">
           Coach IA <StatusBadge status={data.coach.status} />
         </h2>
-        <p>
-          {euros(data.coach.spent_eur)} dépensés sur {euros(data.coach.limit_eur)} ce mois-ci
+        <p>{euros(data.coach.spent_eur)} dépensés ce mois-ci (estimation)</p>
+        <p className="hint">
+          {data.coach.enabled
+            ? 'Via OmniRoute, qui fixe le quota. ◆ si le dernier appel a été refusé.'
+            : 'Aucune clé OmniRoute configurée.'}
         </p>
-        {!data.coach.enabled && <p className="hint">Aucune clé d&apos;IA configurée.</p>}
       </section>
 
       <section className="card" aria-labelledby="server-title">

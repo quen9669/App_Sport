@@ -28,13 +28,10 @@ test('Coach page: a streamed answer appears in the chat', async ({ page }, testI
     route.fulfill({
       json: {
         configured: true,
-        model: 'gemini-3.8-flash',
+        model: 'claude-sonnet-5-5',
         budget: {
           month: '2026-10',
           spent_eur: 0.42,
-          limit_eur: 10,
-          warning: false,
-          exhausted: false,
         },
       },
     }),
@@ -50,7 +47,7 @@ test('Coach page: a streamed answer appears in the chat', async ({ page }, testI
           'de 50:00.\n- Garde 2 sorties faciles par semaine\n- Ajoute une séance au seuil (5:00 /km)',
       },
     ],
-    ['done', { cost_eur: 0.03, month_spent_eur: 0.45, month_limit_eur: 10 }],
+    ['done', { cost_eur: 0.03, month_spent_eur: 0.45 }],
   ]
   await page.route('**/api/coach/conversations/*/messages', (route) =>
     route.fulfill({
@@ -105,13 +102,10 @@ test('Coach page: a weekly plan is accepted, then shown in Mon plan', async ({
     route.fulfill({
       json: {
         configured: true,
-        model: 'gemini-3.8-flash',
+        model: 'claude-sonnet-5-5',
         budget: {
           month: '2026-10',
           spent_eur: 0.5,
-          limit_eur: 10,
-          warning: false,
-          exhausted: false,
         },
       },
     }),
@@ -121,7 +115,7 @@ test('Coach page: a weekly plan is accepted, then shown in Mon plan', async ({
     ['tool', { name: 'propose_weekly_plan', label: 'prépare un plan de semaine' }],
     ['plan', plan],
     ['text', { text: 'Voici une semaine **équilibrée** : allège si ta HRV baisse.' }],
-    ['done', { cost_eur: 0.02, month_spent_eur: 0.52, month_limit_eur: 10 }],
+    ['done', { cost_eur: 0.02, month_spent_eur: 0.52 }],
   ]
   await page.route('**/api/coach/conversations/*/messages', (route) =>
     route.fulfill({

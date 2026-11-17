@@ -18,6 +18,8 @@ ecarts:
       date: 2026-11-17
       preuve: "commit docs(SPT-07): alignement sur le référentiel"
   en_cours:
+    - SPT-01
+    - SPT-02
     - SPT-10
 
 # Ce qui a été fait, en une ligne par élément (la routine complète avec git log).
@@ -25,11 +27,11 @@ fait:
   - "Hébergée sur le VPS (Coolify, sidecar Tailscale, SQLite en volume nommé)"
   - "Page Monitoring et tableau de bord Grafana en JSON dans le dépôt"
   - "Pointeur vers le référentiel dans CLAUDE.md, feuille de route alignée (SPT-07)"
+  - "Coach via OmniRoute et sans plafond dans le code : code prêt, à vérifier sur le VPS (SPT-01, SPT-02)"
 
 # La ou les prochaines étapes, du point de vue de l'app.
 prochaines:
-  - "Coach via OmniRoute, anciennes clés révoquées (SPT-01)"
-  - "Plafond de 10 € retiré du code, coach ◆ Dégradé si OmniRoute refuse (SPT-02)"
+  - "Déployer et vérifier le coach à travers OmniRoute (SPT-01, SPT-02)"
   - "Retrait du sidecar de sauvegarde (SPT-09)"
 
 # Chiffres clés, repris dans /vitrine.json et dans le mail.

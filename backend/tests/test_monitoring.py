@@ -116,8 +116,10 @@ def test_memory_without_limit_or_outside_docker(tmp_path: Path) -> None:
     assert (health.status, health.limit_bytes) == ("ok", None)
 
 
-def test_coach_budget_status(db: Session, settings: Settings) -> None:
-    assert coach_health(db, NOW, settings).status == "ok"
+def test_coach_status(db: Session, settings: Settings) -> None:
+    assert coach_health(db, NOW, settings).status == "unknown"  # no key in tests
+    enabled = settings.model_copy(update={"omniroute_api_key": "k"})
+    assert coach_health(db, NOW, enabled).status == "ok"
     db.add(
         CoachCall(
             created_at=NOW - timedelta(days=1),
@@ -125,14 +127,15 @@ def test_coach_budget_status(db: Session, settings: Settings) -> None:
             model="m",
             input_tokens=0,
             output_tokens=0,
-            cost_eur=settings.coach_monthly_budget_eur * 0.9,
+            cost_eur=50.0,
             latency_ms=1,
+            error="LLMError",
         )
     )
     db.commit()
-    health = coach_health(db, NOW, settings)
-    assert health.status == "warning"
-    assert health.enabled is False  # no key in tests
+    # The last call failed (e.g. OmniRoute refused it): "◆ Dégradé", never a limit.
+    health = coach_health(db, NOW, enabled)
+    assert (health.status, health.enabled, health.spent_eur) == ("warning", True, 50.0)
 
 
 def test_the_worst_status_wins() -> None:

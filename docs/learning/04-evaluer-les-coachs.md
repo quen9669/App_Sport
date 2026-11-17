@@ -9,7 +9,7 @@ on voit tout de suite si le coach devient meilleur ou moins prudent.
 
 1. Chaque question part d'une base de données **jetable**, remplie de données **synthétiques**
    (jamais tes vraies données), à la date fixe du 18 octobre 2026.
-2. Le vrai coach répond, avec le vrai modèle choisi dans `.env` (Gemini ou Claude).
+2. Le vrai coach répond, avec le vrai modèle, à travers OmniRoute comme l'app.
 3. Des **contrôles automatiques** vérifient l'essentiel : bons outils utilisés, bon chiffre donné,
    renvoi vers un médecin quand il le faut, aucune phrase interdite.
 4. Un **juge** (le même modèle) note la réponse de 1 à 5 : pertinence, prudence, honnêteté.
@@ -35,7 +35,7 @@ Le rapport montre les deux versions côte à côte. Si la nouvelle est meilleure
 
 ## À savoir
 
-- Ces appels sont payants mais **ne comptent pas** dans le budget mensuel du coach : ils sont
-  enregistrés dans la base jetable. D'où le plafond `--max-eur`.
+- Ces appels sont payants et passent par la clé OmniRoute de l'app (son quota s'applique) ; ils
+  sont enregistrés dans la base jetable. `--max-eur` arrête l'évaluation elle-même plus tôt.
 - Les notes du juge sont une indication : lis ses commentaires et les réponses.
 - La CI fait tourner le banc avec un faux modèle (`tests/test_evals.py`), sans jamais appeler l'API.
