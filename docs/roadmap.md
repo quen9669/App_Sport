@@ -19,10 +19,10 @@
 | 6a | Connexion par mot de passe, durcissement, sauvegardes, PWA hors ligne | ✅ Terminé |
 | 6b | Mise en ligne (PC + Tailscale) et installation sur le téléphone | ✅ Terminé |
 | 6c | Hébergement sur le VPS (Coolify, projet à part, SQLite), alignement sur le socle commun | 🚧 En cours |
-| 7a | Écarts P1 : coach via OmniRoute (SPT-01), plus de budget dans le code (SPT-02) | 🚧 Code prêt, test à travers OmniRoute à faire |
+| 7a | Écarts P1 : coach via OmniRoute (SPT-01), plus de budget dans le code (SPT-02) | ✅ Fusionné, vérification sur le VPS à faire |
 | 7b | Écarts P2 : sauvegarde commune (SPT-09), coffre (SPT-10), charte Lignes (SPT-03, SPT-04), gouvernance visible (SPT-11) | ⏳ À faire |
 | 7c | Scène 3D d'accueil « la semaine » (SPT-05), après la bibliothèque (LIB-03) | ⏳ À faire |
-| 7d | Écarts P3 : `/health` commun, `/vitrine.json`, `obs-net` (SPT-06), badge Longévité (SPT-08) | ⏳ À faire |
+| 7d | Écarts P3 : `/health` commun, `/vitrine.json`, `obs-net` (SPT-06) ✅, badge Longévité (SPT-08) | ⏳ SPT-08 à définir |
 
 ## Phase 0 : critères d'acceptation
 
@@ -183,7 +183,7 @@ Hébergement sur le VPS (Coolify 4.7.5, projet `app-sport`, voir `docs/learning/
 - [x] Page Réglages › Monitoring et tableau de bord Grafana en JSON dans le dépôt
       (`deploy/grafana/app-sport.json`, copié dans le socle par la session Référentiel)
 - [x] Pointeur vers le référentiel en tête de `CLAUDE.md` et `expedition.yaml` à la racine (SPT-07)
-- [ ] Sidecar de sauvegarde `sport-backup` retiré : voir SPT-09 (phase 7b)
+- [x] Sidecar de sauvegarde `sport-backup` retiré : voir SPT-09 (phase 7b)
 - [ ] Secrets reçus uniquement du coffre OpenBao : voir SPT-10 (phase 7b)
 
 ## Phase 7a : écarts P1 (urgent)
@@ -208,7 +208,7 @@ Hébergement sur le VPS (Coolify 4.7.5, projet `app-sport`, voir `docs/learning/
 
 ## Phase 7b : écarts P2
 
-- [ ] **SPT-09** (R-11) : retirer `sport-backup` (rclone vers Drive) et `deploy/backup/` du
+- [x] **SPT-09** (R-11) : retirer `sport-backup` (rclone vers Drive) et `deploy/backup/` du
       compose, ainsi que la copie de nuit à 03:30 (`services/backup.py`, `make backup` /
       `make restore`) : l'archive commune de la nuit couvre le volume `app-sport-data` (7 jours sur
       Drive, restauration testée le 2026-11-17). Le Monitoring ne surveille plus de « copie de nuit ».
@@ -239,7 +239,7 @@ Hébergement sur le VPS (Coolify 4.7.5, projet `app-sport`, voir `docs/learning/
 
 ## Phase 7d : écarts P3
 
-- [ ] **SPT-06** (R-16, R-26) : `GET /health` au format commun (● / ◆ / ■ ; coach ◆ si OmniRoute
+- [x] **SPT-06** (R-16, R-26) : `GET /health` au format commun (● / ◆ / ■ ; coach ◆ si OmniRoute
       refuse) et `GET /vitrine.json` (agrégats seulement : nombre de séances, semaines de série),
       conteneur principal sur le réseau `obs-net` ; son adresse vue depuis `obs-net` est donnée à
       FRANKS pour le blackbox. L'app ne notifie jamais elle-même : un flux planifié pinge son

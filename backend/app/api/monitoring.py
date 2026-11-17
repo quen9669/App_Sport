@@ -28,13 +28,6 @@ class SourceHealthOut(BaseModel):
     failures_7d: int
 
 
-class BackupHealthOut(BaseModel):
-    status: Status
-    last_copy_at: datetime | None
-    copies: int
-    last_copy_bytes: int | None
-
-
 class MemoryHealthOut(BaseModel):
     status: Status
     used_bytes: int | None  # None outside Docker
@@ -53,7 +46,6 @@ class MonitoringOut(BaseModel):
     checked_at: datetime
     started_at: datetime  # when the app (this process) started
     sources: list[SourceHealthOut]
-    backup: BackupHealthOut
     memory: MemoryHealthOut
     coach: CoachHealthOut
     database_bytes: int | None

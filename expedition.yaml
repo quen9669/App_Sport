@@ -16,10 +16,20 @@ ecarts:
   corriges:
     - id: SPT-07
       date: 2026-11-17
-      preuve: "commit docs(SPT-07): alignement sur le référentiel"
+      preuve: "PR #38"
+    - id: SPT-01
+      date: 2026-11-17
+      preuve: "PR #38"
+    - id: SPT-02
+      date: 2026-11-17
+      preuve: "PR #38"
+    - id: SPT-09
+      date: 2026-11-17
+      preuve: "PR #39"
+    - id: SPT-06
+      date: 2026-11-17
+      preuve: "PR #39"
   en_cours:
-    - SPT-01
-    - SPT-02
     - SPT-10
 
 # Ce qui a été fait, en une ligne par élément (la routine complète avec git log).
@@ -27,13 +37,15 @@ fait:
   - "Hébergée sur le VPS (Coolify, sidecar Tailscale, SQLite en volume nommé)"
   - "Page Monitoring et tableau de bord Grafana en JSON dans le dépôt"
   - "Pointeur vers le référentiel dans CLAUDE.md, feuille de route alignée (SPT-07)"
-  - "Coach via OmniRoute et sans plafond dans le code : code prêt, à vérifier sur le VPS (SPT-01, SPT-02)"
+  - "Coach via OmniRoute, sans plafond dans le code (SPT-01, SPT-02)"
+  - "Sidecar de sauvegarde et copies de nuit retirés, archive commune seule (SPT-09)"
+  - "/health au format commun, /vitrine.json, obs-net, ping Healthchecks (SPT-06)"
 
 # La ou les prochaines étapes, du point de vue de l'app.
 prochaines:
-  - "Déployer et vérifier le coach à travers OmniRoute (SPT-01, SPT-02)"
-  - "Retrait du sidecar de sauvegarde (SPT-09)"
+  - "Charte Lignes : jetons, polices, pictogrammes par sport (SPT-03, SPT-04), dès que NPM_TOKEN est dans le coffre"
+  - "Gouvernance visible avec les composants de la bibliothèque (SPT-11)"
 
 # Chiffres clés, repris dans /vitrine.json et dans le mail.
-# À remplir quand /vitrine.json existera (SPT-06) : aucun chiffre inventé.
+# Les vrais chiffres sont servis en direct par GET /vitrine.json : aucun chiffre inventé ici.
 chiffres: []

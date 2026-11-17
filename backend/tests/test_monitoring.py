@@ -1,4 +1,4 @@
-"""Monitoring settings page: sync, backup, memory and coach checks."""
+"""Monitoring settings page: sync, memory and coach checks."""
 
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -11,7 +11,6 @@ from app.config import Settings
 from app.db.models.coach import CoachCall
 from app.db.models.sync import SyncLog
 from app.services.monitoring import (
-    backup_health,
     coach_health,
     memory_health,
     overall,
@@ -79,25 +78,6 @@ def test_old_failures_are_not_counted(db: Session) -> None:
     assert source_health(db, "strava", NOW).failures_7d == 0
 
 
-def test_backup_reads_the_time_from_the_newest_copy(tmp_path: Path) -> None:
-    (tmp_path / "app_sport-20261114-033000.db").write_bytes(b"x" * 10)
-    (tmp_path / "app_sport-20261115-033000.db").write_bytes(b"x" * 20)
-    health = backup_health(tmp_path, NOW)
-    assert health.status == "ok"
-    assert health.copies == 2
-    assert health.last_copy_at == datetime(2026, 11, 15, 3, 30, tzinfo=UTC)
-    assert health.last_copy_bytes == 20
-
-
-def test_a_missed_night_is_an_error(tmp_path: Path) -> None:
-    (tmp_path / "app_sport-20261113-033000.db").write_bytes(b"x")
-    assert backup_health(tmp_path, NOW).status == "error"
-
-
-def test_no_copy_yet_is_unknown(tmp_path: Path) -> None:
-    assert backup_health(tmp_path / "missing", NOW).status == "unknown"
-
-
 def test_memory_against_the_docker_limit(tmp_path: Path) -> None:
     (tmp_path / "memory.current").write_text("214000000\n")
     (tmp_path / "memory.max").write_text("536870912\n")
@@ -163,7 +143,6 @@ def test_route_answers_without_any_health_data(
         "checked_at",
         "started_at",
         "sources",
-        "backup",
         "memory",
         "coach",
         "database_bytes",

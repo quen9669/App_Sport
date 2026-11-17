@@ -1,6 +1,6 @@
 # App Sport on the VPS, as one Coolify project ("app-sport").
 #
-# Three containers on a Docker network of their own, one volume, and NO port
+# Two containers on a Docker network of their own, one volume, and NO port
 # published on the VPS: you reach the app only through Tailscale, at
 # https://app-sport.<your-tailnet>.ts.net. Nothing here touches other projects.
 # Guide: docs/learning/07-vps-coolify.md
@@ -30,12 +30,17 @@ services:
       OMNIROUTE_BASE_URL: http://omniroute:20128/v1
       # Address of the Grafana dashboard (button on Réglages > Monitoring); empty = no button.
       GRAFANA_URL: ${GRAFANA_URL:-}
+      # Pinged after each scheduled sync (référentiel R-26); the URL comes from the vault.
+      HEALTHCHECKS_URL: ${HEALTHCHECKS_URL:-}
       APP_TIMEZONE: Europe/Luxembourg
     volumes:
       - app-sport-data:/data
     # default: the project's own network (the Tailscale sidecar reaches the app
-    # there); llm-net: the shared network where OmniRoute listens.
-    networks: [default, llm-net]
+    # there); llm-net: the shared network where OmniRoute listens; obs-net: the
+    # supervision reads http://sport-app:8000/health from there (SPT-06).
+    networks: [default, llm-net, obs-net]
+    # No backup container (référentiel R-11, SPT-09): the server's nightly archive
+    # copies the named volume app-sport-data, 7 days on Google Drive.
     # Hardening: read-only system, no Linux privileges, a memory ceiling.
     read_only: true
     tmpfs:
@@ -67,34 +72,6 @@ services:
     security_opt: ["no-new-privileges:true"]
     mem_limit: 128m
 
-  # Encrypted copy of the nightly backups to Google Drive (folder "App Sport").
-  sport-backup:
-    build: ./deploy/backup
-    restart: unless-stopped
-    environment:
-      # Google Drive access. It can be the same Google account and OAuth client as
-      # JobRadar's backup (owner's choice): only these values are copied, App Sport
-      # still writes to its own folder with its own encryption keys.
-      RCLONE_CONFIG_GDRIVE_TYPE: drive
-      RCLONE_CONFIG_GDRIVE_SCOPE: ${RCLONE_GDRIVE_SCOPE:-drive.file}
-      RCLONE_CONFIG_GDRIVE_CLIENT_ID: ${RCLONE_GDRIVE_CLIENT_ID:-}
-      RCLONE_CONFIG_GDRIVE_CLIENT_SECRET: ${RCLONE_GDRIVE_CLIENT_SECRET:-}
-      RCLONE_CONFIG_GDRIVE_TOKEN: ${RCLONE_GDRIVE_TOKEN:?}
-      RCLONE_CONFIG_SPORT_TYPE: crypt
-      RCLONE_CONFIG_SPORT_REMOTE: "gdrive:App Sport"
-      RCLONE_CONFIG_SPORT_PASSWORD: ${RCLONE_CRYPT_PASSWORD:?}
-      RCLONE_CONFIG_SPORT_PASSWORD2: ${RCLONE_CRYPT_SALT:?}
-    volumes:
-      # Read-only: the backup container can never change the database.
-      - app-sport-data:/data:ro
-    read_only: true
-    tmpfs:
-      - /tmp
-      - /config/rclone
-    cap_drop: [ALL]
-    security_opt: ["no-new-privileges:true"]
-    mem_limit: 128m
-
 volumes:
   app-sport-data:
   app-sport-tailscale:
@@ -102,4 +79,7 @@ volumes:
 networks:
   # Created once on the server by the AI socle, shared by the apps that use AI.
   llm-net:
+    external: true
+  # Created by the supervision socle; the blackbox probes /health through it.
+  obs-net:
     external: true

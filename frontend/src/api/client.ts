@@ -694,12 +694,6 @@ export interface Monitoring {
   checked_at: string
   started_at: string // when the app last started
   sources: SourceHealth[]
-  backup: {
-    status: MonitoringStatus
-    last_copy_at: string | null
-    copies: number
-    last_copy_bytes: number | null
-  }
   memory: {
     status: MonitoringStatus
     used_bytes: number | null // null outside Docker
