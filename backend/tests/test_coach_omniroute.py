@@ -146,7 +146,7 @@ def test_streams_text_and_tool_calls_with_usage() -> None:
     request = route.calls.last.request
     assert request.headers["authorization"] == "Bearer key-app-sport"
     sent = json.loads(request.content)
-    assert sent["model"] == "claude-sonnet-5-5"
+    assert sent["model"] == "claude-sonnet-5-5"  # an explicit override is passed on
     assert sent["stream"] is True and sent["stream_options"] == {"include_usage": True}
     assert sent["tools"][0]["function"]["name"] == "get_sleep"
 
@@ -182,5 +182,13 @@ def test_the_coach_needs_only_the_omniroute_key() -> None:
     assert get_llm(Settings(omniroute_api_key="")) is None
     assert isinstance(get_llm(Settings(omniroute_api_key="k")), OmniRouteLLM)
     settings = Settings(omniroute_api_key="k")
-    assert (settings.main_model, settings.light_model) == ("claude-sonnet-5-5", "claude-haiku-5-5")
-    assert settings.prices("claude-haiku-5-5") == (1.0, 5.0)
+    # The model is imposed in OmniRoute: none is named by default.
+    assert (settings.main_model, settings.light_model) == ("", "")
+    assert settings.prices("") == (3.0, 15.0)
+
+
+@respx.mock
+def test_no_model_named_by_default() -> None:
+    route = respx.post(URL).mock(return_value=httpx.Response(200, text=stream_body()))
+    ask(OmniRouteLLM(BASE, "k"), model="")
+    assert "model" not in json.loads(route.calls.last.request.content)

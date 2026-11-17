@@ -187,9 +187,12 @@ def test_cost_estimate(settings: Settings) -> None:
     usage = Usage(input_tokens=1_000_000, output_tokens=100_000, cache_read_tokens=1_000_000)
     # Default main model: 3 $ input + 0.3 $ cache reads + 1.5 $ output = 4.8 $.
     assert cost_eur(usage, settings.main_model, settings) == pytest.approx(4.8 * 0.92)
+    # No light model named (OmniRoute imposes one): the main prices apply.
     assert cost_eur(
         Usage(output_tokens=1_000_000), settings.light_model, settings
-    ) == pytest.approx(5.0 * 0.92)
+    ) == pytest.approx(15.0 * 0.92)
+    light = settings.model_copy(update={"coach_light_model": "small"})
+    assert light.prices("small") == (1.0, 5.0)
 
 
 # --- The agent loop ----------------------------------------------------------------------

@@ -202,8 +202,8 @@ Hébergement sur le VPS (Coolify 4.7.5, projet `app-sport`, voir `docs/learning/
       avec un quota fixé par FRANKS dans OmniRoute. Si OmniRoute refuse (quota atteint, clé
       bloquée), le coach passe en ◆ Dégradé avec un message clair, et le reste de l'app
       fonctionne. Le coût par appel peut rester journalisé, sans plafond.
-- [ ] Vérifié sur le VPS à travers OmniRoute : outils, streaming SSE, cache de prompt, noms des
-      modèles (`COACH_MODEL`) ; `GEMINI_API_KEY`, `ANTHROPIC_API_KEY` et `COACH_MONTHLY_BUDGET_EUR`
+- [ ] Vérifié sur le VPS à travers OmniRoute : outils, streaming SSE, cache de prompt (le modèle est imposé dans OmniRoute, l'app n'en nomme aucun) ;
+      `GEMINI_API_KEY`, `ANTHROPIC_API_KEY` et `COACH_MONTHLY_BUDGET_EUR`
       supprimées de Coolify (et du coffre si elles y sont).
 
 ## Phase 7b : écarts P2

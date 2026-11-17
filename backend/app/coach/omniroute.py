@@ -194,7 +194,8 @@ class OmniRouteLLM:
         max_tokens: int,
     ) -> Iterator[StreamEvent]:
         body: dict[str, Any] = {
-            "model": model,
+            # Empty = no model named: OmniRoute uses the one FRANKS imposed on the key.
+            **({"model": model} if model else {}),
             "messages": chat_messages(system, messages),
             "max_tokens": max_tokens,
             "stream": True,
