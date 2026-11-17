@@ -11,11 +11,12 @@ from typing import Literal
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# The model is imposed by FRANKS in OmniRoute (key app-sport): by default the app
-# names none and OmniRoute picks its own. COACH_MODEL / COACH_LIGHT_MODEL only
-# exist to override that. The key is paid, so prompts are not kept (R-08).
-DEFAULT_MODEL = ""
-DEFAULT_LIGHT_MODEL = ""
+# The model is chosen by FRANKS in OmniRoute (key app-sport). OmniRoute refuses a
+# request without "model" (400 "Missing model"), so the app sends "auto" and lets
+# OmniRoute route it. COACH_MODEL / COACH_LIGHT_MODEL (vault) override it.
+# The key is paid, so prompts are not kept (R-08).
+DEFAULT_MODEL = "auto"
+DEFAULT_LIGHT_MODEL = "auto"
 # US dollars per million tokens, (input, output), only to ESTIMATE each call's
 # cost (https://www.anthropic.com/pricing). The budget itself lives in OmniRoute.
 DEFAULT_PRICES = (3.0, 15.0)

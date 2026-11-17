@@ -20,9 +20,9 @@ raison, et tout le reste de l'app fonctionne.
 
 ## Les modèles
 
-Le modèle est **imposé par FRANKS dans OmniRoute** sur la clé `app-sport` : l'app n'en nomme
-aucun. `COACH_MODEL` et `COACH_LIGHT_MODEL` restent vides (ils ne servent qu'à forcer un autre
-modèle). La clé est payante, donc les données de santé ne servent jamais à entraîner un modèle
+Le modèle est **imposé par FRANKS dans OmniRoute** sur la clé `app-sport` : OmniRoute refuse une
+requête sans modèle, donc l'app envoie `auto` et OmniRoute choisit. `COACH_MODEL` et
+`COACH_LIGHT_MODEL` (dans le coffre) servent à nommer un autre modèle. La clé est payante, donc les données de santé ne servent jamais à entraîner un modèle
 (règle R-08).
 
 ## En développement

@@ -28,6 +28,9 @@ services:
       # The monthly quota is set in OmniRoute, never in the app (R-07, SPT-02).
       OMNIROUTE_API_KEY: ${OMNIROUTE_API_KEY}
       OMNIROUTE_BASE_URL: http://omniroute:20128/v1
+      # Model names sent to OmniRoute; empty = "auto" (OmniRoute routes). From the vault.
+      COACH_MODEL: ${COACH_MODEL:-}
+      COACH_LIGHT_MODEL: ${COACH_LIGHT_MODEL:-}
       # Address of the Grafana dashboard (button on Réglages > Monitoring); empty = no button.
       GRAFANA_URL: ${GRAFANA_URL:-}
       # Pinged after each scheduled sync (référentiel R-26); the URL comes from the vault.
