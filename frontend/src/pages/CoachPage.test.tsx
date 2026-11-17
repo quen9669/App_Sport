@@ -14,8 +14,8 @@ afterEach(() => {
 
 const status: CoachStatus = {
   configured: true,
-  model: 'gemini-3.8-flash',
-  budget: { month: '2026-10', spent_eur: 0.12, limit_eur: 10, warning: false, exhausted: false },
+  model: 'claude-sonnet-5-5',
+  budget: { month: '2026-10', spent_eur: 0.12 },
 }
 
 function sse(...events: [string, object][]): Response {
@@ -42,13 +42,13 @@ describe('CoachPage', () => {
           ['tool', { name: 'get_sleep', label: 'lit ton sommeil' }],
           ['text', { text: 'Tu dors **6,5 h**' }],
           ['text', { text: ' en moyenne.\n- Couche-toi plus tôt' }],
-          ['done', { cost_eur: 0.02, month_spent_eur: 0.14, month_limit_eur: 10 }],
+          ['done', { cost_eur: 0.02, month_spent_eur: 0.14 }],
         ),
     })
     const user = userEvent.setup()
     render(<CoachPage coach="training" />)
 
-    expect(await screen.findByText(/Ce mois-ci : 0,12 € sur 10 €/)).toBeInTheDocument()
+    expect(await screen.findByText(/Ce mois-ci : 0,12 € \(estimation\)/)).toBeInTheDocument()
     await user.type(screen.getByLabelText('Ta question'), 'Comment je dors ?{Enter}')
 
     const chat = screen.getByRole('region', { name: 'Conversation avec le coach' })
@@ -100,7 +100,7 @@ describe('CoachPage', () => {
       'GET /api/coach/training/memories': [],
     })
     render(<CoachPage coach="training" />)
-    expect(await screen.findByText(/attend ta clé API Gemini/)).toBeInTheDocument()
+    expect(await screen.findByText(/attend la clé OmniRoute/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Envoyer' })).toBeDisabled()
     expect(screen.getByRole('button', { name: /préparation du 10 km/ })).toBeDisabled()
   })
@@ -170,7 +170,7 @@ describe('CoachPage plans', () => {
           ['tool', { name: 'propose_weekly_plan', label: 'prépare un plan de semaine' }],
           ['plan', plan],
           ['text', { text: 'Voici ta semaine.' }],
-          ['done', { cost_eur: 0.01, month_spent_eur: 0.13, month_limit_eur: 10 }],
+          ['done', { cost_eur: 0.01, month_spent_eur: 0.13 }],
         ),
       'PATCH /api/coach/plans/7': { ...plan, status: 'accepted' },
     })

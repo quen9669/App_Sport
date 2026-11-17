@@ -16,7 +16,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.coach.costs import month_budget
+from app.coach.costs import month_spent
 from app.coach.engine import (
     CoachEvent,
     DoneEvent,
@@ -26,8 +26,8 @@ from app.coach.engine import (
     TextEvent,
     ToolEvent,
 )
-from app.coach.gemini import GeminiLLM
-from app.coach.llm import LLM, AnthropicLLM
+from app.coach.llm import LLM
+from app.coach.omniroute import OmniRouteLLM
 from app.coach.plans import plan_data
 from app.coach.tools import ALL_TOOLS
 from app.config import Settings, get_settings
@@ -52,29 +52,27 @@ class CoachName(StrEnum):
 
 
 def get_llm(settings: Settings = Depends(get_settings)) -> LLM | None:
-    """The real model (Gemini or Claude, see Settings.provider), or None without a key.
+    """The real model through OmniRoute, or None without the app's key.
 
     Tests replace this dependency.
     """
-    if settings.provider is None:
+    if not settings.coach_enabled:
         return None
-    key = settings.api_key_for(settings.provider)
-    return GeminiLLM(key) if settings.provider == "gemini" else AnthropicLLM(key)
+    return OmniRouteLLM(settings.omniroute_base_url, settings.omniroute_api_key)
 
 
 # --- Status --------------------------------------------------------------------------
 
 
 class BudgetOut(BaseModel):
+    """The month's estimated spending, for information: the limit lives in OmniRoute."""
+
     month: str
     spent_eur: float
-    limit_eur: float
-    warning: bool  # 80 % reached
-    exhausted: bool
 
 
 class StatusOut(BaseModel):
-    configured: bool  # an API key is set in .env
+    configured: bool  # the OmniRoute key is set
     model: str
     budget: BudgetOut
 
@@ -83,17 +81,11 @@ class StatusOut(BaseModel):
 def read_status(
     db: Session = Depends(get_db), settings: Settings = Depends(get_settings)
 ) -> StatusOut:
-    budget = month_budget(db, utc_now(), settings)
+    month, spent = month_spent(db, utc_now())
     return StatusOut(
-        configured=settings.provider is not None,
+        configured=settings.coach_enabled,
         model=settings.main_model,
-        budget=BudgetOut(
-            month=budget.month,
-            spent_eur=round(budget.spent_eur, 4),
-            limit_eur=budget.limit_eur,
-            warning=budget.warning,
-            exhausted=budget.exhausted,
-        ),
+        budget=BudgetOut(month=month, spent_eur=round(spent, 4)),
     )
 
 

@@ -1,5 +1,15 @@
 # CLAUDE.md
 
+## Référentiel Franks (prioritaire, lecture seule)
+
+Ce projet suit le référentiel `C:\Users\franc\Dev\Projets\portfolio-franks` (dépôt `quen9669/Referentiel-Portfolio`). On tend absolument vers lui.
+Avant toute modification d'infra, d'IA, de secrets, de données ou d'interface :
+1. Relire `REGLES.md` (R-01 à R-26, non négociables) et `apps/app-sport.md`, en commençant par la **section 4 « Écarts à corriger »**.
+2. Le moins de code possible (méthode Ponytail) et sobriété en tokens.
+3. Visuels : uniquement la bibliothèque `@quen9669/lignes`. IA : uniquement OmniRoute. Secrets : uniquement le coffre OpenBao.
+4. Citer l'ID de l'écart dans le commit (`fix(XXX-01): …`) et mettre à jour `expedition.yaml`.
+Ne jamais modifier le référentiel depuis cette session. Si une règle gêne, le signaler à Franks.
+
 Project memo for anyone (human or AI) working on this repository. Keep it up to date at each phase.
 
 ## What this is
@@ -185,21 +195,20 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 
 ## AI coaches (phase 5a)
 
-- Two providers behind the `LLM` protocol (`app/coach/llm.py`): **Gemini** (`gemini.py`, REST
-  `streamGenerateContent` over httpx, faked with respx; owner's choice, used when `GEMINI_API_KEY`
-  is set) and Claude (`AnthropicLLM`, SDK on **httpx2**, so tests pass
-  `http_client=httpx2.Client(transport=MockTransport)`). Stored messages use Anthropic's block
-  format; `gemini.py` translates and keeps Gemini's `thought_signature` in the blocks (stripped
-  for Claude). Defaults per provider in `config.COACH_DEFAULTS`; `Settings.provider` picks one.
-- Package `app/coach/`: `engine.py` (tool loop, max 8 rounds, logs every call), `costs.py` (cost in EUR, monthly
-  budget: warning at 80 %, hard stop at 100 %), `history.py` (summaries by the light model,
+- One model class behind the `LLM` protocol (`app/coach/llm.py`): `OmniRouteLLM`
+  (`omniroute.py`, OpenAI-compatible `chat/completions` streamed over httpx, faked with respx).
+  Every call goes through OmniRoute (`OMNIROUTE_BASE_URL`, network `llm-net`, référentiel R-05,
+  SPT-01); never call a provider directly. Stored messages keep Anthropic's block format;
+  `omniroute.py` translates both ways (old Gemini keys in blocks are ignored).
+- Package `app/coach/`: `engine.py` (tool loop, max 8 rounds, logs every call), `costs.py`
+  (estimated cost in EUR, information only: NO budget in the app, the quota lives in OmniRoute,
+  R-07, SPT-02; a refusal raises `LLMError` "◆ Coach dégradé", the rest works), `history.py` (summaries by the light model,
   compaction), `prompts/*.md` (versioned with `<!-- version: ... -->`), `tools/` (typed inputs,
   `extra="forbid"`, results capped at 20,000 chars).
 - The model only sees data through tools, never GPS positions; tool results are data, not
   instructions. Memories are proposed by the coach and sent to the model only once accepted.
-- Settings: `GEMINI_API_KEY` / `ANTHROPIC_API_KEY` (both empty = coach disabled, screen explains
-  it), `COACH_PROVIDER`, `COACH_MODEL`,
-  `COACH_LIGHT_MODEL`, `COACH_MONTHLY_BUDGET_EUR`, prices per million tokens.
+- Settings: `OMNIROUTE_API_KEY` (from the vault; empty = coach disabled, screen explains it),
+  `OMNIROUTE_BASE_URL`, `COACH_MODEL`, `COACH_LIGHT_MODEL`, prices per million tokens.
 - Routes in `api/coach.py`; the answer is SSE (`text` / `tool` / `done` / `error`) with its own DB
   session. Tests use `tests/fixtures/fake_llm.py`. Page `CoachPage` (`/coach`), answers rendered by
   `CoachText` (mini-Markdown built from React elements, never raw HTML).
@@ -304,7 +313,7 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - Réglages › Monitoring (`/monitoring`, `MonitoringPage`): `services/monitoring.py` computes, read-only,
   the app's own health from its database and files: last good sync per source (`success` or
   `partial`; warning after 6 h, error after 12 h), failed runs over 7 days, newest nightly copy
-  (error after 30 h), database size, coach budget, container memory from cgroup v2
+  (error after 30 h), database size, coach (month's estimate; warning if the last call failed), container memory from cgroup v2
   (`/sys/fs/cgroup/memory.current|max`, `unknown` outside Docker). Statuses ok / warning / error /
   unknown; the worst wins, `unknown` never alarms. Technical numbers only, never health data.
   Route `GET /api/monitoring`; French words in `utils/monitoring.ts`.

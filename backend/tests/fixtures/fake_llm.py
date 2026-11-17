@@ -1,4 +1,4 @@
-"""A scripted stand-in for the model: tests never call the real Anthropic API.
+"""A scripted stand-in for the model: tests never call OmniRoute.
 
 Each call to ``stream`` plays the next scripted turn and records what the
 engine sent (model, system blocks, tools, messages), so tests can check both

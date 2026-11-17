@@ -22,8 +22,9 @@ from typing import Literal
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.coach.costs import month_budget
+from app.coach.costs import month_spent
 from app.config import Settings
+from app.db.models import CoachCall
 from app.db.models.activity import Activity
 from app.db.models.enums import DataSource, SyncStatus
 from app.db.models.sync import SyncLog
@@ -84,8 +85,7 @@ class CoachHealth:
     status: Status
     enabled: bool
     month: str
-    spent_eur: float
-    limit_eur: float
+    spent_eur: float  # estimate, information only (the quota lives in OmniRoute)
 
 
 @dataclass(frozen=True)
@@ -191,20 +191,14 @@ def memory_health(cgroup_dir: Path = CGROUP_DIR) -> MemoryHealth:
 
 
 def coach_health(db: Session, now: datetime, settings: Settings) -> CoachHealth:
-    budget = month_budget(db, now, settings)
-    status: Status
-    if budget.exhausted:
-        status = "error"
-    elif budget.warning:
-        status = "warning"
-    else:
-        status = "ok"
+    """``warning`` (◆ Dégradé) when the last model call failed, e.g. OmniRoute refused it."""
+    month, spent = month_spent(db, now)
+    last_error = db.scalar(select(CoachCall.error).order_by(CoachCall.id.desc()).limit(1))
+    status: Status = "warning" if last_error else "ok"
+    if not settings.coach_enabled:
+        status = "unknown"
     return CoachHealth(
-        status=status,
-        enabled=settings.provider is not None,
-        month=budget.month,
-        spent_eur=round(budget.spent_eur, 2),
-        limit_eur=budget.limit_eur,
+        status=status, enabled=settings.coach_enabled, month=month, spent_eur=round(spent, 2)
     )
 
 
