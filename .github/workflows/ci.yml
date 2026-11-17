@@ -14,10 +14,13 @@ concurrency:
 
 permissions:
   contents: read
+  # Read the shared library @quen9669/lignes (the package grants App_Sport access).
+  packages: read
 
-# Read-only GitHub token for the shared library @quen9669/lignes (frontend/.npmrc).
+# The run's own token reads the package: no copy of the vault's NPM_TOKEN in
+# GitHub (référentiel R-15). frontend/.npmrc reads it as NPM_TOKEN.
 env:
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   backend:
