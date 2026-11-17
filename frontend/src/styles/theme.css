@@ -1,78 +1,57 @@
 /*
- * Global styles and light/dark theme ("épuré", in the Garmin Connect spirit,
- * red like FRANKS's logo instead of Garmin's blue).
- * Colors are CSS variables: components use var(--text) etc., and the dark
- * theme only redefines the variables. The theme follows the phone/PC setting.
+ * Global styles. Colours, spaces and fonts come from the shared charter
+ * (@quen9669/lignes/tokens.css, imported in main.tsx, dark by default, light
+ * when the phone/PC asks for it). Below, the app's names only point at the
+ * charter's tokens: no colour of the app's own (référentiel R-18, SPT-03).
+ * App Sport's line is ML: --line-ml is the dominant colour; the main button
+ * is the neutral --action.
  */
 :root {
-  --bg: #f2f3f5;
-  --surface: #ffffff;
-  --text: #16181d;
-  --text-muted: #5e6470;
-  /* The logo's red: buttons and other filled shapes (white text on it: 4.9:1). */
-  --accent: #e20912;
-  /* A darker red for text and links on a light background (readable: 6:1). */
-  --accent-text: #c8102e;
-  --accent-soft: #fbe7ea;
-  /* "Done" and "realistic" stay green: red here means the brand, not "bad". */
-  --success: #1e7a46;
-  --danger: #b3261e;
-  --border: #e3e5e9;
-  /* The dark frame: top bar (phone) and sidebar (PC). */
-  --chrome: #111317;
-  --chrome-text: #ffffff;
-  --chrome-muted: #b9bdc6;
-  --radius: 14px;
+  --surface: var(--card);
+  --text-muted: var(--muted);
+  /* The app's line: borders, chart lines, links. */
+  --accent: var(--line-ml);
+  --accent-text: var(--line-ml);
+  --accent-soft: color-mix(in srgb, var(--line-ml) 16%, var(--card));
+  --success: var(--line-dg);
+  --danger: var(--state-stop);
+  /* The frame: top bar (phone) and sidebar (PC). */
+  --chrome: var(--alt);
+  --chrome-text: var(--text);
+  --chrome-muted: var(--muted);
+  --radius: var(--radius-md);
   --bottom-bar-height: 4rem;
-  /* Chart series, in fixed order (validated for color blindness, see the dataviz notes). */
-  --series-1: #2a78d6;
-  --series-2: #eb6834;
-  --series-3: #1baf7a;
-  --series-4: #eda100;
-  /* Sport colours (FRANKS's choice), used by the activity tables and the map. */
-  --sport-run: #dc2626;
-  --sport-ride: #16a34a;
-  --sport-walk: #9333ea;
-  --sport-strength: #ca8a04;
-  --sport-other: #ea580c;
 
-  color-scheme: light dark;
-  /* Barlow is bundled with the app (main.tsx), never loaded from a font CDN.
-     "Twemoji Country Flags" is only used for flags. */
-  font-family:
-    'Twemoji Country Flags',
-    Barlow,
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  /* "Twemoji Country Flags" is only used for flags (main.tsx). */
+  font-family: 'Twemoji Country Flags', var(--font-sans);
   line-height: 1.5;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0d0e11;
-    --surface: #1a1c21;
-    --text: #f1f2f4;
-    --text-muted: #a3a8b3;
-    /* A lighter red: the logo's red is too dark to read on a dark background. */
-    --accent: #e5262e;
-    --accent-text: #ff6b71;
-    --accent-soft: #3a1518;
-    --success: #4cc27e;
-    --danger: #ff8a80;
-    --border: #2c2f36;
-    --chrome: #000000;
-    --series-1: #3987e5;
-    --series-2: #d95926;
-    --series-3: #199e70;
-    --series-4: #c98500;
-    --sport-run: #f87171;
-    --sport-ride: #4ade80;
-    --sport-walk: #c084fc;
-    --sport-strength: #facc15;
-    --sport-other: #fb923c;
+/* Chart series and sport colours: still the app's own, until SPT-04 (pictogram
+   + label per sport, charts per the charter's dataviz rules). The charter is dark
+   unless the phone/PC asks for light, so the dark values come first. */
+:root {
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --sport-run: #f87171;
+  --sport-ride: #4ade80;
+  --sport-walk: #c084fc;
+  --sport-strength: #facc15;
+  --sport-other: #fb923c;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --series-4: #eda100;
+    --sport-run: #dc2626;
+    --sport-ride: #16a34a;
+    --sport-walk: #9333ea;
+    --sport-strength: #ca8a04;
+    --sport-other: #ea580c;
   }
 }
 
@@ -86,14 +65,14 @@ body {
   color: var(--text);
 }
 
-/* Titles and big numbers: the narrower Barlow, like the mockup. */
+/* Titles and big numbers: the charter's display font. */
 h1,
 h2,
 h3,
 .tile dd,
 .tile-value,
 .topbar-folder {
-  font-family: 'Barlow Semi Condensed', Barlow, system-ui, sans-serif;
+  font-family: var(--font-display);
 }
 
 h1 {
@@ -324,7 +303,7 @@ a {
     gap: 0.6rem;
     padding: 0 0.5rem;
     color: var(--chrome-text);
-    font-family: 'Barlow Semi Condensed', Barlow, system-ui, sans-serif;
+    font-family: var(--font-display);
     font-size: 1.25rem;
     font-weight: 700;
     text-decoration: none;
@@ -489,8 +468,8 @@ button,
   padding: 0.6rem 1rem;
   border: none;
   border-radius: 0.5rem;
-  background: var(--accent);
-  color: #fff;
+  background: var(--action);
+  color: var(--on-action);
   font: inherit;
   font-weight: 600;
   text-decoration: none;

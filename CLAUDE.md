@@ -247,10 +247,14 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 
 ## Interface (design pass before phase 6)
 
-- Owner's choice: clean, Garmin Connect look in the red of his "QF" logo (`src/assets/logo.png`,
-  PWA icons in `public/icons/`). Tokens in `styles/theme.css`: `--accent` (logo red, fills),
-  `--accent-text` (darker red for text), `--success` (reached goals stay green), dark mode redefines
-  them. Barlow fonts come from `@fontsource` (bundled, never a font CDN).
+- Look: the shared charter `@quen9669/lignes` (SPT-03): `polices.css`, `tokens.css` and
+  imported in `main.tsx`. The logo is still `src/assets/logo.png` (the library's `<Logo>` cannot
+  find `app-sport` in 0.2.0: to fix in the library first).
+  `styles/theme.css` only maps the app's names to the charter's tokens (`--accent` = `--line-ml`,
+  the ML line; main button `--action`), never a colour of its own (R-18), except `--series-*` and
+  `--sport-*` until SPT-04. Installed from GitHub Packages with `frontend/.npmrc` (no secret) and
+  `NPM_TOKEN` (read:packages; PC: `gh auth token`; vault: `apps/app-sport/NPM_TOKEN`).
+  PWA icons in `public/icons/` are still the old ones too.
 - Menu in 3 folders (owner's request), all in `src/navigation.ts`: Entraînement (Ma semaine,
   Activités, Muscu, Course, Objectifs), Santé (Résumé, Sommeil, Récupération, Activité, Poids,
   Tabac, Bilan longévité), Coach (Muscu et cardio, Longévité, Mon plan); Réglages (Profil, Sources, Mes lieux)

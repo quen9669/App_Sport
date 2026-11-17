@@ -11,7 +11,12 @@
 services:
   # The app: API + interface on port 8000, inside the project network only.
   sport-app:
-    build: .
+    build:
+      context: .
+      # Read-only GitHub token for the shared library (vault: apps/app-sport/NPM_TOKEN).
+      # Used only by the build stage that compiles the interface, never at runtime.
+      args:
+        NPM_TOKEN: ${NPM_TOKEN:-}
     restart: unless-stopped
     environment:
       # Same values as the PC's .env. TOKEN_ENCRYPTION_KEY MUST be the PC's one:
