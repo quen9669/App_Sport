@@ -11,11 +11,11 @@ from typing import Literal
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Coach models when COACH_MODEL / COACH_LIGHT_MODEL are left empty: names as
-# OmniRoute knows them. The key is paid, so the provider does not keep prompts
-# (référentiel R-08: health data).
-DEFAULT_MODEL = "claude-sonnet-5-5"
-DEFAULT_LIGHT_MODEL = "claude-haiku-5-5"  # cheaper model for small jobs (summaries)
+# The model is imposed by FRANKS in OmniRoute (key app-sport): by default the app
+# names none and OmniRoute picks its own. COACH_MODEL / COACH_LIGHT_MODEL only
+# exist to override that. The key is paid, so prompts are not kept (R-08).
+DEFAULT_MODEL = ""
+DEFAULT_LIGHT_MODEL = ""
 # US dollars per million tokens, (input, output), only to ESTIMATE each call's
 # cost (https://www.anthropic.com/pricing). The budget itself lives in OmniRoute.
 DEFAULT_PRICES = (3.0, 15.0)
@@ -133,7 +133,7 @@ class Settings(BaseSettings):
 
     def prices(self, model: str) -> tuple[float, float]:
         """(input, output) price of a model, in dollars per million tokens."""
-        if model == self.light_model:
+        if model == self.light_model and self.light_model != self.main_model:
             default_in, default_out = DEFAULT_LIGHT_PRICES
             given = (self.coach_light_price_input_usd, self.coach_light_price_output_usd)
         else:

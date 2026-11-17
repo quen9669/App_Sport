@@ -78,7 +78,7 @@ def render(results: list[Result], settings: Settings, when: datetime) -> str:
     lines = [
         f"# Évaluation des coachs, {when:%Y-%m-%d %H:%M}",
         "",
-        f"Modèle : {settings.main_model} (le juge utilise le même). "
+        f"Modèle : {settings.main_model or 'imposé par OmniRoute'} (le juge utilise le même). "
         "Données synthétiques uniquement.",
         "",
         *summary(results),
