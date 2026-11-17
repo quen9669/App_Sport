@@ -1,0 +1,37 @@
+# expedition.yaml — à la racine de chaque dépôt d'app (règle R-21)
+# Lu chaque lundi par la routine d'état des lieux du référentiel.
+# Tenu à jour par la session Claude Code de l'app, à chaque fin de tâche.
+
+code: EXP-04                 # code d'expédition de l'app
+app: app-sport
+ligne: ml                    # de | dg | ds | ai | ml
+etape: 5                     # 1 à 6 (port → dernier km)
+etape_libelle: "En production privée, phase 6c en cours"
+etat: en_service             # en_service | degrade | arrete | en_construction
+maj: 2026-11-17
+
+# Écarts du référentiel (apps/app-sport.md §4) corrigés ou en cours.
+# Un écart passe ici quand le commit qui le corrige cite son ID : fix(SPT-03): …
+ecarts:
+  corriges:
+    - id: SPT-07
+      date: 2026-11-17
+      preuve: "commit docs(SPT-07): alignement sur le référentiel"
+  en_cours:
+    - SPT-10
+
+# Ce qui a été fait, en une ligne par élément (la routine complète avec git log).
+fait:
+  - "Hébergée sur le VPS (Coolify, sidecar Tailscale, SQLite en volume nommé)"
+  - "Page Monitoring et tableau de bord Grafana en JSON dans le dépôt"
+  - "Pointeur vers le référentiel dans CLAUDE.md, feuille de route alignée (SPT-07)"
+
+# La ou les prochaines étapes, du point de vue de l'app.
+prochaines:
+  - "Coach via OmniRoute, anciennes clés révoquées (SPT-01)"
+  - "Plafond de 10 € retiré du code, coach ◆ Dégradé si OmniRoute refuse (SPT-02)"
+  - "Retrait du sidecar de sauvegarde (SPT-09)"
+
+# Chiffres clés, repris dans /vitrine.json et dans le mail.
+# À remplir quand /vitrine.json existera (SPT-06) : aucun chiffre inventé.
+chiffres: []
