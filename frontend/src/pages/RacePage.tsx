@@ -16,6 +16,7 @@ import {
   saveRaceTarget,
   setRunExcluded,
 } from '../api/client'
+import { CalcSource } from '../components/Governance'
 import { formatKm } from '../utils/activity'
 import { RACE_BOUNDS, rangeError } from '../utils/bounds'
 import { formatHeartRate, formatNumber, formatShortDate, todayIso } from '../utils/format'
@@ -113,6 +114,9 @@ function FormCard({ form }: { form: RaceForm }) {
             vite. Il est calculé sur tes meilleures sorties récentes, avec ta fréquence cardiaque
             quand elle est connue.
           </p>
+          <CalcSource>
+            Garmin et Strava (sorties de course des 120 derniers jours) · VDOT de Jack Daniels.
+          </CalcSource>
         </>
       ) : (
         <p className="notice" role="status">

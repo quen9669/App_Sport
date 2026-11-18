@@ -17,6 +17,7 @@ import {
   type StepsAndFloors,
   type TrainingLoad,
 } from '../api/client'
+import { CalcSource } from '../components/Governance'
 import LongevitySection from '../components/LongevitySection'
 import SmokeFreeSection from '../components/SmokeFreeSection'
 import type { HealthSection } from '../navigation'
@@ -404,6 +405,10 @@ function LoadSection({ load }: { load: TrainingLoad }) {
         {load.target !== null && <Stat label="Objectif par semaine" value={String(load.target)} />}
       </dl>
       <p>{acwrLabel(load.acwr)}</p>
+      <CalcSource>
+        Garmin et Strava (activités, FC) · TRIMP de Banister ; ratio aigu/chronique = 7 derniers
+        jours ÷ moyenne des 4 semaines avant.
+      </CalcSource>
       <p className="hint">
         Le ratio compare ta dernière semaine à tes habitudes. C’est un repère grossier, pas un
         diagnostic : écoute aussi tes sensations.
