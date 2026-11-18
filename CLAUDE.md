@@ -248,8 +248,8 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 ## Interface (design pass before phase 6)
 
 - Look: the shared charter `@quen9669/lignes` (SPT-03): `polices.css`, `tokens.css` and
-  imported in `main.tsx`. The logo is still `src/assets/logo.png` (the library's `<Logo>` cannot
-  find `app-sport` in 0.2.0: to fix in the library first).
+  and `composants.css` imported in `main.tsx`; `<Logo app="app-sport" />` (library) in the frame
+  and on the login screen.
   `styles/theme.css` only maps the app's names to the charter's tokens (`--accent` = `--line-ml`,
   the ML line; main button `--action`), never a colour of its own (R-18), except `--series-*` and
   `--sport-*` until SPT-04. Installed from GitHub Packages with `frontend/.npmrc` (no secret) and

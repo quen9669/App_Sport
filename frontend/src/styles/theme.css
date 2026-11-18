@@ -151,7 +151,6 @@ a {
 
 .login-logo {
   justify-self: center;
-  height: auto;
 }
 
 .login-card h1 {
@@ -184,16 +183,6 @@ a {
 
 .topbar-logo {
   display: flex;
-  /* The logo is red on transparent: a white chip keeps it readable on black. */
-  padding: 0.2rem 0.35rem;
-  border-radius: 10px;
-  background: #fff;
-}
-
-.topbar-logo img {
-  display: block;
-  width: 2.1rem;
-  height: auto;
 }
 
 .topbar-folder {
@@ -307,12 +296,6 @@ a {
     font-size: 1.25rem;
     font-weight: 700;
     text-decoration: none;
-  }
-
-  .sidebar-brand img {
-    padding: 0.2rem 0.3rem;
-    border-radius: 10px;
-    background: #fff;
   }
 
   .sidebar-nav {

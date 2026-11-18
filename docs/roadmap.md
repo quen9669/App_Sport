@@ -217,7 +217,7 @@ Hébergement sur le VPS (Coolify 4.7.5, projet `app-sport`, voir `docs/learning/
       Coolify par la synchro ; aucun `.env` réel. Reste à faire par FRANKS : supprimer les `.env`
       réels du PC. Un nouveau secret = une ligne `NOM: ${NOM}` dans le compose, valeur rangée par
       FRANKS dans le coffre.
-- [x] **SPT-03** (R-17, R-18, 2026-11-17, sauf logo et icônes PWA) : `styles/theme.css` (rouge `#e20912`, Barlow) remplacé par les
+- [x] **SPT-03** (R-17, R-18, 2026-11-18, sauf icônes PWA) : `styles/theme.css` (rouge `#e20912`, Barlow) remplacé par les
       jetons de `@quen9669/lignes` (ligne dominante `--line-ml`, bouton principal `--action`,
       polices Archivo, IBM Plex Sans, JetBrains Mono auto-hébergées), logo et icônes PWA de la
       bibliothèque. Installation par `.npmrc` sans secret, `NPM_TOKEN` (read:packages) dans le coffre.
