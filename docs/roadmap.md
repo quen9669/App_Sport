@@ -217,15 +217,15 @@ Hébergement sur le VPS (Coolify 4.7.5, projet `app-sport`, voir `docs/learning/
       Coolify par la synchro ; aucun `.env` réel. Reste à faire par FRANKS : supprimer les `.env`
       réels du PC. Un nouveau secret = une ligne `NOM: ${NOM}` dans le compose, valeur rangée par
       FRANKS dans le coffre.
-- [x] **SPT-03** (R-17, R-18, 2026-11-18, sauf icônes PWA) : `styles/theme.css` (rouge `#e20912`, Barlow) remplacé par les
+- [x] **SPT-03** (R-17, R-18, 2026-11-18, icônes PWA comprises) : `styles/theme.css` (rouge `#e20912`, Barlow) remplacé par les
       jetons de `@quen9669/lignes` (ligne dominante `--line-ml`, bouton principal `--action`,
       polices Archivo, IBM Plex Sans, JetBrains Mono auto-hébergées), logo et icônes PWA de la
       bibliothèque. Installation par `.npmrc` sans secret, `NPM_TOKEN` (read:packages) dans le coffre.
-- [ ] **SPT-04** (R-17) : plus de couleur par sport (`--sport-*`) : pictogramme + libellé en neutre
+- [x] **SPT-04** (2026-11-18, manque : pictogramme « marche », remplacé par `randonnee`) (R-17) : plus de couleur par sport (`--sport-*`) : pictogramme + libellé en neutre
       (pictogrammes manquants à signaler pour la bibliothèque, jamais créés ici), tracés de la
       carte en `--line-ml` seulement, graphiques selon la charte (`--series-*` remplacées).
       Rouge = erreur seulement, ambre ◆ = dégradé, flamme de série en violet.
-- [ ] **SPT-11** (R-23) : la gouvernance se voit : fraîcheur de la synchro Garmin/Strava (🔵 DE),
+- [x] **SPT-11** (2026-11-18) (R-23) : la gouvernance se voit : fraîcheur de la synchro Garmin/Strava (🔵 DE),
       complétude des données ✓ (🟢 DG) et source de chaque calcul (TRIMP, ratio aigu/chronique,
       VDOT), avec les composants de la bibliothèque. Carte des couleurs de l'app affichée (légende
       ou page « À propos »).
