@@ -1,9 +1,10 @@
 // The activity table shared by the home page (week sessions) and the map page
 // (activities in view): one activity per line, with the columns FRANKS chose:
-// flag, town, date, name, sport (emoji + colour), distance, duration, then the
+// flag, town, date, name, sport (pictogram + label), distance, duration, then the
 // average and max heart rate (empty when the watch recorded none).
 // `extra` adds columns at the end (e.g. the category picker of the home page).
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { Picto } from '@quen9669/lignes/ui'
 import { Link } from 'react-router-dom'
 
 import type { ActivityRow } from '../api/client'
@@ -12,8 +13,7 @@ import {
   flagEmoji,
   formatKm,
   shownDistance,
-  SPORT_COLOR_VARS,
-  SPORT_EMOJIS,
+  SPORT_PICTOS,
   SPORT_LABELS,
 } from '../utils/activity'
 import { formatDuration, formatHeartRate, formatTableDate } from '../utils/format'
@@ -95,11 +95,9 @@ export default function ActivityTable<T extends ActivityRow>({
 }
 
 function SportTag({ row }: { row: ActivityRow }) {
-  // The tag reads its colour from a CSS variable set on the element itself.
-  const style = { '--sport-color': `var(${SPORT_COLOR_VARS[row.sport]})` } as CSSProperties
   return (
-    <span className="sport-tag" style={style}>
-      <span aria-hidden="true">{SPORT_EMOJIS[row.sport]}</span>
+    <span className="sport-tag">
+      <Picto nom={SPORT_PICTOS[row.sport]} taille={16} />
       {SPORT_LABELS[row.sport]}
     </span>
   )
