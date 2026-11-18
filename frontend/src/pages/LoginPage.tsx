@@ -2,8 +2,9 @@
 // again on this device. After 5 wrong passwords the backend asks to wait 15 min.
 import { useState, type FormEvent } from 'react'
 
+import { Logo } from '@quen9669/lignes/ui'
+
 import { ApiError, login } from '../api/client'
-import logo from '../assets/logo.png'
 
 export default function LoginPage({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = useState('')
@@ -28,7 +29,9 @@ export default function LoginPage({ onSuccess }: { onSuccess: () => void }) {
   return (
     <main className="login">
       <form className="card login-card" onSubmit={(event) => void submit(event)}>
-        <img src={logo} alt="" width={96} height={84} className="login-logo" />
+        <span aria-hidden="true" className="login-logo">
+          <Logo app="app-sport" taille={84} />
+        </span>
         <h1>App Sport</h1>
         <label>
           Mot de passe

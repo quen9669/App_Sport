@@ -16,7 +16,7 @@ ecarts:
   corriges:
     - id: SPT-03
       date: 2026-11-17
-      preuve: "bibliothèque @quen9669/lignes 0.2.0 (jetons, polices) ; logo et icônes PWA à reprendre"
+      preuve: "bibliothèque @quen9669/lignes 0.2.1 (jetons, polices, logo) ; icônes PWA à reprendre"
     - id: SPT-07
       date: 2026-11-17
       preuve: "PR #38"
@@ -47,7 +47,7 @@ fait:
 # La ou les prochaines étapes, du point de vue de l'app.
 prochaines:
   - "Pictogramme et libellé par sport, graphiques selon la charte (SPT-04)"
-  - "Logo et icônes PWA depuis la bibliothèque, une fois <Logo app=\"app-sport\"> corrigé dans Lignes (reste de SPT-03)"
+  - "Icônes PWA depuis le logo de la bibliothèque (reste de SPT-03)"
   - "Gouvernance visible avec les composants de la bibliothèque (SPT-11)"
 
 # Chiffres clés, repris dans /vitrine.json et dans le mail.

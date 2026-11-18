@@ -10,6 +10,7 @@ import flagFont from 'country-flag-emoji-polyfill/dist/TwemojiCountryFlags.woff2
 // CDN), then the colour and spacing tokens. theme.css only maps them to the app.
 import '@quen9669/lignes/polices.css'
 import '@quen9669/lignes/tokens.css'
+import '@quen9669/lignes/composants.css'
 
 import App from './App'
 import { captureInstallPrompt } from './pwa/install'

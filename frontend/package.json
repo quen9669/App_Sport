@@ -16,7 +16,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@quen9669/lignes": "0.2.0",
+    "@quen9669/lignes": "0.2.1",
     "country-flag-emoji-polyfill": "0.1.10",
     "leaflet": "^1.9.4",
     "react": "^19.2.8",
