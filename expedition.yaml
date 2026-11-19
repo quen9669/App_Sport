@@ -8,7 +8,7 @@ ligne: ml                    # de | dg | ds | ai | ml
 etape: 5                     # 1 à 6 (port → dernier km)
 etape_libelle: "En production privée, phase 6c en cours"
 etat: en_service             # en_service | degrade | arrete | en_construction
-maj: 2026-11-17
+maj: 2026-11-18
 
 # Écarts du référentiel (apps/app-sport.md §4) corrigés ou en cours.
 # Un écart passe ici quand le commit qui le corrige cite son ID : fix(SPT-03): …
@@ -16,7 +16,13 @@ ecarts:
   corriges:
     - id: SPT-03
       date: 2026-11-17
-      preuve: "bibliothèque @quen9669/lignes 0.2.1 (jetons, polices, logo) ; icônes PWA à reprendre"
+      preuve: "bibliothèque @quen9669/lignes 0.2.1 (jetons, polices, logo) ; icônes PWA tirées du logo"
+    - id: SPT-04
+      date: 2026-11-18
+      preuve: "pictogrammes lignes, tracés --line-ml, séries de la charte"
+    - id: SPT-11
+      date: 2026-11-18
+      preuve: "fraîcheur, complétude, source des calculs, légende (composants lignes)"
     - id: SPT-07
       date: 2026-11-17
       preuve: "PR #38"
@@ -46,9 +52,8 @@ fait:
 
 # La ou les prochaines étapes, du point de vue de l'app.
 prochaines:
-  - "Pictogramme et libellé par sport, graphiques selon la charte (SPT-04)"
-  - "Icônes PWA depuis le logo de la bibliothèque (reste de SPT-03)"
-  - "Gouvernance visible avec les composants de la bibliothèque (SPT-11)"
+  - "Scène 3D d'accueil (SPT-05)"
+  - "Pictogramme « marche » à demander à la bibliothèque"
 
 # Chiffres clés, repris dans /vitrine.json et dans le mail.
 # Les vrais chiffres sont servis en direct par GET /vitrine.json : aucun chiffre inventé ici.

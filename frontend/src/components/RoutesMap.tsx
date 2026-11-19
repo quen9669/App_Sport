@@ -24,7 +24,7 @@ import {
   cssColor,
   decodePolyline,
   formatKm,
-  SPORT_COLOR_VARS,
+  MAP_COLOR_VAR,
   SPORT_LABELS,
   speedText,
 } from '../utils/activity'
@@ -36,7 +36,7 @@ const START_CENTER: [number, number] = [49.61, 6.13]
 const START_ZOOM = 12
 // Heatmap: every route drawn thick and almost transparent, in one warm colour.
 // Where routes overlap the colour adds up, so frequent paths stand out.
-const HEAT_COLOR = '#ff4d00'
+// (the heat colour is read at draw time from the charter, see cssColor)
 const HEAT_OPACITY = 0.18
 
 // Pixels: the biggest a gym circle gets, whatever its number of sessions.
@@ -81,8 +81,8 @@ export default function RoutesMap({ routes, points, places, mode, fitTo, onViewC
 function RouteLine({ route, heat }: { route: MapRoute; heat: boolean }) {
   const positions = useMemo(() => decodePolyline(route.polyline), [route.polyline])
   const style = heat
-    ? { color: HEAT_COLOR, weight: 6, opacity: HEAT_OPACITY }
-    : { color: cssColor(SPORT_COLOR_VARS[route.sport]), weight: 3, opacity: 0.8 }
+    ? { color: cssColor(MAP_COLOR_VAR), weight: 6, opacity: HEAT_OPACITY }
+    : { color: cssColor(MAP_COLOR_VAR), weight: 3, opacity: 0.8 }
   return (
     <Polyline positions={positions} pathOptions={style}>
       <Popup>
@@ -94,7 +94,7 @@ function RouteLine({ route, heat }: { route: MapRoute; heat: boolean }) {
 
 /** An activity known only by its start point (its route is not imported yet). */
 function StartDot({ point, heat }: { point: MapPoint; heat: boolean }) {
-  const color = heat ? HEAT_COLOR : cssColor(SPORT_COLOR_VARS[point.sport])
+  const color = cssColor(MAP_COLOR_VAR)
   return (
     <CircleMarker
       center={[point.latitude, point.longitude]}
@@ -146,7 +146,7 @@ function PlaceMarker({ place, heat }: { place: MapPlace; heat: boolean }) {
   // The circle grows with the number of sessions (area, not radius, is what the
   // eye compares), up to a cap: a year of gym sessions must not hide the map.
   const radius = Math.min(6 + 2 * Math.sqrt(place.activity_count), MAX_PLACE_RADIUS)
-  const color = heat ? HEAT_COLOR : cssColor(SPORT_COLOR_VARS.strength)
+  const color = cssColor(MAP_COLOR_VAR)
   return (
     <CircleMarker
       center={[place.latitude, place.longitude]}

@@ -116,8 +116,7 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - History and streak: `weeks_history()` loads a whole period in 3 queries; the current week never
   breaks the streak. "Done" goals still count for past weeks, paused ones never do.
 - The gym draft lives in `localStorage` (`src/utils/strengthDraft.ts`) until "Terminer la séance".
-- Chart series colors are CSS variables `--series-1..4` (fixed order, validated for color
-  blindness, separate light/dark steps); legend and labels stay in text colors.
+- Chart series colors are CSS variables `--series-1..4` mapped to charter tokens (see Interface); legend and labels stay in text colors.
 
 ## Garmin activities, health screen, load (phase 3a)
 
@@ -163,7 +162,7 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - The map opens on the last 14 days (owner's choice). Activities with a start point but no route
   yet (Garmin routes come with the details) are dots at their start, never at a gym.
 - Activity tables (`components/ActivityTable.tsx`, week list and map list): flag, town, date, name,
-  sport (emoji + `--sport-*` colour: red run, green ride, purple walk, yellow strength, orange other),
+  sport (library pictogram + label, no colour per sport: SPT-04; `SPORT_PICTOS`; walking uses `randonnee`, no `marche` pictogram yet),
   distance (empty for strength / no distance), duration, average and max HR (empty without a reading).
   Rows come from `api/rows.py`. The Course page lists each run with its HR too.
 - Town: `activity.location_name` (Garmin `locationName`, Strava `location_city`), else the place's
@@ -251,10 +250,12 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   and `composants.css` imported in `main.tsx`; `<Logo app="app-sport" />` (library) in the frame
   and on the login screen.
   `styles/theme.css` only maps the app's names to the charter's tokens (`--accent` = `--line-ml`,
-  the ML line; main button `--action`), never a colour of its own (R-18), except `--series-*` and
-  `--sport-*` until SPT-04. Installed from GitHub Packages with `frontend/.npmrc` (no secret) and
+  the ML line; main button `--action`), never a colour of its own (R-18). `--series-1..4` point at
+  charter tokens (ML line, text, muted, border; amber `--state-warn` for ◆). Map routes, dots and heat use `--line-ml` (`MAP_COLOR_VAR`). Installed from GitHub Packages with `frontend/.npmrc` (no secret) and
   `NPM_TOKEN` (read:packages; PC: `gh auth token`; vault: `apps/app-sport/NPM_TOKEN`).
-  PWA icons in `public/icons/` are still the old ones too.
+  PWA icons in `public/icons/` are drawn from the library's `app-sport` logo (violet on `--bg`).
+- Governance (SPT-11, R-23): `components/Governance.tsx` on Sources (freshness of each sync from the journal, ● fine under 6 h,
+  ◆ older or last run failed; completeness ✓; colour legend) and `CalcSource` (source + method under TRIMP/ratio on Santé and VDOT on Course).
 - Menu in 3 folders (owner's request), all in `src/navigation.ts`: Entraînement (Ma semaine,
   Activités, Muscu, Course, Objectifs), Santé (Résumé, Sommeil, Récupération, Activité, Poids,
   Tabac, Bilan longévité), Coach (Muscu et cardio, Longévité, Mon plan); Réglages (Profil, Sources, Mes lieux)

@@ -1,5 +1,7 @@
 // Helpers for the map and the activity detail: routes, sports, pace and speed.
 import type { ActivitySeries, SportGroup } from '../api/client'
+import type { NomPicto } from '@quen9669/lignes/ui'
+
 import { formatNumber } from './format'
 
 export type LatLng = [number, number]
@@ -12,24 +14,18 @@ export const SPORT_LABELS: Record<SportGroup, string> = {
   other: 'Divers',
 }
 
-export const SPORT_EMOJIS: Record<SportGroup, string> = {
-  run: '🏃',
-  ride: '🚴',
-  walk: '🚶',
-  strength: '🏋️',
-  other: '🤸',
+// One pictogram per sport, from @quen9669/lignes (no colour per sport: SPT-04).
+// The library has no "marche" pictogram yet: walking uses "randonnee".
+export const SPORT_PICTOS: Record<SportGroup, NomPicto> = {
+  run: 'course',
+  ride: 'velo',
+  walk: 'randonnee',
+  strength: 'musculation',
+  other: 'divers',
 }
 
-// One colour per sport, chosen by FRANKS: red running, green cycling, purple
-// walking, yellow strength, orange the rest. Defined in theme.css (with a
-// lighter step for the dark theme); the map and the tables use the same ones.
-export const SPORT_COLOR_VARS: Record<SportGroup, string> = {
-  run: '--sport-run',
-  ride: '--sport-ride',
-  walk: '--sport-walk',
-  strength: '--sport-strength',
-  other: '--sport-other',
-}
+/** Routes, dots and heat on the maps: the app's line (ML), whatever the sport. */
+export const MAP_COLOR_VAR = '--line-ml'
 
 /**
  * The flag emoji of a country: "LU" -> 🇱🇺. A flag is two "regional indicator"
@@ -61,7 +57,7 @@ export function shownDistance(row: { sport: SportGroup; distance_m: number | nul
  * The colour behind a CSS variable, e.g. "--series-1" -> "#2a78d6".
  * Leaflet draws on a canvas, which does not understand `var(--x)`.
  */
-export function cssColor(variable: string, fallback = '#2a78d6'): string {
+export function cssColor(variable: string, fallback = '#5b3fd1'): string {
   const value = getComputedStyle(document.documentElement).getPropertyValue(variable).trim()
   return value || fallback
 }

@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
+import Governance from '../components/Governance'
 import {
   ApiError,
   disconnectStrava,
@@ -124,6 +125,8 @@ export default function SourcesPage() {
           {message}
         </p>
       )}
+
+      <Governance logs={logs} garmin={garmin} strava={strava} />
 
       <section className="card" aria-labelledby="garmin-title">
         <h2 id="garmin-title">Garmin Connect</h2>

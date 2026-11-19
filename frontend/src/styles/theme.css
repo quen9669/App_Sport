@@ -27,32 +27,14 @@
   line-height: 1.5;
 }
 
-/* Chart series and sport colours: still the app's own, until SPT-04 (pictogram
-   + label per sport, charts per the charter's dataviz rules). The charter is dark
-   unless the phone/PC asks for light, so the dark values come first. */
+/* Chart series (charter dataviz): the app's line (ML) first, then the observed
+   value in the text colour, then neutrals. At most two hues per chart (SPT-04).
+   No colour per sport any more: a pictogram and a label say the sport. */
 :root {
-  --series-1: #3987e5;
-  --series-2: #d95926;
-  --series-3: #199e70;
-  --series-4: #c98500;
-  --sport-run: #f87171;
-  --sport-ride: #4ade80;
-  --sport-walk: #c084fc;
-  --sport-strength: #facc15;
-  --sport-other: #fb923c;
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme='dark']) {
-    --series-1: #2a78d6;
-    --series-2: #eb6834;
-    --series-3: #1baf7a;
-    --series-4: #eda100;
-    --sport-run: #dc2626;
-    --sport-ride: #16a34a;
-    --sport-walk: #9333ea;
-    --sport-strength: #ca8a04;
-    --sport-other: #ea580c;
-  }
+  --series-1: var(--line-ml);
+  --series-2: var(--text);
+  --series-3: var(--muted);
+  --series-4: var(--border);
 }
 
 * {
@@ -837,8 +819,8 @@ textarea {
   gap: 0.3rem;
   padding: 0.05rem 0.5rem 0.05rem 0.35rem;
   border-radius: 999px;
-  border: 1px solid var(--sport-color);
-  background: color-mix(in srgb, var(--sport-color) 16%, transparent);
+  border: 1px solid var(--border);
+  background: var(--card);
   font-size: 0.85rem;
 }
 
@@ -867,7 +849,7 @@ textarea {
 }
 
 .feasibility--ambitious {
-  --feasibility-color: var(--series-4);
+  --feasibility-color: var(--state-warn);
 }
 
 .feasibility--unlikely {
@@ -1151,7 +1133,7 @@ textarea {
 }
 
 .status--partly {
-  --status-color: var(--series-4);
+  --status-color: var(--state-warn);
 }
 
 .status--below {
@@ -1165,4 +1147,16 @@ textarea {
 
 .milestones li {
   margin: 0.3rem 0;
+}
+
+/* Governance block (SPT-11): one line per source, source note under a calculation. */
+.governance-list {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+.governance-source {
+  font-family: var(--font-mono);
 }

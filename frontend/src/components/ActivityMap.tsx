@@ -6,20 +6,18 @@ import 'leaflet/dist/leaflet.css'
 import { useEffect, useMemo } from 'react'
 import { CircleMarker, MapContainer, Polyline, TileLayer, useMap } from 'react-leaflet'
 
-import type { SportGroup } from '../api/client'
-import { cssColor, decodePolyline, SPORT_COLOR_VARS, type LatLng } from '../utils/activity'
+import { cssColor, decodePolyline, MAP_COLOR_VAR, type LatLng } from '../utils/activity'
 import { OSM_ATTRIBUTION, OSM_TILES } from '../utils/tiles'
 
 interface Props {
   polyline: string | null
   place: { latitude: number; longitude: number } | null
-  sport: SportGroup
   marker: LatLng | null // position matching the point under the finger on a chart
 }
 
-export default function ActivityMap({ polyline, place, sport, marker }: Props) {
+export default function ActivityMap({ polyline, place, marker }: Props) {
   const route = useMemo(() => (polyline ? decodePolyline(polyline) : []), [polyline])
-  const color = cssColor(SPORT_COLOR_VARS[sport])
+  const color = cssColor(MAP_COLOR_VAR)
   const start = route[0]
   const center: LatLng = start ?? (place ? [place.latitude, place.longitude] : [49.61, 6.13])
   return (
