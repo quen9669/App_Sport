@@ -38,6 +38,9 @@ ecarts:
     - id: SPT-06
       date: 2026-11-17
       preuve: "PR #39"
+    - id: SPT-08
+      date: 2026-11-19
+      preuve: "badge ML · Longévité sur la VO2max, onglet Santé › Bilan longévité"
   en_cours:
     - SPT-10
 

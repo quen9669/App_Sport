@@ -244,7 +244,7 @@ Hébergement sur le VPS (Coolify 4.7.5, projet `app-sport`, voir `docs/learning/
       conteneur principal sur le réseau `obs-net` ; son adresse vue depuis `obs-net` est donnée à
       FRANKS pour le blackbox. L'app ne notifie jamais elle-même : un flux planifié pinge son
       contrôle Healthchecks (URL dans le coffre), le bot Telegram « Franks Ops » fait le reste.
-- [ ] **SPT-08** : indicateur de longévité (à définir avec FRANKS : VO2max estimée, régularité sur
+- [x] **SPT-08** : indicateur de longévité (à définir avec FRANKS : VO2max estimée, régularité sur
       12 mois…) avec un badge `ML · Longévité`, en s'appuyant sur le Bilan longévité existant.
 
 ## Développements retirés (contraires au référentiel)

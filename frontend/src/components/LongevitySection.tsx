@@ -2,6 +2,7 @@
 // against its public reference and with how solid the evidence is, then what
 // quitting cigarettes has changed in the watch's data. Read-only: the numbers
 // come from GET /api/longevity, the words from utils/longevity.ts.
+import { BadgeLigne } from '@quen9669/lignes/ui'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -47,6 +48,7 @@ export default function LongevitySection() {
 
   return (
     <>
+      <VitalIndicator indicator={data.indicators.find((i) => i.key === 'vo2max')} />
       <section className="card" aria-labelledby="levers-title">
         <h2 id="levers-title">Tes leviers</h2>
         <p className="hint">
@@ -64,6 +66,26 @@ export default function LongevitySection() {
         <Link to="/longevite">En parler au coach longévité</Link>
       </p>
     </>
+  )
+}
+
+/** SPT-08: the one headline longevity indicator (Garmin's VO2max), badge "ML · Longévité". */
+function VitalIndicator({ indicator }: { indicator?: LongevityIndicator }) {
+  if (!indicator) return null
+  return (
+    <section className="card" aria-labelledby="vital-title">
+      <h2 id="vital-title">
+        <BadgeLigne ligne="ml">Longévité</BadgeLigne> Ma VO2max
+      </h2>
+      <p className="tile-value">{formatIndicator(indicator, indicator.value)}</p>
+      <p className="hint">
+        {indicator.value === null
+          ? 'Pas encore assez de données'
+          : indicator.previous !== null
+            ? `Il y a 3 mois : ${formatIndicator(indicator, indicator.previous)}`
+            : 'Estimation de ta montre Garmin'}
+      </p>
+    </section>
   )
 }
 
