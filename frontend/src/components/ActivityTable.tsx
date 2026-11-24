@@ -14,6 +14,7 @@ import {
   formatKm,
   shownDistance,
   SPORT_PICTOS,
+  sportColorVar,
   SPORT_LABELS,
 } from '../utils/activity'
 import { formatDuration, formatHeartRate, formatTableDate } from '../utils/format'
@@ -96,7 +97,10 @@ export default function ActivityTable<T extends ActivityRow>({
 
 function SportTag({ row }: { row: ActivityRow }) {
   return (
-    <span className="sport-tag">
+    <span
+      className="sport-tag"
+      style={{ ['--sport-color' as string]: `var(${sportColorVar(row.sport)})` }}
+    >
       <Picto nom={SPORT_PICTOS[row.sport]} taille={16} />
       {SPORT_LABELS[row.sport]}
     </span>

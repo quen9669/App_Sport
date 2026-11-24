@@ -81,6 +81,7 @@ export default function ActivityPage() {
           <ActivityMap
             polyline={activity.polyline}
             place={activity.place}
+            sport={activity.sport}
             marker={positionAt(activity.series, active)}
           />
         </Suspense>

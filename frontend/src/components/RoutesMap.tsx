@@ -25,6 +25,7 @@ import {
   decodePolyline,
   formatKm,
   MAP_COLOR_VAR,
+  sportColorVar,
   SPORT_LABELS,
   speedText,
 } from '../utils/activity'
@@ -82,7 +83,7 @@ function RouteLine({ route, heat }: { route: MapRoute; heat: boolean }) {
   const positions = useMemo(() => decodePolyline(route.polyline), [route.polyline])
   const style = heat
     ? { color: cssColor(MAP_COLOR_VAR), weight: 6, opacity: HEAT_OPACITY }
-    : { color: cssColor(MAP_COLOR_VAR), weight: 3, opacity: 0.8 }
+    : { color: cssColor(sportColorVar(route.sport)), weight: 3, opacity: 0.8 }
   return (
     <Polyline positions={positions} pathOptions={style}>
       <Popup>
@@ -94,7 +95,7 @@ function RouteLine({ route, heat }: { route: MapRoute; heat: boolean }) {
 
 /** An activity known only by its start point (its route is not imported yet). */
 function StartDot({ point, heat }: { point: MapPoint; heat: boolean }) {
-  const color = cssColor(MAP_COLOR_VAR)
+  const color = cssColor(heat ? MAP_COLOR_VAR : sportColorVar(point.sport))
   return (
     <CircleMarker
       center={[point.latitude, point.longitude]}

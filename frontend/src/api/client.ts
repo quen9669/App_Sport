@@ -287,7 +287,7 @@ export interface StepsAndFloors {
 
 // --- Map and activity detail (phase 3b) ---
 
-export type SportGroup = 'run' | 'ride' | 'walk' | 'strength' | 'other'
+export type SportGroup = 'run' | 'ride' | 'walk' | 'swim' | 'strength' | 'other'
 
 /** The columns of an activity table (mirrors ActivityRowFields). */
 export interface ActivityRow {
@@ -572,6 +572,24 @@ export const fetchHealthMetrics = (days = 30) =>
   request<HealthMetrics>('GET', `/api/health-metrics?days=${days}`)
 export const fetchTrainingLoad = (weeks = 12) =>
   request<TrainingLoad>('GET', `/api/training-load?weeks=${weeks}`)
+
+export interface CalendarActivity {
+  id: number
+  day: string // local day, "2026-11-24"
+  sport: SportGroup
+  name: string
+  duration_s: number
+}
+
+export interface ActivityCalendar {
+  streak_weeks: number // consecutive weeks with at least one activity
+  today: string
+  monday: string // Monday of the current week
+  activities: CalendarActivity[]
+}
+
+export const fetchActivityCalendar = () =>
+  request<ActivityCalendar>('GET', '/api/activity-calendar')
 
 /** Query string from the defined values only: {sport: 'run', days: undefined} -> "?sport=run". */
 function queryString(params: object): string {

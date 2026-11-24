@@ -1,14 +1,8 @@
 # CLAUDE.md
 
-## Référentiel Franks (prioritaire, lecture seule)
+## Independent project
 
-Ce projet suit le référentiel `C:\Users\franc\Dev\Projets\portfolio-franks` (dépôt `quen9669/Referentiel-Portfolio`). On tend absolument vers lui.
-Avant toute modification d'infra, d'IA, de secrets, de données ou d'interface :
-1. Relire `REGLES.md` (R-01 à R-26, non négociables) et `apps/app-sport.md`, en commençant par la **section 4 « Écarts à corriger »**.
-2. Le moins de code possible (méthode Ponytail) et sobriété en tokens.
-3. Visuels : uniquement la bibliothèque `@quen9669/lignes`. IA : uniquement OmniRoute. Secrets : uniquement le coffre OpenBao.
-4. Citer l'ID de l'écart dans le commit (`fix(XXX-01): …`) et mettre à jour `expedition.yaml`.
-Ne jamais modifier le référentiel depuis cette session. Si une règle gêne, le signaler à Franks.
+Owner's decision (2026-11-24): this project no longer follows any outside "référentiel". Its rules are the ones written in this file, nothing else. Old mentions of R-xx / SPT-xx in code comments are history only. Do not ask the owner about the référentiel.
 
 Project memo for anyone (human or AI) working on this repository. Keep it up to date at each phase.
 
@@ -147,6 +141,10 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   `steps` (a DAILY target: the week's average day of the days with data must reach it) and `floors`
   (floors climbed per week). Santé cards "Pas" (one bar per day) and "Étages" (per week).
 
+## Streak calendar (Ma semaine)
+
+- `services/activity_calendar.py` + `GET /api/activity-calendar`: weeks in a row with at least one activity (hidden never count; walks count, other transport does not; the current week can't break it) and the last 30 days. Card `ActivityCalendar`: this week's days with pictograms, then a week x day table of dots (size = duration).
+
 ## Map and activity detail (phase 3b)
 
 - `/api/map/routes` (`services/activity_map.py`): filters (sport group run/ride/strength/other,
@@ -162,7 +160,7 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 - The map opens on the last 14 days (owner's choice). Activities with a start point but no route
   yet (Garmin routes come with the details) are dots at their start, never at a gym.
 - Activity tables (`components/ActivityTable.tsx`, week list and map list): flag, town, date, name,
-  sport (library pictogram + label, no colour per sport: SPT-04; `SPORT_PICTOS`; walking uses `randonnee`, no `marche` pictogram yet),
+  sport (library pictogram + label, tag in the sport's colour; `SPORT_PICTOS`; walking uses `randonnee`, no `marche` pictogram yet),
   distance (empty for strength / no distance), duration, average and max HR (empty without a reading).
   Rows come from `api/rows.py`. The Course page lists each run with its HR too.
 - Town: `activity.location_name` (Garmin `locationName`, Strava `location_city`), else the place's
@@ -251,7 +249,7 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   and on the login screen.
   `styles/theme.css` only maps the app's names to the charter's tokens (`--accent` = `--line-ml`,
   the ML line; main button `--action`), never a colour of its own (R-18). `--series-1..4` point at
-  charter tokens (ML line, text, muted, border; amber `--state-warn` for ◆). Map routes, dots and heat use `--line-ml` (`MAP_COLOR_VAR`). Installed from GitHub Packages with `frontend/.npmrc` (no secret) and
+  charter tokens (ML line, text, muted, border; amber `--state-warn` for ◆). Map heat uses `--line-ml` (`MAP_COLOR_VAR`). Sport colours (owner's choice 2026-11-24: dark green run, light green walk, brown strength, orange ride, blue swim; `--sport-*` in `theme.css`, `sportColorVar()`) colour routes, tags and the calendar; swim is its own `SportGroup`. Installed from GitHub Packages with `frontend/.npmrc` (no secret) and
   `NPM_TOKEN` (read:packages; PC: `gh auth token`; vault: `apps/app-sport/NPM_TOKEN`).
   PWA icons in `public/icons/` are drawn from the library's `app-sport` logo (violet on `--bg`).
 - Governance (SPT-11, R-23): `components/Governance.tsx` on Sources (freshness of each sync from the journal, ● fine under 6 h,

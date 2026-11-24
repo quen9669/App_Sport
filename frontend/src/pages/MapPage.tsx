@@ -17,7 +17,7 @@ import { PERIOD_CHOICES, SPORT_LABELS } from '../utils/activity'
 // Loaded on demand: Leaflet (~150 kB) is only downloaded when the map is opened.
 const RoutesMap = lazy(() => import('../components/RoutesMap'))
 
-const SPORTS: (SportGroup | null)[] = [null, 'run', 'ride', 'walk', 'strength', 'other']
+const SPORTS: (SportGroup | null)[] = [null, 'run', 'ride', 'walk', 'swim', 'strength', 'other']
 // The list under the map stops here: beyond, the map itself is more useful.
 const LIST_LIMIT = 30
 
