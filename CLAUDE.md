@@ -246,7 +246,7 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 
 - Look (redesign 2026-11-24, owner's request): own palette in the tokens at the top of `styles/theme.css`
   (day theme, and "night mode" via `prefers-color-scheme: dark`): soft crimson-red frame (top bar, sidebar, bottom
-  bar), Strava-orange accent and highlighted text, font Figtree bundled (`@fontsource-variable/figtree`), FRANKS's red QF logo
+  bar), red accent and highlighted text, font Figtree bundled (`@fontsource-variable/figtree`), FRANKS's red QF logo
   (`src/assets/logo.png`, `QfLogo` on a white tile; PWA icons are the QF ones). Do not set `color-scheme` on `:root` (it broke an e2e click).
   `@quen9669/lignes` stays only for `Picto` and small badges (installed with `frontend/.npmrc` and
   `NPM_TOKEN`: read:packages; PC: `gh auth token`; vault: `apps/app-sport/NPM_TOKEN`); theme.css overrides its tokens.
