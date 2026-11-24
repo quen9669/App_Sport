@@ -1,14 +1,8 @@
 # CLAUDE.md
 
-## Référentiel Franks (prioritaire, lecture seule)
+## Independent project
 
-Ce projet suit le référentiel `C:\Users\franc\Dev\Projets\portfolio-franks` (dépôt `quen9669/Referentiel-Portfolio`). On tend absolument vers lui.
-Avant toute modification d'infra, d'IA, de secrets, de données ou d'interface :
-1. Relire `REGLES.md` (R-01 à R-26, non négociables) et `apps/app-sport.md`, en commençant par la **section 4 « Écarts à corriger »**.
-2. Le moins de code possible (méthode Ponytail) et sobriété en tokens.
-3. Visuels : uniquement la bibliothèque `@quen9669/lignes`. IA : uniquement OmniRoute. Secrets : uniquement le coffre OpenBao.
-4. Citer l'ID de l'écart dans le commit (`fix(XXX-01): …`) et mettre à jour `expedition.yaml`.
-Ne jamais modifier le référentiel depuis cette session. Si une règle gêne, le signaler à Franks.
+Owner's decision (2026-11-24): this project no longer follows any outside "référentiel". Its rules are the ones written in this file, nothing else. Old mentions of R-xx / SPT-xx in code comments are history only. Do not ask the owner about the référentiel.
 
 Project memo for anyone (human or AI) working on this repository. Keep it up to date at each phase.
 
