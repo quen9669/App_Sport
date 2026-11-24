@@ -1,47 +1,95 @@
 /*
- * Global styles. Colours, spaces and fonts come from the shared charter
- * (@quen9669/lignes/tokens.css, imported in main.tsx, dark by default, light
- * when the phone/PC asks for it). Below, the app's names only point at the
- * charter's tokens: no colour of the app's own (référentiel R-18, SPT-03).
- * App Sport's line is ML: --line-ml is the dominant colour; the main button
- * is the neutral --action.
+ * Global styles and the app's own look (FRANKS's choice, 2026-11-24): soft-red
+ * frame, red accent and text highlights, round Figtree font, his QF logo.
+ * Dark by default is NOT assumed: light follows the device, "night mode" is the dark
+ * variant used when the phone/PC asks for it.
+ *
+ * Everything is driven by the tokens below. Change a colour here and the whole app
+ * follows. (--bg, --card, --text... are the names the rest of the app uses.)
  */
+:root {
+  /* Day theme. */
+  --bg: #f6f2f2;
+  --card: #ffffff;
+  --text: #241c1f;
+  --muted: #6d5f64;
+  --border: #e6dcde;
+  --line-ml: #b3202d; /* red as text/lines: dark enough to read on white */
+  --accent-2: #c8283a; /* red for fills and underlines */
+  --line-dg: #0a7f3f;
+  --state-warn: #b45309;
+  --state-stop: #d0021b;
+  --action: #b3202d; /* main button: red with white text */
+  --on-action: #ffffff;
+  /* The frame (top bar, sidebar, bottom bar): a soft crimson red. */
+  --alt: #a82a36;
+  --chrome-text: #ffffff;
+  --chrome-muted: #f6d6d9;
+  --halo: 0%;
+  --shadow: 0 1px 2px rgb(60 20 30 / 8%);
+  --glow: 0 0 0 2px color-mix(in srgb, var(--accent-2) 35%, transparent);
+  /* Sport colours (owner's choice): dark green run, light green walk, brown
+     strength, orange ride, blue swim. */
+  --sport-run: #15803d;
+  --sport-walk: #6ee7a0;
+  --sport-strength: #a0522d;
+  --sport-ride: #f97316;
+  --sport-swim: #2563eb;
+
+  --font-sans: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: var(--font-sans);
+  --font-mono: ui-monospace, 'Cascadia Code', Menlo, monospace;
+  --radius-md: 0.7rem;
+}
+
+/* Night mode: warm near-black, a deep wine-red frame, brighter red. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #140f12;
+    --card: #201819;
+    --text: #f5eff0;
+    --muted: #b3a2a7;
+    --border: #392a2f;
+    --line-ml: #ff8791;
+    --accent-2: #e5485a;
+    --line-dg: #3ccf7a;
+    --state-warn: #fbbf24;
+    --state-stop: #ff7b72;
+    --action: #c2303f;
+    --alt: #62202a;
+    --chrome-muted: #e3b9bf;
+    --shadow: 0 1px 0 rgb(255 255 255 / 3%) inset;
+    --sport-run: #1fa04f;
+    --sport-walk: #86efac;
+    --sport-strength: #c46a3a;
+    --sport-ride: #fb8c2b;
+    --sport-swim: #3b82f6;
+  }
+}
+
 :root {
   --surface: var(--card);
   --text-muted: var(--muted);
-  /* The app's line: borders, chart lines, links. */
+  /* The app's accent: links, active marks, chart line. */
   --accent: var(--line-ml);
   --accent-text: var(--line-ml);
-  --accent-soft: color-mix(in srgb, var(--line-ml) 16%, var(--card));
+  --accent-soft: color-mix(in srgb, var(--accent-2) 12%, var(--card));
   --success: var(--line-dg);
   --danger: var(--state-stop);
-  /* The frame: top bar (phone) and sidebar (PC). */
   --chrome: var(--alt);
-  --chrome-text: var(--text);
-  --chrome-muted: var(--muted);
   --radius: var(--radius-md);
   --bottom-bar-height: 4rem;
 
   /* "Twemoji Country Flags" is only used for flags (main.tsx). */
   font-family: 'Twemoji Country Flags', var(--font-sans);
   line-height: 1.5;
-}
 
-/* Chart series (charter dataviz): the app's line (ML) first, then the observed
-   value in the text colour, then neutrals. At most two hues per chart (SPT-04).
-   Sport colours below: FRANKS's own choice (2026-11-24), one per sport on the whole app.
-   A pictogram and a label still say the sport too. */
-:root {
+  /* Chart series: the accent first, then the observed value in the text colour,
+     then neutrals. */
   --series-1: var(--line-ml);
   --series-2: var(--text);
   --series-3: var(--muted);
   --series-4: var(--border);
-  /* Sport colours: dark green run, light green walk, brown strength, orange ride, blue swim. */
-  --sport-run: #15803d;
-  --sport-walk: #86efac;
-  --sport-strength: #a0522d;
-  --sport-ride: #f97316;
-  --sport-swim: #2563eb;
   --sport-other: var(--muted);
 }
 
@@ -55,6 +103,12 @@ body {
   color: var(--text);
 }
 
+/* Visible keyboard focus everywhere (accessibility). */
+:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
+}
+
 /* Titles and big numbers: the charter's display font. */
 h1,
 h2,
@@ -66,9 +120,10 @@ h3,
 }
 
 h1 {
-  margin: 0.25rem 0 0.75rem;
-  font-size: 1.75rem;
-  line-height: 1.2;
+  margin: 0.25rem 0 1rem;
+  font-size: 1.9rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 a {
@@ -211,7 +266,7 @@ a {
 }
 
 .tabs a.active {
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--chrome-text);
   color: var(--chrome-text);
 }
 
@@ -226,8 +281,7 @@ a {
   grid-template-columns: repeat(3, 1fr);
   height: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom); /* above the Android gesture bar */
-  border-top: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--chrome);
 }
 
 .bottom-bar a {
@@ -236,14 +290,32 @@ a {
   align-items: center;
   justify-content: center;
   gap: 0.15rem;
-  color: var(--text-muted);
+  color: var(--chrome-muted);
   font-size: 0.8rem;
   font-weight: 600;
   text-decoration: none;
 }
 
 .bottom-bar a.active {
-  color: var(--accent-text);
+  color: var(--chrome-text);
+  /* A white line over the current folder. */
+  box-shadow: inset 0 3px 0 var(--chrome-text);
+}
+
+/* The QF logo is red on transparent: a white rounded tile keeps it readable on blue. */
+.qf-logo {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22%;
+  background: #fff;
+}
+
+.qf-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* Room for the bottom bar, so it never hides the end of the page. */
@@ -272,6 +344,7 @@ a {
     height: 100vh;
     overflow-y: auto;
     padding: 1.25rem 0.75rem;
+    border-right: 1px solid var(--border);
     background: var(--chrome);
     color: var(--chrome-text);
   }
@@ -324,12 +397,12 @@ a {
   }
 
   .sidebar-folder a:hover {
-    background: rgb(255 255 255 / 8%);
+    background: rgb(255 255 255 / 10%);
   }
 
   .sidebar-folder a.active {
-    border-left-color: var(--accent);
-    background: rgb(255 255 255 / 10%);
+    border-left-color: var(--chrome-text);
+    background: rgb(255 255 255 / 16%);
     font-weight: 700;
   }
 
@@ -350,29 +423,44 @@ a {
 
 /* --- Cards, tiles, buttons, notices --- */
 .card {
-  margin: 1rem 0;
-  padding: 1rem 1.1rem;
+  margin: 1.25rem 0;
+  padding: 1.25rem 1.35rem;
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
-  box-shadow: 0 1px 2px rgb(16 24 40 / 6%);
+  box-shadow: var(--shadow);
 }
 
 .card h2 {
   margin-top: 0;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
 }
 
 /* A whole card that opens another page ("Aujourd'hui dans ton plan"). */
 .card-link {
   display: grid;
   gap: 0.15rem;
-  border-left: 4px solid var(--accent);
+  position: relative;
+  padding-right: 2.5rem;
   color: var(--text);
   text-decoration: none;
 }
 
+/* A discreet arrow says "this opens something". */
+.card-link::after {
+  content: '›';
+  position: absolute;
+  top: 50%;
+  right: 1.1rem;
+  translate: 0 -50%;
+  color: var(--accent-text);
+  font-size: 1.6rem;
+}
+
 .card-link:hover {
-  background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface));
+  border-color: var(--accent);
+  box-shadow: var(--glow);
 }
 
 /* Garmin-style numbers: a small label over a big value, 2 per row on a phone. */
@@ -393,12 +481,24 @@ a {
   display: grid;
   align-content: start;
   gap: 0.1rem;
-  padding: 0.8rem 0.9rem;
+  position: relative;
+  overflow: hidden;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
-  box-shadow: 0 1px 2px rgb(16 24 40 / 6%);
+  box-shadow: var(--shadow);
   color: var(--text);
   text-decoration: none;
+}
+
+/* A thin gradient line on top of each tile. */
+.tile::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--accent-2);
 }
 
 .tile dt,
@@ -411,7 +511,7 @@ a {
 .tile dd,
 .tile-value {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: 1.85rem;
   font-weight: 700;
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
@@ -424,7 +524,8 @@ a {
 }
 
 .tiles--links .tile:hover {
-  outline: 2px solid var(--accent-soft);
+  border-color: var(--accent);
+  box-shadow: var(--glow);
 }
 
 .actions {
@@ -440,17 +541,31 @@ button,
   min-height: 2.75rem; /* big enough to tap on a phone */
   padding: 0.6rem 1rem;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 0.8rem;
   background: var(--action);
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--line-ml) 70%, transparent);
   color: var(--on-action);
   font: inherit;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
+  transition:
+    filter 0.15s,
+    transform 0.15s;
+}
+
+button:hover:not(:disabled),
+.button:hover {
+  filter: brightness(1.1);
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 button.secondary {
   background: var(--surface);
+  box-shadow: none;
   color: var(--text);
   border: 1px solid var(--border);
 }
@@ -461,8 +576,9 @@ button:disabled {
 }
 
 .notice {
-  padding: 0.75rem 1rem;
-  border-left: 4px solid var(--accent);
+  padding: 0.85rem 1.1rem;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent-2);
   border-radius: 0 var(--radius) var(--radius) 0;
   background: var(--surface);
 }
@@ -483,9 +599,16 @@ table {
   font-size: 0.875rem;
 }
 
+th {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 th,
 td {
-  padding: 0.4rem 0.5rem;
+  padding: 0.65rem 0.6rem;
   border-bottom: 1px solid var(--border);
   text-align: left;
   white-space: nowrap;
@@ -527,9 +650,9 @@ input,
 select,
 textarea {
   min-height: 2.75rem;
-  padding: 0.5rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border-radius: 0.7rem;
   background: var(--bg);
   color: var(--text);
   font: inherit;
@@ -779,16 +902,20 @@ textarea {
 
 .activity-table th,
 .activity-table td {
-  padding: 0.4rem 0.35rem;
+  padding: 0.8rem 0.5rem;
   text-align: left;
   white-space: nowrap; /* one activity = one line */
   vertical-align: middle;
 }
 
+.activity-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--accent-soft) 55%, transparent);
+}
+
 .activity-table th {
   color: var(--text-muted);
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 /* Discreet separators: a faint line between rows only. */
