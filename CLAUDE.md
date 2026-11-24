@@ -251,7 +251,6 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
   `NPM_TOKEN`: read:packages; PC: `gh auth token`; vault: `apps/app-sport/NPM_TOKEN`); theme.css overrides its tokens.
   Sport colours (owner's choice: dark green run, light green walk, brown strength, orange ride, blue swim; `--sport-*`,
   `sportColorVar()`) colour routes, tags and calendar. Map heat uses `--line-ml` (`MAP_COLOR_VAR`). No colour outside the tokens.
-  `NPM_TOKEN` (read:packages; PC: `gh auth token`; vault: `apps/app-sport/NPM_TOKEN`).
   PWA icons in `public/icons/` are drawn from the library's `app-sport` logo (violet on `--bg`).
 - Governance (SPT-11, R-23): `components/Governance.tsx` on Sources (freshness of each sync from the journal, ● fine under 6 h,
   ◆ older or last run failed; completeness ✓; colour legend) and `CalcSource` (source + method under TRIMP/ratio on Santé and VDOT on Course).
