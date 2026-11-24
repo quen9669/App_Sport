@@ -37,8 +37,10 @@ BASE_HEADERS = {
     "Content-Security-Policy": CONTENT_SECURITY_POLICY,
     # Never guess a file type from its content (a "text" file run as a script...).
     "X-Content-Type-Options": "nosniff",
-    # Other sites never learn which page of the app a link came from.
-    "Referrer-Policy": "same-origin",
+    # Other sites only learn the app's address, never which page a request came from.
+    # Not "same-origin": it sends no Referer at all, and the OpenStreetMap tile server
+    # answers "Access blocked" to a request without one (its usage policy).
+    "Referrer-Policy": "strict-origin-when-cross-origin",
     # Old browsers: refuse to be shown inside a frame (CSP frame-ancestors for new ones).
     "X-Frame-Options": "DENY",
     # The app needs none of these device features.
