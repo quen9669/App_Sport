@@ -245,7 +245,7 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 ## Interface (design pass before phase 6)
 
 - Look (redesign 2026-11-24, owner's request): own palette in the tokens at the top of `styles/theme.css`
-  (day theme, and "night mode" via `prefers-color-scheme: dark`): Garmin-blue frame (top bar, sidebar, bottom
+  (day theme, and "night mode" via `prefers-color-scheme: dark`): soft crimson-red frame (top bar, sidebar, bottom
   bar), Strava-orange accent and highlighted text, font Figtree bundled (`@fontsource-variable/figtree`), FRANKS's red QF logo
   (`src/assets/logo.png`, `QfLogo` on a white tile; PWA icons are the QF ones). Do not set `color-scheme` on `:root` (it broke an e2e click).
   `@quen9669/lignes` stays only for `Picto` and small badges (installed with `frontend/.npmrc` and

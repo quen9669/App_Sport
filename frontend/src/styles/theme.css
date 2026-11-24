@@ -1,5 +1,5 @@
 /*
- * Global styles and the app's own look (FRANKS's choice, 2026-11-24): Garmin-blue
+ * Global styles and the app's own look (FRANKS's choice, 2026-11-24): soft-red
  * frame, Strava-orange accent and text highlights, round Figtree font, his QF logo.
  * Dark by default is NOT assumed: light follows the device, "night mode" is the dark
  * variant used when the phone/PC asks for it.
@@ -9,11 +9,11 @@
  */
 :root {
   /* Day theme. */
-  --bg: #edf1f5;
+  --bg: #f6f2f2;
   --card: #ffffff;
-  --text: #17212b;
-  --muted: #5a6877;
-  --border: #d8e0e8;
+  --text: #241c1f;
+  --muted: #6d5f64;
+  --border: #e6dcde;
   --line-ml: #d23d00; /* orange as text/lines: dark enough to read on white */
   --accent-2: #fc4c02; /* Strava orange, for fills and underlines */
   --line-dg: #0a7f3f;
@@ -21,12 +21,12 @@
   --state-stop: #d0021b;
   --action: #dd4000; /* main button: orange with white text */
   --on-action: #ffffff;
-  /* The frame (top bar, sidebar, bottom bar): Garmin blue. */
-  --alt: #0a6fb0;
+  /* The frame (top bar, sidebar, bottom bar): a soft crimson red. */
+  --alt: #a82a36;
   --chrome-text: #ffffff;
-  --chrome-muted: #cfe3f3;
+  --chrome-muted: #f6d6d9;
   --halo: 0%;
-  --shadow: 0 1px 2px rgb(15 35 60 / 8%);
+  --shadow: 0 1px 2px rgb(60 20 30 / 8%);
   --glow: 0 0 0 2px color-mix(in srgb, var(--accent-2) 35%, transparent);
   /* Sport colours (owner's choice): dark green run, light green walk, brown
      strength, orange ride, blue swim. */
@@ -42,22 +42,22 @@
   --radius-md: 0.7rem;
 }
 
-/* Night mode: deep blue-black, same blue frame but darker, brighter orange. */
+/* Night mode: warm near-black, a deep wine-red frame, brighter orange. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0c141d;
-    --card: #152230;
-    --text: #eef3f8;
-    --muted: #9fb0c1;
-    --border: #25384b;
+    --bg: #140f12;
+    --card: #201819;
+    --text: #f5eff0;
+    --muted: #b3a2a7;
+    --border: #392a2f;
     --line-ml: #ff7a3d;
     --accent-2: #ff6a2b;
     --line-dg: #3ccf7a;
     --state-warn: #fbbf24;
     --state-stop: #ff7b72;
     --action: #e84a0c;
-    --alt: #0b3a5c;
-    --chrome-muted: #a9c3d8;
+    --alt: #62202a;
+    --chrome-muted: #e3b9bf;
     --shadow: 0 1px 0 rgb(255 255 255 / 3%) inset;
     --sport-run: #1fa04f;
     --sport-walk: #86efac;
@@ -266,7 +266,7 @@ a {
 }
 
 .tabs a.active {
-  border-bottom-color: var(--accent-2);
+  border-bottom-color: var(--chrome-text);
   color: var(--chrome-text);
 }
 
@@ -298,8 +298,8 @@ a {
 
 .bottom-bar a.active {
   color: var(--chrome-text);
-  /* An orange line over the current folder. */
-  box-shadow: inset 0 3px 0 var(--accent-2);
+  /* A white line over the current folder. */
+  box-shadow: inset 0 3px 0 var(--chrome-text);
 }
 
 /* The QF logo is red on transparent: a white rounded tile keeps it readable on blue. */
@@ -401,7 +401,7 @@ a {
   }
 
   .sidebar-folder a.active {
-    border-left-color: var(--accent-2);
+    border-left-color: var(--chrome-text);
     background: rgb(255 255 255 / 16%);
     font-weight: 700;
   }
