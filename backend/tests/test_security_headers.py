@@ -76,7 +76,7 @@ def test_production_adds_hsts_and_hides_the_api_docs(prod_client: TestClient) ->
     assert prod_client.get("/openapi.json").headers["content-type"].startswith("text/html")
 
 
-def test_referrer_policy_lets_openstreetmap_tiles_load(client) -> None:
+def test_referrer_policy_lets_openstreetmap_tiles_load(client: TestClient) -> None:
     # Without a Referer the OSM tile server answers "Access blocked" (map shows no tiles).
     response = client.get("/api/health")
     assert response.headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
