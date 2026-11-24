@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 from app.config import Settings, get_settings
 from app.db.session import get_db
 from app.db.types import utc_now
+from app.services.activity_calendar import activity_calendar
+from app.services.activity_map import SportGroup
 from app.services.goals import GoalKind, goals_for_week
 from app.services.health_dashboard import (
     health_days,
@@ -216,4 +218,42 @@ def read_steps_and_floors(
         ],
         steps_target=_goal_target(db, last, GoalKind.STEPS),
         floors_target=_goal_target(db, last, GoalKind.FLOORS),
+    )
+
+
+class CalendarActivityOut(BaseModel):
+    id: int
+    day: date  # local day
+    sport: SportGroup
+    name: str
+    duration_s: int
+
+
+class ActivityCalendarOut(BaseModel):
+    streak_weeks: int  # consecutive weeks with at least one activity
+    today: date
+    monday: date  # Monday of the current week
+    activities: list[CalendarActivityOut]
+
+
+@router.get("/activity-calendar", response_model=ActivityCalendarOut)
+def get_activity_calendar(
+    db: Session = Depends(get_db), settings: Settings = Depends(get_settings)
+) -> ActivityCalendarOut:
+    """Weeks-in-a-row streak and the activities of the last 30 days (and this week)."""
+    calendar = activity_calendar(db, settings.app_timezone)
+    return ActivityCalendarOut(
+        streak_weeks=calendar.streak_weeks,
+        today=calendar.today,
+        monday=calendar.monday,
+        activities=[
+            CalendarActivityOut(
+                id=e.activity.id,
+                day=e.day,
+                sport=e.sport,
+                name=e.activity.name,
+                duration_s=e.activity.moving_time_s or e.activity.elapsed_time_s,
+            )
+            for e in calendar.entries
+        ],
     )

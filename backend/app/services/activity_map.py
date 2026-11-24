@@ -26,6 +26,7 @@ from app.services.activity_location import start_point
 from app.services.classification import (
     RIDE_SPORTS,
     RUN_SPORTS,
+    SWIM_SPORTS,
     WALK_SPORTS,
     Category,
     effective_category,
@@ -46,6 +47,7 @@ class SportGroup(StrEnum):
     RUN = "run"
     RIDE = "ride"
     WALK = "walk"  # walks and hikes
+    SWIM = "swim"
     STRENGTH = "strength"  # weight training and gym classes
     OTHER = "other"  # swims, yoga, skiing, motorcycle trips...
 
@@ -57,6 +59,8 @@ def sport_group(activity: Activity) -> SportGroup:
         return SportGroup.RIDE
     if activity.sport_type in WALK_SPORTS:
         return SportGroup.WALK
+    if activity.sport_type in SWIM_SPORTS:
+        return SportGroup.SWIM
     if effective_category(activity) == Category.STRENGTH:
         return SportGroup.STRENGTH
     return SportGroup.OTHER

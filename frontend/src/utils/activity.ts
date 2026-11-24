@@ -10,22 +10,28 @@ export const SPORT_LABELS: Record<SportGroup, string> = {
   run: 'Course',
   ride: 'Vélo',
   walk: 'Marche',
+  swim: 'Natation',
   strength: 'Muscu',
   other: 'Divers',
 }
 
-// One pictogram per sport, from @quen9669/lignes (no colour per sport: SPT-04).
+// One pictogram per sport, from @quen9669/lignes.
 // The library has no "marche" pictogram yet: walking uses "randonnee".
 export const SPORT_PICTOS: Record<SportGroup, NomPicto> = {
   run: 'course',
   ride: 'velo',
   walk: 'randonnee',
+  // The library has no swimming pictogram yet: "divers" until it has one.
+  swim: 'divers',
   strength: 'musculation',
   other: 'divers',
 }
 
-/** Routes, dots and heat on the maps: the app's line (ML), whatever the sport. */
+/** Heat mode on the maps: the app's line (ML), whatever the sport. */
 export const MAP_COLOR_VAR = '--line-ml'
+
+/** The colour of a sport (theme.css): used by tags, maps and the weekly calendar. */
+export const sportColorVar = (sport: SportGroup) => `--sport-${sport}`
 
 /**
  * The flag emoji of a country: "LU" -> 🇱🇺. A flag is two "regional indicator"

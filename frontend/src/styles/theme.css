@@ -29,12 +29,20 @@
 
 /* Chart series (charter dataviz): the app's line (ML) first, then the observed
    value in the text colour, then neutrals. At most two hues per chart (SPT-04).
-   No colour per sport any more: a pictogram and a label say the sport. */
+   Sport colours below: FRANKS's own choice (2026-11-24), one per sport on the whole app.
+   A pictogram and a label still say the sport too. */
 :root {
   --series-1: var(--line-ml);
   --series-2: var(--text);
   --series-3: var(--muted);
   --series-4: var(--border);
+  /* Sport colours: dark green run, light green walk, brown strength, orange ride, blue swim. */
+  --sport-run: #15803d;
+  --sport-walk: #86efac;
+  --sport-strength: #a0522d;
+  --sport-ride: #f97316;
+  --sport-swim: #2563eb;
+  --sport-other: var(--muted);
 }
 
 * {
@@ -819,7 +827,7 @@ textarea {
   gap: 0.3rem;
   padding: 0.05rem 0.5rem 0.05rem 0.35rem;
   border-radius: 999px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--sport-color, var(--border));
   background: var(--card);
   font-size: 0.85rem;
 }
@@ -1159,4 +1167,85 @@ textarea {
 
 .governance-source {
   font-family: var(--font-mono);
+}
+
+/* "Ma série d'activités": streak, this week's days and the 30-day dots. */
+.streak {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+.streak-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+}
+.streak-count strong {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  line-height: 1;
+}
+.streak-days {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.streak-days li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+.streak-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.streak-day--done {
+  padding: 0 0.3rem;
+  background: var(--card);
+}
+.streak-picto {
+  display: inline-flex;
+  color: var(--dot);
+}
+.dots-table th,
+.dots-table td {
+  padding: 0.25rem 0.4rem;
+  text-align: center;
+  vertical-align: middle;
+}
+.dots-table th[scope='row'] {
+  text-align: left;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.dots-table td {
+  min-width: 2.5rem;
+}
+.dot {
+  display: inline-block;
+  margin: 1px;
+  border-radius: 50%;
+  background: var(--dot);
+  vertical-align: middle;
+}
+.dots-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
 }

@@ -16,6 +16,7 @@ import {
   type WeekActivity,
   type WeekProgress,
 } from '../api/client'
+import ActivityCalendar from '../components/ActivityCalendar'
 import ActivityTable from '../components/ActivityTable'
 import GoalRing from '../components/GoalRing'
 import QuickWeight from '../components/QuickWeight'
@@ -177,6 +178,8 @@ export default function HomePage() {
           </dl>
         )}
       </section>
+
+      <ActivityCalendar />
 
       <TodayPlan />
 

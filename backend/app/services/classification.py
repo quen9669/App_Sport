@@ -101,6 +101,7 @@ RIDE_SPORTS = frozenset(
 )
 # Walks and hikes: one group in the lists and on the map ("Marche").
 WALK_SPORTS = frozenset({*_WALKING, "Hike", "hiking"})
+SWIM_SPORTS = frozenset({"Swim", "swimming", "lap_swimming", "open_water_swimming"})
 
 
 def is_motorized(sport_type: str) -> bool:
