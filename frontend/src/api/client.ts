@@ -859,14 +859,7 @@ export interface CoachConversation {
 }
 
 export type PlanSessionKind =
-  | 'run'
-  | 'ride'
-  | 'strength'
-  | 'class'
-  | 'walk'
-  | 'mobility'
-  | 'rest'
-  | 'other'
+  'run' | 'ride' | 'strength' | 'class' | 'walk' | 'mobility' | 'rest' | 'other'
 
 /** One session of a weekly plan (mirrors PlanSessionOut). */
 export interface PlanSession {
