@@ -18,7 +18,7 @@ export default defineConfig({
       workbox: {
         // Files kept on the device so the app opens offline: code, styles, the
         // logo and icons, and the bundled fonts (only their latin cuts).
-        globPatterns: ['**/*.{js,css,html,png,webmanifest}', 'assets/*latin-[0-9]*.woff2'],
+        globPatterns: ['**/*.{js,css,html,png,webmanifest}', 'assets/*-latin-wght-*.woff2'],
         // Addresses under /api are the backend's, never the app's pages.
         navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
