@@ -5,9 +5,8 @@
 import type { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
-import { Logo } from '@quen9669/lignes/ui'
-
 import AppBanners from './AppBanners'
+import QfLogo from './QfLogo'
 import { FOLDERS, locate, SETTINGS, type Folder } from '../navigation'
 import { FolderIcon, GearIcon } from './icons'
 
@@ -19,10 +18,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
     <div className="shell">
       <aside className="sidebar">
         <Link to="/" className="sidebar-brand">
-          {/* The charter's logo; decorative here, the name is written next to it. */}
-          <span aria-hidden="true">
-            <Logo app="app-sport" taille={38} />
-          </span>
+          <QfLogo size={40} />
           <span>App Sport</span>
         </Link>
         <nav aria-label="Menu" className="sidebar-nav">
@@ -37,9 +33,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <header className="topbar">
           <div className="topbar-row">
             <Link to="/" className="topbar-logo" aria-label="Accueil">
-              <span aria-hidden="true">
-                <Logo app="app-sport" taille={34} />
-              </span>
+              <QfLogo size={36} />
             </Link>
             <span className="topbar-folder">{folder.label}</span>
             <Link to="/profil" className="icon-button" aria-label="Réglages">

@@ -1,88 +1,82 @@
 /*
- * Global styles and the app's own look (FRANKS's choice, 2026-11-24: a modern,
- * "futuristic" style, the project no longer follows an outside charter).
+ * Global styles and the app's own look (FRANKS's choice, 2026-11-24): Garmin-blue
+ * frame, Strava-orange accent and text highlights, round Figtree font, his QF logo.
+ * Dark by default is NOT assumed: light follows the device, "night mode" is the dark
+ * variant used when the phone/PC asks for it.
  *
- * Everything is driven by the tokens below: dark by default, light when the
- * phone/PC asks for it. The accent is a violet-to-cyan gradient. Change a colour
- * here and the whole app follows. The names --bg, --card, --text... are the
- * ones the rest of the app (and the @quen9669/lignes components) already use.
+ * Everything is driven by the tokens below. Change a colour here and the whole app
+ * follows. (--bg, --card, --text... are the names the rest of the app uses.)
  */
 :root {
-  /* Dark theme (default): deep blue-black, glowing violet and cyan. */
-  --bg: #060913;
-  --card: #0e1527;
-  --alt: #0a1020;
-  --text: #e9eefb;
-  --muted: #94a0ba;
-  --border: #212c45;
-  --line-ml: #9b8cff; /* the accent as text / lines: light enough for dark */
-  --accent-2: #22d3ee; /* second end of the gradient */
-  --line-dg: #34d399;
-  --state-warn: #fbbf24;
-  --state-stop: #fb7185;
-  --action: linear-gradient(135deg, #7c5cff, #19b6e6);
+  /* Day theme. */
+  --bg: #edf1f5;
+  --card: #ffffff;
+  --text: #17212b;
+  --muted: #5a6877;
+  --border: #d8e0e8;
+  --line-ml: #d23d00; /* orange as text/lines: dark enough to read on white */
+  --accent-2: #fc4c02; /* Strava orange, for fills and underlines */
+  --line-dg: #0a7f3f;
+  --state-warn: #b45309;
+  --state-stop: #d0021b;
+  --action: #dd4000; /* main button: orange with white text */
   --on-action: #ffffff;
-  --halo: 16%; /* strength of the coloured glow behind the page */
-  --glow:
-    0 0 0 1px color-mix(in srgb, var(--line-ml) 35%, transparent),
-    0 8px 28px -8px color-mix(in srgb, var(--line-ml) 55%, transparent);
-  --shadow: 0 1px 0 rgb(255 255 255 / 4%) inset, 0 10px 30px -14px rgb(0 0 0 / 70%);
+  /* The frame (top bar, sidebar, bottom bar): Garmin blue. */
+  --alt: #0a6fb0;
+  --chrome-text: #ffffff;
+  --chrome-muted: #cfe3f3;
+  --halo: 0%;
+  --shadow: 0 1px 2px rgb(15 35 60 / 8%);
+  --glow: 0 0 0 2px color-mix(in srgb, var(--accent-2) 35%, transparent);
   /* Sport colours (owner's choice): dark green run, light green walk, brown
-     strength, orange ride, blue swim. Slightly lifted so they read on dark. */
-  --sport-run: #1fa04f;
-  --sport-walk: #86efac;
-  --sport-strength: #c46a3a;
-  --sport-ride: #fb8c2b;
-  --sport-swim: #3b82f6;
+     strength, orange ride, blue swim. */
+  --sport-run: #15803d;
+  --sport-walk: #6ee7a0;
+  --sport-strength: #a0522d;
+  --sport-ride: #f97316;
+  --sport-swim: #2563eb;
 
-  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Space Grotesk Variable', var(--font-sans);
+  --font-sans: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: var(--font-sans);
   --font-mono: ui-monospace, 'Cascadia Code', Menlo, monospace;
-  --radius-md: 1.1rem;
-  color-scheme: dark;
+  --radius-md: 0.7rem;
 }
 
-@media (prefers-color-scheme: light) {
+/* Night mode: deep blue-black, same blue frame but darker, brighter orange. */
+@media (prefers-color-scheme: dark) {
   :root {
-    --bg: #f2f4fb;
-    --halo: 7%;
-    --card: #ffffff;
-    --alt: #ffffff;
-    --text: #0f172a;
-    --muted: #55627d;
-    --border: #e0e5f0;
-    --line-ml: #5a3df0;
-    --accent-2: #0891b2;
-    --line-dg: #047857;
-    --state-warn: #b45309;
-    --state-stop: #e11d48;
-    --action: linear-gradient(135deg, #6a49ff, #0ea5e9);
-    --glow:
-      0 0 0 1px color-mix(in srgb, var(--line-ml) 30%, transparent),
-      0 8px 24px -8px color-mix(in srgb, var(--line-ml) 40%, transparent);
-    --shadow: 0 1px 2px rgb(15 23 42 / 5%), 0 10px 28px -16px rgb(30 41 99 / 22%);
-    --sport-run: #15803d;
-    --sport-walk: #6ee7a0;
-    --sport-strength: #a0522d;
-    --sport-ride: #f97316;
-    --sport-swim: #2563eb;
-    color-scheme: light;
+    --bg: #0c141d;
+    --card: #152230;
+    --text: #eef3f8;
+    --muted: #9fb0c1;
+    --border: #25384b;
+    --line-ml: #ff7a3d;
+    --accent-2: #ff6a2b;
+    --line-dg: #3ccf7a;
+    --state-warn: #fbbf24;
+    --state-stop: #ff7b72;
+    --action: #e84a0c;
+    --alt: #0b3a5c;
+    --chrome-muted: #a9c3d8;
+    --shadow: 0 1px 0 rgb(255 255 255 / 3%) inset;
+    --sport-run: #1fa04f;
+    --sport-walk: #86efac;
+    --sport-strength: #c46a3a;
+    --sport-ride: #fb8c2b;
+    --sport-swim: #3b82f6;
   }
 }
 
 :root {
   --surface: var(--card);
   --text-muted: var(--muted);
-  /* The app's line: borders, chart lines, links. */
+  /* The app's accent: links, active marks, chart line. */
   --accent: var(--line-ml);
   --accent-text: var(--line-ml);
-  --accent-soft: color-mix(in srgb, var(--line-ml) 14%, var(--card));
+  --accent-soft: color-mix(in srgb, var(--accent-2) 12%, var(--card));
   --success: var(--line-dg);
   --danger: var(--state-stop);
-  /* The frame: top bar (phone) and sidebar (PC). */
   --chrome: var(--alt);
-  --chrome-text: var(--text);
-  --chrome-muted: var(--muted);
   --radius: var(--radius-md);
   --bottom-bar-height: 4rem;
 
@@ -105,20 +99,7 @@
 
 body {
   margin: 0;
-  /* Two soft coloured glows behind everything, fixed while the page scrolls. */
-  background:
-    radial-gradient(
-      50rem 28rem at 90% -8%,
-      color-mix(in srgb, var(--line-ml) var(--halo), transparent),
-      transparent
-    ),
-    radial-gradient(
-      40rem 26rem at -8% 8%,
-      color-mix(in srgb, var(--accent-2) 9%, transparent),
-      transparent
-    ),
-    var(--bg);
-  background-attachment: fixed;
+  background: var(--bg);
   color: var(--text);
 }
 
@@ -233,10 +214,7 @@ a {
   position: sticky;
   top: 0;
   z-index: 10; /* above the map (Leaflet keeps its panes under 1000 inside .map) */
-  /* Frosted glass: the page shows through a little. */
-  background: color-mix(in srgb, var(--chrome) 82%, transparent);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
+  background: var(--chrome);
   color: var(--chrome-text);
 }
 
@@ -303,9 +281,7 @@ a {
   grid-template-columns: repeat(3, 1fr);
   height: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom); /* above the Android gesture bar */
-  border-top: 1px solid var(--border);
-  background: color-mix(in srgb, var(--chrome) 85%, transparent);
-  backdrop-filter: blur(16px);
+  background: var(--chrome);
 }
 
 .bottom-bar a {
@@ -314,16 +290,32 @@ a {
   align-items: center;
   justify-content: center;
   gap: 0.15rem;
-  color: var(--text-muted);
+  color: var(--chrome-muted);
   font-size: 0.8rem;
   font-weight: 600;
   text-decoration: none;
 }
 
 .bottom-bar a.active {
-  color: var(--accent-text);
-  /* A small glowing line over the current folder. */
-  box-shadow: inset 0 2px 0 var(--accent-2);
+  color: var(--chrome-text);
+  /* An orange line over the current folder. */
+  box-shadow: inset 0 3px 0 var(--accent-2);
+}
+
+/* The QF logo is red on transparent: a white rounded tile keeps it readable on blue. */
+.qf-logo {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22%;
+  background: #fff;
+}
+
+.qf-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* Room for the bottom bar, so it never hides the end of the page. */
@@ -405,12 +397,12 @@ a {
   }
 
   .sidebar-folder a:hover {
-    background: color-mix(in srgb, var(--text) 7%, transparent);
+    background: rgb(255 255 255 / 10%);
   }
 
   .sidebar-folder a.active {
     border-left-color: var(--accent-2);
-    background: linear-gradient(90deg, var(--accent-soft), transparent);
+    background: rgb(255 255 255 / 16%);
     font-weight: 700;
   }
 
@@ -451,7 +443,6 @@ a {
   gap: 0.15rem;
   position: relative;
   padding-right: 2.5rem;
-  background: linear-gradient(110deg, var(--accent-soft), var(--surface) 70%);
   color: var(--text);
   text-decoration: none;
 }
@@ -507,8 +498,7 @@ a {
   position: absolute;
   inset: 0 0 auto;
   height: 3px;
-  background: var(--action);
-  opacity: 0.85;
+  background: var(--accent-2);
 }
 
 .tile dt,

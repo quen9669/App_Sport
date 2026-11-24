@@ -6,11 +6,10 @@ import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill'
 // "?url": Vite copies the font into the build and gives its local address.
 import flagFont from 'country-flag-emoji-polyfill/dist/TwemojiCountryFlags.woff2?url'
 
-// Fonts bundled with the app (no font CDN): Inter for text, Space Grotesk for
-// titles and big numbers. The colours live in theme.css; the library's own CSS
-// only styles its small components (logo, badges).
-import '@fontsource-variable/inter'
-import '@fontsource-variable/space-grotesk'
+// Font bundled with the app (no font CDN): Figtree, a round geometric sans close to
+// Strava's look. The colours live in theme.css; the library's own CSS only styles
+// its small components (badges, pictograms).
+import '@fontsource-variable/figtree'
 import '@quen9669/lignes/tokens.css'
 import '@quen9669/lignes/composants.css'
 

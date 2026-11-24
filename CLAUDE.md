@@ -244,10 +244,11 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 
 ## Interface (design pass before phase 6)
 
-- Look (redesign 2026-11-24, owner's request: modern, "futuristic"): own palette, all in the tokens at the top of
-  `styles/theme.css` (dark by default, light via `prefers-color-scheme`; accent = violet-to-cyan gradient `--action`,
-  glass top/bottom bars, bordered cards). Fonts bundled: `@fontsource-variable/inter` (text), `space-grotesk` (titles,
-  numbers). `@quen9669/lignes` stays for `<Logo>`, `Picto` and small badges (installed with `frontend/.npmrc` and
+- Look (redesign 2026-11-24, owner's request): own palette in the tokens at the top of `styles/theme.css`
+  (day theme, and "night mode" via `prefers-color-scheme: dark`): Garmin-blue frame (top bar, sidebar, bottom
+  bar), Strava-orange accent and highlighted text, font Figtree bundled (`@fontsource-variable/figtree`), FRANKS's red QF logo
+  (`src/assets/logo.png`, `QfLogo` on a white tile; PWA icons are the QF ones). Do not set `color-scheme` on `:root` (it broke an e2e click).
+  `@quen9669/lignes` stays only for `Picto` and small badges (installed with `frontend/.npmrc` and
   `NPM_TOKEN`: read:packages; PC: `gh auth token`; vault: `apps/app-sport/NPM_TOKEN`); theme.css overrides its tokens.
   Sport colours (owner's choice: dark green run, light green walk, brown strength, orange ride, blue swim; `--sport-*`,
   `sportColorVar()`) colour routes, tags and calendar. Map heat uses `--line-ml` (`MAP_COLOR_VAR`). No colour outside the tokens.
