@@ -86,11 +86,6 @@ class StravaClient:
             raise
         return result
 
-    def get_athlete_zones(self) -> dict[str, Any]:
-        """Heart-rate (and power) zones configured on Strava."""
-        result: dict[str, Any] = self._get("/athlete/zones", {})
-        return result
-
     def _get(self, path: str, params: dict[str, Any]) -> Any:
         """GET with quota handling and retries.
 

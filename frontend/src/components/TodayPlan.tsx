@@ -1,27 +1,14 @@
 // "Ma semaine": today's session from the accepted weekly plan, as one line
 // that opens "Mon plan". Without a plan, a link to ask the coach for one.
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { fetchCurrentPlans, type CurrentPlans } from '../api/client'
+import { fetchCurrentPlans } from '../api/client'
+import { useLoad } from '../hooks/useLoad'
 import { todayIso } from '../utils/format'
 
 export default function TodayPlan({ today = todayIso() }: { today?: string }) {
-  const [plans, setPlans] = useState<CurrentPlans | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchCurrentPlans()
-      .then((data) => {
-        if (!cancelled) setPlans(data)
-      })
-      .catch(() => {
-        // Not essential: without an answer, the line stays hidden.
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  // Not essential: if the call fails, `plans` stays empty and the line stays hidden.
+  const { data: plans } = useLoad(fetchCurrentPlans)
 
   if (!plans) return null
   const plan = plans.this_week

@@ -6,7 +6,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db.models import CoachCall, CoachConversation, CoachMemory, CoachMessage, CoachPlan
+from app.db.models import CoachConversation, CoachMemory, CoachMessage, CoachPlan
 from app.db.types import utc_now
 
 # --- Conversations ---------------------------------------------------------------
@@ -164,8 +164,3 @@ def accepted_plan(db: Session, week_start: date) -> CoachPlan | None:
 
 
 # --- Call log --------------------------------------------------------------------------
-
-
-def recent_calls(db: Session, limit: int = 20) -> list[CoachCall]:
-    query = select(CoachCall).order_by(CoachCall.id.desc()).limit(limit)
-    return list(db.scalars(query))

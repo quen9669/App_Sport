@@ -422,6 +422,11 @@ export class ApiError extends Error {
   }
 }
 
+/** Text of an error to show to the user (one place for every page). */
+export function errorText(error: unknown): string {
+  return error instanceof ApiError ? error.message : 'Le backend ne répond pas.'
+}
+
 /** Message shown when a change is tried without network. */
 export const OFFLINE_MESSAGE = 'Hors ligne : cette action attendra le retour du réseau.'
 

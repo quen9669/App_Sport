@@ -3,7 +3,7 @@
 import { lazy, Suspense, useCallback, useEffect, useState, type FormEvent } from 'react'
 
 import {
-  ApiError,
+  errorText,
   deleteBodyMetric,
   fetchBodyMetrics,
   fetchProfile,
@@ -29,10 +29,6 @@ const WeightChart = lazy(() => import('../components/WeightChart'))
 
 const PERIODS = [30, 90, 365] as const
 type Period = (typeof PERIODS)[number]
-
-function errorText(error: unknown): string {
-  return error instanceof ApiError ? error.message : 'Le backend ne répond pas.'
-}
 
 export default function ProfilePage() {
   const [form, setForm] = useState<ProfileForm | null>(null)

@@ -2,29 +2,18 @@
 import { useEffect, useState } from 'react'
 
 import { AUTH_REQUIRED_EVENT, fetchAuthStatus, logout } from '../api/client'
+import { useLoad } from '../hooks/useLoad'
 import { canInstall, isInstalled, onInstallChange, promptInstall } from '../pwa/install'
 import { clearOfflineData } from '../pwa/offlineData'
 
 export default function DeviceSection() {
   const [installable, setInstallable] = useState(canInstall)
-  const [authEnabled, setAuthEnabled] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
 
   useEffect(() => onInstallChange(() => setInstallable(canInstall())), [])
 
-  useEffect(() => {
-    let cancelled = false
-    fetchAuthStatus()
-      .then((status) => {
-        if (!cancelled) setAuthEnabled(status.enabled)
-      })
-      .catch(() => {
-        // Offline: no sign-out button (it needs the backend anyway).
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  // Offline: no status, so no sign-out button (it needs the backend anyway).
+  const authEnabled = useLoad(fetchAuthStatus).data?.enabled ?? false
 
   async function install() {
     if (await promptInstall())
