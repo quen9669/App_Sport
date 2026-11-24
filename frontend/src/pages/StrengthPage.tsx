@@ -4,7 +4,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 
 import {
-  ApiError,
+  errorText,
   createStrengthSession,
   deleteStrengthSession,
   fetchExercises,
@@ -28,10 +28,6 @@ import {
 } from '../utils/strengthDraft'
 
 const OTHER = '__other__' // value of the "Autre exercice…" choice
-
-function errorText(error: unknown): string {
-  return error instanceof ApiError ? error.message : 'Le backend ne répond pas.'
-}
 
 /** Group the catalogue for the <optgroup>s of the exercise list, keeping the backend's order. */
 function groupByMuscle(exercises: Exercise[]): [string, Exercise[]][] {

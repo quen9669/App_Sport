@@ -2,11 +2,11 @@
 // paces, and the race FRANKS is preparing with its pace plan and feasibility.
 // Every number is computed by the backend (app/services/race/); this page only
 // displays it and sends the target race or a run to leave out.
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import {
-  ApiError,
+  errorText,
   deleteRaceTarget,
   fetchRace,
   type Race,
@@ -16,6 +16,7 @@ import {
   saveRaceTarget,
   setRunExcluded,
 } from '../api/client'
+import { useLoad } from '../hooks/useLoad'
 import { CalcSource } from '../components/Governance'
 import { formatKm } from '../utils/activity'
 import { RACE_BOUNDS, rangeError } from '../utils/bounds'
@@ -31,31 +32,20 @@ import {
 } from '../utils/race'
 
 export default function RacePage() {
-  const [race, setRace] = useState<Race | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchRace()
-      .then((result) => {
-        if (!cancelled) setRace(result)
-      })
-      .catch(() => {
-        if (!cancelled) setError('Impossible de charger le prédicteur de course.')
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const loaded = useLoad(fetchRace)
+  const race = loaded.data
+  const [actionError, setActionError] = useState<string | null>(null)
+  const error =
+    actionError ?? (loaded.error ? 'Impossible de charger le prédicteur de course.' : null)
 
   // Every change answers with the whole screen: no second request needed.
   async function change(action: () => Promise<Race>): Promise<boolean> {
-    setError(null)
+    setActionError(null)
     try {
-      setRace(await action())
+      loaded.replace(await action())
       return true
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Le backend ne répond pas.')
+      setActionError(errorText(err))
       return false
     }
   }

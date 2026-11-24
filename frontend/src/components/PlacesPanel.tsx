@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 
 import {
-  ApiError,
+  errorText,
   createPlace,
   deletePlace,
   fetchPlaces,
@@ -18,10 +18,6 @@ import { parseCoordinates } from '../utils/activity'
 const ROLE_LABELS: Record<PlaceRole, string> = {
   strength_default: 'Par défaut pour la muscu',
   other_default: 'Par défaut pour le reste',
-}
-
-function errorText(error: unknown): string {
-  return error instanceof ApiError ? error.message : 'Le backend ne répond pas.'
 }
 
 export default function PlacesPanel() {

@@ -1,19 +1,18 @@
 // "Objectifs" page: list, add, pause or delete weekly goals.
-import { lazy, Suspense, useCallback, useEffect, useState, type FormEvent } from 'react'
+import { lazy, Suspense, useState, type FormEvent } from 'react'
 
 import {
-  ApiError,
+  errorText,
   createGoal,
   deleteGoal,
   fetchGoalHistory,
   fetchGoals,
   updateGoal,
-  type Goal,
-  type GoalHistory,
   type GoalInput,
   type GoalKind,
   type GoalSport,
 } from '../api/client'
+import { useLoad } from '../hooks/useLoad'
 import { GOAL_TARGET_BOUNDS, rangeError } from '../utils/bounds'
 import { formatNumber, GOAL_KIND_LABELS, GOAL_UNITS, goalTitle } from '../utils/format'
 import { historyRows } from '../utils/history'
@@ -31,52 +30,24 @@ const PRESET: GoalInput[] = [
 
 const STATUS_TEXT: Record<string, string> = { active: 'actif', paused: 'en pause', done: 'terminé' }
 
-function errorText(error: unknown): string {
-  return error instanceof ApiError ? error.message : 'Le backend ne répond pas.'
-}
-
 export default function GoalsPage() {
-  const [goals, setGoals] = useState<Goal[]>([])
-  const [history, setHistory] = useState<GoalHistory | null>(null)
   const [kind, setKind] = useState<GoalKind>('strength_sessions')
   const [target, setTarget] = useState('3')
   const [sport, setSport] = useState<GoalSport | ''>('')
-  const [error, setError] = useState<string | null>(null)
-
-  const reload = useCallback(async () => {
-    try {
-      const [list, weeks] = await Promise.all([fetchGoals(), fetchGoalHistory()])
-      setGoals(list)
-      setHistory(weeks)
-    } catch (err) {
-      setError(errorText(err))
-    }
-  }, [])
-
-  useEffect(() => {
-    let cancelled = false
-    Promise.all([fetchGoals(), fetchGoalHistory()])
-      .then(([list, weeks]) => {
-        if (!cancelled) {
-          setGoals(list)
-          setHistory(weeks)
-        }
-      })
-      .catch((err: unknown) => {
-        if (!cancelled) setError(errorText(err))
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const [actionError, setActionError] = useState<string | null>(null)
+  const loaded = useLoad(() => Promise.all([fetchGoals(), fetchGoalHistory()]))
+  const goals = loaded.data?.[0] ?? []
+  const history = loaded.data?.[1] ?? null
+  // The load error and the error of an action share the same place on screen.
+  const error = actionError ?? (loaded.error ? errorText(loaded.error) : null)
 
   async function run(action: () => Promise<unknown>) {
-    setError(null)
+    setActionError(null)
     try {
       await action()
-      await reload()
+      loaded.reload()
     } catch (err) {
-      setError(errorText(err))
+      setActionError(errorText(err))
     }
   }
 
@@ -85,7 +56,7 @@ export default function GoalsPage() {
     const value = Number(target.replace(',', '.'))
     const problem = rangeError(value, GOAL_TARGET_BOUNDS[kind], GOAL_UNITS[kind])
     if (problem) {
-      setError(problem)
+      setActionError(problem)
       return
     }
     const goal: GoalInput = { kind, target: value }

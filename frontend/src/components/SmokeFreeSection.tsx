@@ -2,16 +2,17 @@
 // the current streak, and the occasional day with a cigarette, written in a few
 // taps. Only the days WITH a cigarette are saved: every other day counts as
 // smoke-free. Vaping is not counted here.
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import {
-  ApiError,
+  errorText,
   deleteCigaretteDay,
   fetchSmoking,
   saveCigaretteDay,
   saveQuitDate,
   type Smoking,
 } from '../api/client'
+import { useLoad } from '../hooks/useLoad'
 import { CIGARETTE_BOUNDS, rangeError } from '../utils/bounds'
 import { formatNumber, formatShortDate, todayIso } from '../utils/format'
 
@@ -31,31 +32,19 @@ function monthLabel(month: string): string {
 const longDate = (isoDate: string) => `${formatShortDate(isoDate)} ${isoDate.slice(0, 4)}`
 
 export default function SmokeFreeSection() {
-  const [data, setData] = useState<Smoking | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchSmoking()
-      .then((result) => {
-        if (!cancelled) setData(result)
-      })
-      .catch(() => {
-        if (!cancelled) setError('Impossible de charger le suivi tabac.')
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const loaded = useLoad(fetchSmoking)
+  const data = loaded.data
+  const [actionError, setActionError] = useState<string | null>(null)
+  const error = actionError ?? (loaded.error ? 'Impossible de charger le suivi tabac.' : null)
 
   // Every change answers with the new counters: no second request needed.
   async function change(action: () => Promise<Smoking>): Promise<boolean> {
-    setError(null)
+    setActionError(null)
     try {
-      setData(await action())
+      loaded.replace(await action())
       return true
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Le backend ne répond pas.')
+      setActionError(errorText(err))
       return false
     }
   }

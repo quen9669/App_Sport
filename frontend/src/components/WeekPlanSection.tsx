@@ -1,29 +1,16 @@
 // "Mon plan" page: the weekly plans accepted on the coach screen (this week and
 // the next one). They are a guide: they never change the goals. Runs show their
 // steps with paces and can be sent to the Garmin watch, one by one.
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { type CoachPlan, type CurrentPlans, fetchCurrentPlans } from '../api/client'
+import { type CoachPlan, fetchCurrentPlans } from '../api/client'
+import { useLoad } from '../hooks/useLoad'
 import PlanCard from './PlanCard'
 import RunGarminActions from './RunGarminActions'
 
 export default function WeekPlanSection() {
-  const [plans, setPlans] = useState<CurrentPlans | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchCurrentPlans()
-      .then((data) => {
-        if (!cancelled) setPlans(data)
-      })
-      .catch(() => {
-        // Not essential on the home page: without plans, the section stays hidden.
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  // Not essential on the home page: without plans, the section stays hidden.
+  const { data: plans, setData: setPlans } = useLoad(fetchCurrentPlans)
 
   if (!plans) return null
   // After a send, a removal or an edit, the backend answers with the new plan.

@@ -54,12 +54,12 @@ export function shownDistance(row: { sport: SportGroup; distance_m: number | nul
 }
 
 /**
- * The colour behind a CSS variable, e.g. "--series-1" -> "#2a78d6".
+ * The colour behind a CSS variable, e.g. "--series-1" -> "#2a78d6" (a charter token).
  * Leaflet draws on a canvas, which does not understand `var(--x)`.
  */
-export function cssColor(variable: string, fallback = '#5b3fd1'): string {
-  const value = getComputedStyle(document.documentElement).getPropertyValue(variable).trim()
-  return value || fallback
+export function cssColor(variable: string): string {
+  // Empty only where there is no stylesheet (unit tests): Leaflet then uses its own default.
+  return getComputedStyle(document.documentElement).getPropertyValue(variable).trim()
 }
 
 /**

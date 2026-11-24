@@ -3,10 +3,10 @@
 // quitting cigarettes has changed in the watch's data. Read-only: the numbers
 // come from GET /api/longevity, the words from utils/longevity.ts.
 import { BadgeLigne } from '@quen9669/lignes/ui'
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { fetchLongevity, type Longevity, type LongevityIndicator } from '../api/client'
+import { useLoad } from '../hooks/useLoad'
 import { formatNumber, formatShortDate } from '../utils/format'
 import {
   COMPARISON_LABELS,
@@ -21,27 +21,12 @@ import {
 const plural = (count: number, word: string) => `${count} ${word}${count > 1 ? 's' : ''}`
 
 export default function LongevitySection() {
-  const [data, setData] = useState<Longevity | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchLongevity()
-      .then((result) => {
-        if (!cancelled) setData(result)
-      })
-      .catch(() => {
-        if (!cancelled) setError('Impossible de charger le bilan longévité.')
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const { data, error } = useLoad(fetchLongevity)
 
   if (error)
     return (
       <p className="field-error" role="alert">
-        {error}
+        Impossible de charger le bilan longévité.
       </p>
     )
   if (!data) return <p className="hint">Chargement…</p>

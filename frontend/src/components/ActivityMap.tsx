@@ -27,11 +27,13 @@ export default function ActivityMap({ polyline, place, marker }: Props) {
         <>
           <FitRoute route={route} />
           <Polyline positions={route} pathOptions={{ color, weight: 4, opacity: 0.9 }} />
-          {start && <CircleMarker center={start} radius={6} pathOptions={endStyle('#16a34a')} />}
+          {start && (
+            <CircleMarker center={start} radius={6} pathOptions={endStyle(cssColor('--success'))} />
+          )}
           <CircleMarker
             center={route.at(-1) ?? center}
             radius={6}
-            pathOptions={endStyle('#dc2626')}
+            pathOptions={endStyle(cssColor('--danger'))}
           />
         </>
       )}
@@ -46,16 +48,16 @@ export default function ActivityMap({ polyline, place, marker }: Props) {
         <CircleMarker
           center={marker}
           radius={7}
-          pathOptions={{ color: '#ffffff', weight: 3, fillColor: color, fillOpacity: 1 }}
+          pathOptions={{ color: cssColor('--card'), weight: 3, fillColor: color, fillOpacity: 1 }}
         />
       )}
     </MapContainer>
   )
 }
 
-// Start (green) and finish (red): white border so they stay visible on the route.
+// Start (green) and finish (red): a border in the card colour so they stay visible on the route.
 const endStyle = (fill: string) => ({
-  color: '#ffffff',
+  color: cssColor('--card'),
   weight: 2,
   fillColor: fill,
   fillOpacity: 1,

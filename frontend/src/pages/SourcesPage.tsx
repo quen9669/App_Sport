@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 
 import Governance from '../components/Governance'
 import {
-  ApiError,
+  errorText,
   disconnectStrava,
   fetchGarminStatus,
   fetchStravaStatus,
@@ -31,11 +31,6 @@ const STRAVA_RESULT_MESSAGES: Record<string, string> = {
 }
 
 const REFRESH_WHILE_RUNNING_MS = 4000
-
-/** Text of an error to show to the user. */
-function errorText(error: unknown): string {
-  return error instanceof ApiError ? error.message : 'Le backend ne répond pas.'
-}
 
 export default function SourcesPage() {
   const [searchParams] = useSearchParams()
