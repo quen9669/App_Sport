@@ -244,12 +244,13 @@ waits for the next 15-min window, stops the run as `partial` near the daily limi
 
 ## Interface (design pass before phase 6)
 
-- Look: the shared charter `@quen9669/lignes` (SPT-03): `polices.css`, `tokens.css` and
-  and `composants.css` imported in `main.tsx`; `<Logo app="app-sport" />` (library) in the frame
-  and on the login screen.
-  `styles/theme.css` only maps the app's names to the charter's tokens (`--accent` = `--line-ml`,
-  the ML line; main button `--action`), never a colour of its own (R-18). `--series-1..4` point at
-  charter tokens (ML line, text, muted, border; amber `--state-warn` for ◆). Map heat uses `--line-ml` (`MAP_COLOR_VAR`). Sport colours (owner's choice 2026-11-24: dark green run, light green walk, brown strength, orange ride, blue swim; `--sport-*` in `theme.css`, `sportColorVar()`) colour routes, tags and the calendar; swim is its own `SportGroup`. Installed from GitHub Packages with `frontend/.npmrc` (no secret) and
+- Look (redesign 2026-11-24, owner's request: modern, "futuristic"): own palette, all in the tokens at the top of
+  `styles/theme.css` (dark by default, light via `prefers-color-scheme`; accent = violet-to-cyan gradient `--action`,
+  glass top/bottom bars, bordered cards). Fonts bundled: `@fontsource-variable/inter` (text), `space-grotesk` (titles,
+  numbers). `@quen9669/lignes` stays for `<Logo>`, `Picto` and small badges (installed with `frontend/.npmrc` and
+  `NPM_TOKEN`: read:packages; PC: `gh auth token`; vault: `apps/app-sport/NPM_TOKEN`); theme.css overrides its tokens.
+  Sport colours (owner's choice: dark green run, light green walk, brown strength, orange ride, blue swim; `--sport-*`,
+  `sportColorVar()`) colour routes, tags and calendar. Map heat uses `--line-ml` (`MAP_COLOR_VAR`). No colour outside the tokens.
   `NPM_TOKEN` (read:packages; PC: `gh auth token`; vault: `apps/app-sport/NPM_TOKEN`).
   PWA icons in `public/icons/` are drawn from the library's `app-sport` logo (violet on `--bg`).
 - Governance (SPT-11, R-23): `components/Governance.tsx` on Sources (freshness of each sync from the journal, ● fine under 6 h,
